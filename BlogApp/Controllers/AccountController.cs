@@ -1,5 +1,5 @@
 // Jack Gerber - A01266976
-// Production AccountController with Email Confirmation (EmailJS)
+// Production AccountController with Email Confirmation (Render & Resend integrated)
 
 using BlogApp.Models;
 using Microsoft.AspNetCore.Identity;
@@ -17,17 +17,20 @@ namespace BlogApp.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IEmailSender _emailSender;
+        private readonly IConfiguration _config; // Added to access APP_BASE_URL
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             RoleManager<IdentityRole> roleManager,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IConfiguration config)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
             _emailSender = emailSender;
+            _config = config;
         }
 
         // ---------------- REGISTER (GET) ----------------
@@ -72,12 +75,9 @@ namespace BlogApp.Controllers
 
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
-            var confirmUrl = Url.Action(
-                "ConfirmEmail",
-                "Account",
-                new { userId = user.Id, token = token },
-                protocol: HttpContext.Request.Scheme
-            );
+            // ✅ Use APP_BASE_URL if available (for Render/Production)
+            var baseUrl = _config["APP_BASE_URL"] ?? $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
+            var confirmUrl = $"{baseUrl}/Account/ConfirmEmail?userId={user.Id}&token={Uri.EscapeDataString(token)}";
 
             // Load email template
             var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "email", "confirm.html");
@@ -116,11 +116,9 @@ namespace BlogApp.Controllers
             // Generate token
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
-            var confirmUrl = Url.Action(
-                "ConfirmEmail",
-                "Account",
-                new { userId = user.Id, token = token },
-                protocol: HttpContext.Request.Scheme);
+            // ✅ Use environment-aware base URL
+            var baseUrl = _config["APP_BASE_URL"] ?? $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
+            var confirmUrl = $"{baseUrl}/Account/ConfirmEmail?userId={user.Id}&token={Uri.EscapeDataString(token)}";
 
             var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "email", "confirm.html");
             var html = await System.IO.File.ReadAllTextAsync(templatePath);
@@ -312,7 +310,7 @@ namespace BlogApp.Controllers
             if (user == null)
                 return NotFound();
 
-            // Prevent removing the original admin
+            // Prevent removing the original admin (stored in Render env var)
             if (user.Email.Equals(Environment.GetEnvironmentVariable("ADMIN_EMAIL"), StringComparison.OrdinalIgnoreCase))
             {
                 TempData["Success"] = "The primary admin cannot be demoted.";
@@ -359,12 +357,9 @@ namespace BlogApp.Controllers
             // Generate reset token
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-            var resetLink = Url.Action(
-                "ResetPassword",
-                "Account",
-                new { email = user.Email, token = token },
-                protocol: HttpContext.Request.Scheme
-            );
+            // ✅ Use environment-aware base URL
+            var baseUrl = _config["APP_BASE_URL"] ?? $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
+            var resetLink = $"{baseUrl}/Account/ResetPassword?email={Uri.EscapeDataString(user.Email)}&token={Uri.EscapeDataString(token)}";
 
             // Load template
             var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "email", "resetpassword.html");
@@ -428,6 +423,5 @@ namespace BlogApp.Controllers
 
             return View();
         }
-
     }
 }

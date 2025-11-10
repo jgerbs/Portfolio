@@ -1,0 +1,96 @@
+# ===============================
+# Core .NET & Build Artifacts
+# ===============================
+bin/
+obj/
+out/
+*.exe
+*.dll
+*.log
+*.pdb
+*.tmp
+*.db-shm
+*.db-wal
+
+# ===============================
+# User-Specific Files
+# ===============================
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+.vscode/
+.idea/
+*.swp
+*.bak
+*.orig
+*.tmp
+
+# ===============================
+# Environment & Configuration
+# ===============================
+.env
+.env.*
+appsettings.Development.json
+appsettings.Local.json
+appsettings.Secret.json
+
+# IMPORTANT:
+# Keep `appsettings.json` (production-safe) if it has no secrets
+# You can uncomment the next line to exclude it entirely:
+# appsettings.json
+
+# ===============================
+# Database Files (local only)
+# ===============================
+*.db
+*.sqlite
+*.sqlite3
+
+# ===============================
+# OS / Misc
+# ===============================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===============================
+# Publish / Build Output
+# ===============================
+/publish/
+/build/
+/release/
+/debug/
+*.Publish.xml
+*.publishsettings
+
+# ===============================
+# Node / Frontend (if any scripts)
+# ===============================
+node_modules/
+package-lock.json
+npm-debug.log*
+
+# ===============================
+# Git / Backup Safety
+# ===============================
+*.zip
+*.tar
+*.gz
+*.7z
+*.bak
+*.old
+
+# ===============================
+# Backup folders (personal)
+# ===============================
+/backups/
+/BlogAppBackup*/
+/Portfolio 2025/BlogApp/old/
+/Portfolio 2025/BlogAppBackupPreArticleChanges/
+
+# ===============================
+# Temporary Development Assets
+# ===============================
+/Migrations/old/
+/wwwroot/email/test-templates/

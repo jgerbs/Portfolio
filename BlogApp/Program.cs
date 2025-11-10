@@ -14,8 +14,17 @@ var builder = WebApplication.CreateBuilder(args);
 // ------------------------------------------------------------
 // DATABASE + IDENTITY
 // ------------------------------------------------------------
+var host = builder.Configuration["DB_HOST"];
+var port = builder.Configuration["DB_PORT"];
+var database = builder.Configuration["DB_NAME"];
+var username = builder.Configuration["DB_USER"];
+var password = builder.Configuration["DB_PASSWORD"];
+
+// Build connection string dynamically
+var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(connectionString));
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {

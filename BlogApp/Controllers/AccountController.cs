@@ -283,7 +283,8 @@ namespace BlogApp.Controllers
             return RedirectToAction("ManageUsers");
         }
 
-        // --------------- GRANT ADMIN ROLE ----------------
+        // ------------------ MAKE ADMIN ------------------
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> MakeAdmin(string id)
         {
@@ -295,14 +296,21 @@ namespace BlogApp.Controllers
             if (!await _roleManager.RoleExistsAsync("Admin"))
                 await _roleManager.CreateAsync(new IdentityRole("Admin"));
 
-            // Add user to Admin role
+            // Remove "Contributor" if currently assigned
+            if (await _userManager.IsInRoleAsync(user, "Contributor"))
+                await _userManager.RemoveFromRoleAsync(user, "Contributor");
+
+            // Add "Admin"
             await _userManager.AddToRoleAsync(user, "Admin");
 
             TempData["Success"] = $"{user.Email} has been granted Admin privileges.";
             return RedirectToAction("ManageUsers");
         }
 
-        // --------------- REVOKE ADMIN ROLE ----------------
+
+
+        // ------------------ REMOVE ADMIN ------------------
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> RemoveAdmin(string id)
         {
@@ -310,16 +318,27 @@ namespace BlogApp.Controllers
             if (user == null)
                 return NotFound();
 
-            // Prevent removing the original admin (stored in Render env var)
-            if (user.Email.Equals(Environment.GetEnvironmentVariable("ADMIN_EMAIL"), StringComparison.OrdinalIgnoreCase))
+            // Prevent removing the primary admin
+            var primaryAdmin = Environment.GetEnvironmentVariable("ADMIN_EMAIL");
+            if (!string.IsNullOrEmpty(primaryAdmin) &&
+                user.Email.Equals(primaryAdmin, StringComparison.OrdinalIgnoreCase))
             {
                 TempData["Success"] = "The primary admin cannot be demoted.";
                 return RedirectToAction("ManageUsers");
             }
 
-            await _userManager.RemoveFromRoleAsync(user, "Admin");
+            // Remove "Admin" role
+            if (await _userManager.IsInRoleAsync(user, "Admin"))
+                await _userManager.RemoveFromRoleAsync(user, "Admin");
 
-            TempData["Success"] = $"{user.Email} is no longer an Admin.";
+            // Ensure "Contributor" exists and reassign it
+            if (!await _roleManager.RoleExistsAsync("Contributor"))
+                await _roleManager.CreateAsync(new IdentityRole("Contributor"));
+
+            if (!await _userManager.IsInRoleAsync(user, "Contributor"))
+                await _userManager.AddToRoleAsync(user, "Contributor");
+
+            TempData["Success"] = $"{user.Email} is no longer an Admin and has been reassigned as a Contributor.";
             return RedirectToAction("ManageUsers");
         }
 

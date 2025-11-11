@@ -31,7 +31,9 @@
         @foreach (var user in Model)
         {
             var roles = await UserManager.GetRolesAsync(user);
-            var role = roles.FirstOrDefault() ?? "User";
+            var role = roles.Contains("Admin") ? "Admin"
+                : roles.Contains("Contributor") ? "Contributor"
+                : "User";
             bool isSuspended = user.LockoutEnd.HasValue && user.LockoutEnd > DateTimeOffset.UtcNow;
             bool isOriginalAdmin = user.Email.Equals(originalAdminEmail, StringComparison.OrdinalIgnoreCase);
 

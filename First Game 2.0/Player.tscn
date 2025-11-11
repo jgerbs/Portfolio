@@ -1,0 +1,41 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://playerSpriteFrames.tres" type="SpriteFrames" id=1]
+[ext_resource path="res://Player.gd" type="Script" id=2]
+[ext_resource path="res://assets/sounds/jump1.ogg" type="AudioStream" id=3]
+[ext_resource path="res://assets/sounds/jingles_PIZZA07.ogg" type="AudioStream" id=4]
+
+[sub_resource type="CapsuleShape2D" id=1]
+radius = 25.0
+height = 15.0
+
+[node name="Player" type="KinematicBody2D"]
+script = ExtResource( 2 )
+
+[node name="Sprite" type="AnimatedSprite" parent="."]
+frames = ExtResource( 1 )
+animation = "walk"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2( -1, 15 )
+shape = SubResource( 1 )
+
+[node name="Timer" type="Timer" parent="."]
+one_shot = true
+
+[node name="SoundJump" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 3 )
+volume_db = -10.0
+pitch_scale = 1.2
+
+[node name="SoundKilled" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 4 )
+
+[node name="Wallchecker" type="RayCast2D" parent="."]
+position = Vector2( 0, 11 )
+rotation = -1.5708
+enabled = true
+cast_to = Vector2( -1.5299e-06, 35 )
+collision_mask = 3
+
+[connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]

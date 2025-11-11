@@ -101,6 +101,7 @@ public class ArticleController : Controller
 
         // Update title + content
         article.Title = updatedArticle.Title;
+        article.ShortDescription = updatedArticle.ShortDescription;
         article.ContentHtml = updatedArticle.ContentHtml;
         article.CoverImageUrl = updatedArticle.CoverImageUrl; // default (URL)
 

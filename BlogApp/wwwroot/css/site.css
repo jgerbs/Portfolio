@@ -1,232 +1,384 @@
+/* ============================================================
+   GLOBAL / BASE
+============================================================ */
 html {
   font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
   position: relative;
   min-height: 100%;
 }
-
-body {
-  margin-bottom: 60px;
+@media (min-width: 768px) {
+  html { font-size: 16px; }
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+/* Keep full-height layout so footer can stick without white gap */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #fff;
+  color: #222;
+  font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Bootstrap-style focus helpers */
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+/* Floating labels */
+.form-floating > .form-control-plaintext::placeholder,
+.form-floating > .form-control::placeholder {
   color: var(--bs-secondary-color);
   text-align: end;
 }
-
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+.form-floating > .form-control-plaintext:focus::placeholder,
+.form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
 
-/* -----------------------------------------------------------
-   ARTICLE CARD (Matches Portfolio Style) — FIXED VERSION
-------------------------------------------------------------*/
+main { flex: 1 0 auto; } /* So footer sits flush without white gap */
 
+/* ============================================================
+   TITLES
+============================================================ */
+.section-title {
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 30px;
+}
+
+/* ============================================================
+   CYBER TEAL NAVBAR THEME
+============================================================ */
+.cyber-nav {
+  background: linear-gradient(90deg, #03121a, #062633 90%);
+  border-bottom: 2px solid #1eb6d9;
+  padding: 0.75rem 1.5rem;
+}
+.cyber-nav .nav-logo {
+  height: 72px;
+  width: auto;
+}
+.cyber-nav .nav-title {
+  color: #bfefff;
+  font-weight: 700;
+  font-size: 1.6rem;
+  letter-spacing: 0.5px;
+}
+.cyber-nav .nav-link {
+  color: #c8f0ff;
+  font-weight: 500;
+  transition: color .25s ease;
+}
+.cyber-nav .nav-link:hover {
+  color: #1eb6d9;
+  text-shadow: 0 0 4px #1eb6d9;
+}
+
+/* -----------------------------------------------------------
+   NAVBAR ACTION BUTTONS
+------------------------------------------------------------ */
+.nav-btn {
+  padding: 6px 18px;
+  font-size: 0.95rem;
+  border-radius: 10px;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.nav-btn.btn-primary {
+  background-color: #1eb6d9;
+  border: none;
+  color: #fff;
+}
+.nav-btn.btn-primary:hover {
+  background-color: #0f7a99;
+  transform: translateY(-1px);
+}
+
+
+/* ============================================================
+   ARTICLE CARD (dark card variant used elsewhere)
+============================================================ */
 .article-card {
-    background: #0a0f1a;
-    border-radius: 14px;
-    padding: 22px;
-    margin-bottom: 40px;
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.08);
-    border: 1px solid rgba(0, 255, 255, 0.08);
-    transition: transform .25s ease, box-shadow .25s ease;
-    opacity: 1;                 /* ✅ FIX: always visible */
-    transform: none;            /* ✅ FIX */
-    color: #dce7f7;             /* ✅ FIX: visible text */
+  background: #0a0f1a;
+  border-radius: 14px;
+  padding: 22px;
+  margin-bottom: 40px;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.08);
+  border: 1px solid rgba(0, 255, 255, 0.08);
+  transition: transform .25s ease, box-shadow .25s ease;
+  color: #dce7f7;
 }
-
-.article-card * {
-    color: #dce7f7;             /* ✅ FIX: children visible */
-}
-
+.article-card * { color: #dce7f7; }
 .article-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 0 30px rgba(0, 255, 255, 0.15);
+  transform: translateY(-6px);
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.15);
 }
-
-/* FIXED ARTICLE IMAGE SIZE */
 .article-image {
-    width: 100%;
-    height: 340px;          /* ✅ Set fixed height */
-    object-fit: cover;      /* ✅ Crop nicely */
-    object-position: center;
-    border-radius: 10px;
-    margin-bottom: 16px;
+  width: 100%;
+  height: 340px;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 10px;
+  margin-bottom: 16px;
 }
-
-
 .article-title {
-    font-size: 28px;
-    margin-bottom: 6px;
-    color: #fff;
+  font-size: 28px;
+  margin-bottom: 6px;
+  color: #fff;
 }
-
 .article-meta {
-    font-size: 15px;
-    color: #9ab;
-    margin-bottom: 8px;
+  font-size: 15px;
+  color: #9ab;
+  margin-bottom: 8px;
 }
-
 .article-description {
-    font-size: 17px;
-    margin-bottom: 20px;
-    color: #dce7f7;
+  font-size: 17px;
+  margin-bottom: 20px;
 }
 
-/* -----------------------------------------------------------
-   NICER, BIGGER, ROUNDED ARTICLE BUTTONS
-------------------------------------------------------------*/
-
+/* ============================================================
+   ARTICLE BUTTONS (shared)
+============================================================ */
 .article-buttons {
-    display: flex;
-    justify-content: flex-end;
-    gap: 18px;                  /* more space between buttons */
-    margin-top: 15px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 18px;
+  margin-top: 15px;
 }
-
-/* base button style */
 .article-btn {
-    padding: 10px 28px;         /* ✅ bigger */
-    font-size: 17px;            /* ✅ easier to read */
-    border-radius: 12px;        /* ✅ rounded edges */
-    font-weight: 600;           /* ✅ bold text */
-    cursor: pointer;
-    border: none;
-    transition: all .25s ease;
-    text-decoration: none;
-    display: inline-block;
+  padding: 10px 28px;
+  font-size: 17px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all .25s ease;
+  text-decoration: none;
+  display: inline-block;
 }
-
-/* READ button */
-.btn-read {
-    background: #1eb6d9;
-    color: #fff;
-}
-.btn-read:hover {
-    background: #0f7a99;
-    transform: translateY(-3px);
-}
-
-/* EDIT button */
-.btn-edit {
-    background: #ffc107;
-    color: #000;
-}
-.btn-edit:hover {
-    background: #d39e00;
-    transform: translateY(-3px);
-}
-
-/* DELETE button */
-.btn-delete {
-    background: #dc3545;
-    color: #fff;
-}
-.btn-delete:hover {
-    background: #bd2130;
-    transform: translateY(-3px);
-}
-
-/* Buttons */
+/* Variants */
 .btn-read { background: #1eb6d9; color: #fff; }
-.btn-read:hover { background: #0f7a99; }
-
+.btn-read:hover { background: #0f7a99; transform: translateY(-3px); }
 .btn-edit { background: #ffc107; color: #000; }
-.btn-edit:hover { background: #d39e00; }
-
+.btn-edit:hover { background: #d39e00; transform: translateY(-3px); }
 .btn-delete { background: #dc3545; color: #fff; }
-.btn-delete:hover { background: #bd2130; }
+.btn-delete:hover { background: #bd2130; transform: translateY(-3px); }
 
-/* -----------------------------------------------------------
-   CUSTOM DARK CYBER MODAL
-------------------------------------------------------------*/
-
-.custom-modal .modal-dialog {
-    max-width: 500px;
-}
-
+/* ============================================================
+   MODALS (cyber variant)
+============================================================ */
+.custom-modal .modal-dialog { max-width: 500px; }
 .modal-theme {
-    background: #0a0f1a;
-    border-radius: 14px;
-    border: 1px solid rgba(0,255,255,0.08);
-    box-shadow: 0 0 25px rgba(0,255,255,0.1);
-    color: #dce7f7;
+  background: #0a0f1a;
+  border-radius: 14px;
+  border: 1px solid rgba(0,255,255,0.08);
+  box-shadow: 0 0 25px rgba(0,255,255,0.1);
+  color: #dce7f7;
 }
-
-/* Header */
-.modal-theme .modal-header {
-    border-bottom: 1px solid rgba(0,255,255,0.08);
-}
-
+.modal-theme .modal-header { border-bottom: 1px solid rgba(0,255,255,0.08); }
+.modal-theme .modal-footer { border-top: 1px solid rgba(0,255,255,0.08); }
 .modal-theme .modal-title {
-    font-size: 22px;
-    font-weight: 600;
-    color: #1eb6d9;
+  font-size: 22px;
+  font-weight: 600;
+  color: #1eb6d9;
 }
-
-/* Body */
 .modal-theme .modal-body {
-    font-size: 17px;
-    line-height: 1.6;
+  font-size: 17px;
+  line-height: 1.6;
 }
-
 .modal-article-title {
-    font-size: 20px;
-    color: #fff;
-    margin-top: 10px;
+  font-size: 20px;
+  color: #fff;
+  margin-top: 10px;
 }
-
-/* Footer */
-.modal-theme .modal-footer {
-    border-top: 1px solid rgba(0,255,255,0.08);
-    display: flex;
-    justify-content: flex-end;
-    gap: 14px;
-}
-
-/* Buttons */
 .modal-btn {
-    padding: 10px 24px;
-    border-radius: 10px;
-    border: none;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: .25s ease;
+  padding: 10px 24px;
+  border-radius: 10px;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .25s ease;
+}
+.modal-cancel { background: #6c757d; color: #fff; }
+.modal-cancel:hover { background: #545b62; }
+.modal-delete { background: #dc3545; color: #fff; }
+.modal-delete:hover { background: #bd2130; }
+.btn-close-white { filter: invert(1); }
+
+/* ============================================================
+   FEATURED ARTICLES (top grid of 3)
+============================================================ */
+.featured-article-card {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.featured-article-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+.featured-img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-bottom: 1px solid #eee;
+}
+.featured-content { padding: 16px 18px 18px 18px; }
+.featured-meta {
+  font-size: 0.9rem;
+  color: #777;
+  margin-bottom: 6px;
+}
+.separator { margin: 0 6px; color: #aaa; }
+.featured-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.featured-title a { color: #111; text-decoration: none; }
+.featured-title a:hover { color: #0073e6; }
+.featured-desc {
+  color: #444;
+  font-size: 0.96rem;
+  line-height: 1.55;
+  margin-bottom: 10px;
+  min-height: 50px;
 }
 
-/* Cancel */
-.modal-cancel {
-    background: #6c757d;
-    color: white;
+/* ============================================================
+   LOWER ARTICLE LIST (horizontal rows)
+============================================================ */
+/* Section container (lighter divider for white theme) */
+.older-articles {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  border-top: 2px solid #eee;
+  padding-top: 28px;
 }
-.modal-cancel:hover {
-    background: #545b62;
-}
-
-/* Delete */
-.modal-delete {
-    background: #dc3545;
-    color: white;
-}
-.modal-delete:hover {
-    background: #bd2130;
-}
-
-/* Close button white */
-.btn-close-white {
-    filter: invert(1);
+/* Single row layout: left (title/auth), middle (desc), right (image) */
+.older-article-flex {
+  display: grid;
+  grid-template-columns: 2fr 3fr 1.2fr; /* left | middle | right */
+  align-items: start;
+  gap: 24px;
+  padding: 22px 0;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.08);
 }
 
+/* Left column */
+.older-left { display: flex; flex-direction: column; }
+.title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.older-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.older-title a { color: #111; text-decoration: none; }
+.older-title a:hover { color: #0073e6; text-decoration: underline; }
+.article-meta {
+  font-size: 0.9rem;
+  color: #777;
+  margin-bottom: 5px;
+}
+
+/* Middle column */
+.older-middle { display: flex; align-items: center; }
+.article-desc {
+  font-size: 0.96rem;
+  color: #444;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Right column */
+.older-right { text-align: right; }
+.older-thumb {
+  width: 100%;
+  max-width: 180px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* ============================================================
+   SMALL ADMIN ICON BUTTONS (used in multiple sections)
+============================================================ */
+.admin-btns {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  margin-top: 5px;
+}
+.edit-btn,
+.delete-btn {
+  border: none;
+  background: none;
+  font-size: 1.1rem;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+.edit-btn:hover { color: #0073e6; transform: scale(1.1); }
+.delete-btn:hover { color: #dc3545; transform: scale(1.1); }
+
+/* Modal rounding used elsewhere */
+.modal-content { border-radius: 10px; }
+
+/* ============================================================
+   FOOTER (matches navbar theme) + no white gap
+============================================================ */
+.footer {
+  background: linear-gradient(90deg, #03121a, #062633 90%);
+  color: #bfefff;
+  border-top: 2px solid #1eb6d9;
+  font-size: 0.95rem;
+  padding: 1.2rem 0;
+  margin-top: auto; /* keep pinned to bottom */
+  text-align: center;
+}
+.footer-icons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 22px;
+  margin-bottom: 12px;
+}
+.footer-icons a img {
+  width: 28px;
+  height: 28px;
+  opacity: 0.8;
+  transition: opacity 0.3s ease, transform 0.2s ease;
+  filter: invert(73%) sepia(8%) saturate(940%) hue-rotate(167deg) brightness(105%) contrast(93%);
+}
+.footer-icons a img:hover {
+  opacity: 1;
+  transform: scale(1.15);
+  filter: invert(63%) sepia(80%) saturate(748%) hue-rotate(163deg) brightness(104%) contrast(97%);
+}
+.footer p {
+  margin: 0;
+  color: #aee7ff;
+  letter-spacing: 0.3px;
+}

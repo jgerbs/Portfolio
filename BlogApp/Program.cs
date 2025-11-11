@@ -14,11 +14,23 @@ var builder = WebApplication.CreateBuilder(args);
 // ------------------------------------------------------------
 // DATABASE + IDENTITY
 // ------------------------------------------------------------
-var host = builder.Configuration["DB_HOST"];
-var port = builder.Configuration["DB_PORT"];
-var database = builder.Configuration["DB_NAME"];
-var username = builder.Configuration["DB_USER"];
-var password = builder.Configuration["DB_PASSWORD"];
+
+// Try to read environment variables (Render)
+var host = Environment.GetEnvironmentVariable("DB_HOST");
+var port = Environment.GetEnvironmentVariable("DB_PORT");
+var database = Environment.GetEnvironmentVariable("DB_NAME");
+var username = Environment.GetEnvironmentVariable("DB_USER");
+var password = Environment.GetEnvironmentVariable("DB_PASSWORD");
+
+// If null, fall back to local appsettings.Development.json
+if (string.IsNullOrWhiteSpace(host))
+{
+    host = builder.Configuration["Database:Host"] ?? "localhost";
+    port = builder.Configuration["Database:Port"] ?? "5432";
+    database = builder.Configuration["Database:Name"] ?? "blogappdb";
+    username = builder.Configuration["Database:User"] ?? "postgres";
+    password = builder.Configuration["Database:Password"] ?? "Kilimanjar0!";
+}
 
 // Build connection string dynamically
 var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
@@ -35,27 +47,22 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
-
 // ------------------------------------------------------------
 // CONFIGURE PASSWORD DEFAULTS
 // ------------------------------------------------------------
 builder.Services.Configure<IdentityOptions>(options =>
 {
-    // GLOBAL PASSWORD RULES
     options.Password.RequiredLength = 8;
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
     options.Password.RequireUppercase = true;
-    options.Password.RequireNonAlphanumeric = true; // special char
+    options.Password.RequireNonAlphanumeric = true;
 });
 
 // ------------------------------------------------------------
-// EMAILJS EMAIL SENDER 
+// EMAILJS EMAIL SENDER
 // ------------------------------------------------------------
-
-// Register HttpClient + Email sender
 builder.Services.AddTransient<IEmailSender, EmailSender>();
-
 
 // ------------------------------------------------------------
 // MVC
@@ -67,8 +74,13 @@ var app = builder.Build();
 // ------------------------------------------------------------
 // MIGRATIONS + SEED ADMIN + SEED ROLES
 // ------------------------------------------------------------
-var adminEmail = builder.Configuration["ADMIN_EMAIL"] ?? "admin@example.com";
-var adminPassword = builder.Configuration["ADMIN_PASSWORD"] ?? "ChangeThis123!";
+var adminEmail = Environment.GetEnvironmentVariable("ADMIN_EMAIL")
+                 ?? builder.Configuration["AppSettings:AdminEmail"]
+                 ?? "admin@example.com";
+
+var adminPassword = Environment.GetEnvironmentVariable("ADMIN_PASSWORD")
+                    ?? builder.Configuration["AppSettings:AdminPassword"]
+                    ?? "ChangeThis123!";
 
 using (var scope = app.Services.CreateScope())
 {
@@ -79,13 +91,11 @@ using (var scope = app.Services.CreateScope())
 
     await context.Database.MigrateAsync();
 
-    // Ensure roles
     if (!await roleManager.RoleExistsAsync("Admin"))
         await roleManager.CreateAsync(new IdentityRole("Admin"));
     if (!await roleManager.RoleExistsAsync("Contributor"))
         await roleManager.CreateAsync(new IdentityRole("Contributor"));
 
-    // Seed main admin
     var admin = await userManager.FindByEmailAsync(adminEmail);
     if (admin == null)
     {
@@ -104,7 +114,6 @@ using (var scope = app.Services.CreateScope())
             await userManager.AddToRoleAsync(admin, "Admin");
     }
 }
-
 
 // ------------------------------------------------------------
 // MIDDLEWARE
@@ -126,7 +135,6 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// ROUTING
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

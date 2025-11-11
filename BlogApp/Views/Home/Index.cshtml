@@ -10,7 +10,9 @@
 @{
     var user = Model?.Item1;
     var articles = Model?.Item2 ?? new List<Article>();
-    ViewData["Title"] = user != null ? $"Welcome, {user.FirstName}!" : "Home Page";
+    ViewData["Title"] = user != null
+    ? $"Welcome, {char.ToUpper(user.FirstName[0])}{user.FirstName.Substring(1).ToLower()}!"
+    : "Home Page";
 }
 
 <div class="d-flex justify-content-between align-items-center">
@@ -19,17 +21,6 @@
     <div class="d-flex justify-content-end align-items-center">
         <!-- Filter Button -->
         <button class="btn btn-secondary me-3" data-bs-toggle="modal" data-bs-target="#filterModal">Filter</button>
-
-        @if (User.Identity.IsAuthenticated)
-        {
-            var currentUser = await UserManager.GetUserAsync(User);
-            var userRoles = await UserManager.GetRolesAsync(currentUser);
-
-            if (userRoles.Contains("Contributor") || userRoles.Contains("Admin"))
-            {
-                <a href="@Url.Action("Create", "Article")" class="btn btn-primary">Create New Article</a>
-            }
-        }
     </div>
 </div>
 
@@ -61,115 +52,158 @@
     </div>
 </div>
 
-<div>
-    <p>Here's the latest news:</p>
+<div class="articles-section">
+    <h2 class="section-title">Latest Articles</h2>
 
     @if (articles.Any())
     {
-        @foreach (var article in articles.OrderByDescending(a => a.DatePosted))
-        {
-            var contributor = await UserManager.FindByNameAsync(article.ContributorUsername);
-
-            bool isOwner = User.Identity.IsAuthenticated &&
-                        article.ContributorUsername == User.Identity.Name;
-
-            bool isAdmin = User.IsInRole("Admin");
-
-        <div class="article-card fade-in">
-
-            <!-- Article Cover Image -->
-            @if (!string.IsNullOrEmpty(article.CoverImageUrl))
+        <!-- Featured Top 3 -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+            @foreach (var article in articles.OrderByDescending(a => a.DatePosted).Take(3))
             {
-                <img class="article-image" src="@article.CoverImageUrl" alt="@article.Title">
-            }
+                var contributor = await UserManager.FindByNameAsync(article.ContributorUsername);
+                bool isOwner = User.Identity.IsAuthenticated && article.ContributorUsername == User.Identity.Name;
+                bool isAdmin = User.IsInRole("Admin");
 
-            <!-- Content Area -->
-            <div class="article-info">
-
-                <h2 class="article-title">@article.Title</h2>
-
-                <p class="article-meta">
-                    <strong>@contributor?.FirstName @contributor?.LastName</strong> — 
-                    @article.DatePosted.ToLocalTime().ToString("MMMM dd, yyyy")
-                </p>
-
-                <p class="article-description">
-                    @article.ShortDescription
-                </p>
-
-                <!-- Buttons (aligned right) -->
-                <div class="article-buttons">
-
-                    <!-- READ is visible to everyone -->
-                    <a class="article-btn btn-read"
-                    asp-controller="Article"
-                    asp-action="Details"
-                    asp-route-id="@article.ArticleId">
-                    Read
-                    </a>
-
-                    @* Only show Edit if user is authenticated AND either Admin or article owner *@
-                    @if (User.Identity.IsAuthenticated && (isAdmin || isOwner))
-                    {
-                        <a class="article-btn btn-edit"
-                        asp-controller="Article"
-                        asp-action="Edit"
-                        asp-route-id="@article.ArticleId">
-                        Edit
+                <div class="col">
+                    <div class="featured-article-card">
+                        <!-- IMAGE -->
+                        <a asp-controller="Article" asp-action="Details" asp-route-id="@article.ArticleId" class="featured-img-link">
+                            <img src="@(string.IsNullOrEmpty(article.CoverImageUrl) ? "/images/placeholder.jpg" : article.CoverImageUrl)"
+                                alt="@article.Title" class="featured-img" />
                         </a>
-                    }
 
-                    @* Only show Delete if user is Admin or article owner*@
-                    @if (User.Identity.IsAuthenticated && (isAdmin || isOwner))
-                    {
-                        <button class="article-btn btn-delete"
-                                data-bs-toggle="modal"
-                                data-bs-target="#deleteModal-@article.ArticleId">
-                            Delete
-                        </button>
-                    }
-                </div>
+                        <!-- CONTENT -->
+                        <div class="featured-content">
+                            <!-- DATE + AUTHOR -->
+                            <p class="featured-meta">
+                                @article.DatePosted.ToLocalTime().ToString("MMMM dd, yyyy")
+                                <span class="separator">·</span>
+                                <span>@contributor?.FirstName @contributor?.LastName</span>
+                            </p>
 
-            </div>
+                            <!-- TITLE -->
+                            <h3 class="featured-title">
+                                <a asp-controller="Article" asp-action="Details" asp-route-id="@article.ArticleId">@article.Title</a>
+                            </h3>
 
-        </div>
+                            <!-- SHORT DESCRIPTION -->
+                            @if (!string.IsNullOrEmpty(article.ShortDescription))
+                            {
+                                <p class="featured-desc">@article.ShortDescription</p>
+                            }
 
-        <!-- DELETE MODAL -->
-        @if (isOwner || isAdmin)
-        {
-            <div class="modal fade custom-modal" id="deleteModal-@article.ArticleId" tabindex="-1">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content modal-theme">
-
-                        <div class="modal-header">
-                            <h5 class="modal-title">Confirm Delete</h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            <!-- ACTION BUTTONS -->
+                            @if (User.Identity.IsAuthenticated && (isAdmin || isOwner))
+                            {
+                                <div class="admin-btns">
+                                    <a asp-controller="Article" asp-action="Edit" asp-route-id="@article.ArticleId" class="edit-btn" title="Edit">✎</a>
+                                    <button type="button"
+                                            class="delete-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteModal-@article.ArticleId"
+                                            title="Delete">🗑</button>
+                                </div>
+                            }
                         </div>
-
-                        <div class="modal-body">
-                            <p>Are you sure you want to delete:</p>
-                            <h4 class="modal-article-title">@article.Title</h4>
-                            <p>This action cannot be undone.</p>
-                        </div>
-
-                        <div class="modal-footer">
-                            <button class="modal-btn modal-cancel" data-bs-dismiss="modal">Cancel</button>
-
-                            <form asp-controller="Article"
-                                asp-action="DeleteConfirmed"
-                                asp-route-id="@article.ArticleId"
-                                method="post">
-                                <button type="submit" class="modal-btn modal-delete">
-                                    Yes, Delete
-                                </button>
-                            </form>
-
-                        </div>
-
                     </div>
                 </div>
-            </div>
-        }
+            }
+        </div>
+
+        <!-- Older Articles -->
+        <div class="older-articles">
+            @foreach (var article in articles.OrderByDescending(a => a.DatePosted).Skip(3))
+            {
+                var contributor = await UserManager.FindByNameAsync(article.ContributorUsername);
+                bool isOwner = User.Identity.IsAuthenticated && article.ContributorUsername == User.Identity.Name;
+                bool isAdmin = User.IsInRole("Admin");
+
+                <div class="older-article-flex">
+                    <!-- LEFT: DATE, AUTHOR, TITLE, ACTIONS -->
+                    <div class="older-left">
+                        <p class="article-meta">
+                            @article.DatePosted.ToLocalTime().ToString("MMMM dd, yyyy")
+                            <span class="separator">·</span>
+                            <span>@contributor?.FirstName @contributor?.LastName</span>
+                        </p>
+
+                        <div class="title-row">
+                            <h4 class="older-title">
+                                <a asp-controller="Article" asp-action="Details" asp-route-id="@article.ArticleId">
+                                    @article.Title
+                                </a>
+                            </h4>
+
+                            @if (User.Identity.IsAuthenticated && (isAdmin || isOwner))
+                            {
+                                <div class="admin-btns">
+                                    <a asp-controller="Article" asp-action="Edit"
+                                    asp-route-id="@article.ArticleId"
+                                    class="edit-btn" title="Edit">✎</a>
+                                    <button type="button"
+                                            class="delete-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteModal-@article.ArticleId"
+                                            title="Delete">🗑</button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- MIDDLE: SHORT DESCRIPTION -->
+                    <div class="older-middle">
+                        @if (!string.IsNullOrEmpty(article.ShortDescription))
+                        {
+                            <p class="article-desc">@article.ShortDescription</p>
+                        }
+                    </div>
+
+                    <!-- RIGHT: IMAGE -->
+                    <div class="older-right">
+                        <a asp-controller="Article" asp-action="Details" asp-route-id="@article.ArticleId">
+                            <img src="@(string.IsNullOrEmpty(article.CoverImageUrl) ? "/images/placeholder-thumb.jpg" : article.CoverImageUrl)"
+                                alt="@article.Title"
+                                class="older-thumb" />
+                        </a>
+                    </div>
+                </div>
+
+            }
+        </div>
+
+        @* ===  Delete Modals for all articles === *@
+        @foreach (var a in articles.OrderByDescending(x => x.DatePosted))
+        {
+            var isOwner = User.Identity.IsAuthenticated && a.ContributorUsername == User.Identity.Name;
+            var isAdmin = User.IsInRole("Admin");
+
+            if (User.Identity.IsAuthenticated && (isAdmin || isOwner))
+            {
+                <div class="modal fade" id="deleteModal-@a.ArticleId" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Confirm Delete</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Are you sure you want to delete <strong>@a.Title</strong>?</p>
+                                <p class="text-muted mb-0">This action cannot be undone.</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <form asp-controller="Article"
+                                    asp-action="DeleteConfirmed"
+                                    asp-route-id="@a.ArticleId"
+                                    method="post">
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
         }
 
     }
@@ -178,3 +212,4 @@
         <p>No articles available.</p>
     }
 </div>
+

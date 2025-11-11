@@ -36,7 +36,7 @@ public class ArticleController : Controller
         // Pre-populate a new Article model with the logged-in user's username
         var article = new Article
         {
-            ContributorUsername = user.UserName,
+            ContributorUsername = user.UserName ?? "Unknown User",
         };
 
         return View(article); // Return the view with the new article model
@@ -80,7 +80,7 @@ public class ArticleController : Controller
         var article = await _context.Articles.FindAsync(id);
         if (article == null) return NotFound(); // Return NotFound if article not found
 
-        if (!User.IsInRole("Admin") && article.ContributorUsername != User.Identity.Name)
+        if (!User.IsInRole("Admin") && article.ContributorUsername != User.Identity?.Name)
         {
             return Forbid(); // Contributors can only edit their own articles
         }
@@ -141,7 +141,7 @@ public class ArticleController : Controller
         var article = await _context.Articles.FindAsync(id);
         if (article == null) return NotFound(); // Return NotFound if article doesn't exist
 
-        if (!User.IsInRole("Admin") && article.ContributorUsername != User.Identity.Name)
+        if (!User.IsInRole("Admin") && article.ContributorUsername != User.Identity?.Name)
         {
             return Forbid(); // Restrict deletion to the owner or an admin
         }
@@ -184,5 +184,11 @@ public class ArticleController : Controller
     private bool ArticleExists(int id)
     {
         return _context.Articles.Any(e => e.ArticleId == id);
+    }
+
+    private IActionResult ErrorView(string message)
+    {
+        ViewBag.ErrorMessage = message;
+        return View("~/Views/Shared/Error.cshtml");
     }
 }

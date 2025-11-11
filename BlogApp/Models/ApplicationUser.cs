@@ -10,10 +10,10 @@ public class ApplicationUser : IdentityUser
 {
 
         [Required]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = string.Empty;
 
         [Required]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = string.Empty;
 
         public bool IsApproved { get; set; } = false; // Admin approval flag
         

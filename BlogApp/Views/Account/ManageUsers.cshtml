@@ -30,19 +30,25 @@
     <tbody>
         @foreach (var user in Model)
         {
+            if (user == null)
+            {
+                continue; // skip null entries just in case
+            }
+
             var roles = await UserManager.GetRolesAsync(user);
             var role = roles.Contains("Admin") ? "Admin"
                 : roles.Contains("Contributor") ? "Contributor"
                 : "User";
+
             bool isSuspended = user.LockoutEnd.HasValue && user.LockoutEnd > DateTimeOffset.UtcNow;
-            bool isOriginalAdmin = user.Email.Equals(originalAdminEmail, StringComparison.OrdinalIgnoreCase);
+            bool isOriginalAdmin = string.Equals(user?.Email, originalAdminEmail, StringComparison.OrdinalIgnoreCase);
 
             <tr>
-                <td>@user.FirstName @user.LastName</td>
-                <td>@user.Email</td>
+                <td>@(user?.FirstName ?? "Unknown") @(user?.LastName ?? "User")</td>
+                <td>@(user?.Email ?? "unknown@email.com")</td>
 
                 <td>
-                    @if (user.EmailConfirmed)
+                    @if (user?.EmailConfirmed == true)
                     {
                         <span class="badge bg-success">Yes</span>
                     }
@@ -72,14 +78,14 @@
                         if (!isSuspended)
                         {
                             <form method="post" asp-action="SuspendUser" class="d-inline">
-                                <input type="hidden" name="id" value="@user.Id" />
+                                <input type="hidden" name="id" value="@(user?.Id ?? string.Empty)" />
                                 <button class="btn btn-warning btn-sm">Suspend</button>
                             </form>
                         }
                         else
                         {
                             <form method="post" asp-action="UnsuspendUser" class="d-inline">
-                                <input type="hidden" name="id" value="@user.Id" />
+                                <input type="hidden" name="id" value="@(user?.Id ?? string.Empty)" />
                                 <button class="btn btn-success btn-sm">Unsuspend</button>
                             </form>
                         }
@@ -88,14 +94,14 @@
                         @if (role != "Admin")
                         {
                             <form method="post" asp-action="MakeAdmin" class="d-inline">
-                                <input type="hidden" name="id" value="@user.Id" />
+                                <input type="hidden" name="id" value="@(user?.Id ?? string.Empty)" />
                                 <button class="btn btn-info btn-sm">Make Admin</button>
                             </form>
                         }
                         else
                         {
                             <form method="post" asp-action="RemoveAdmin" class="d-inline">
-                                <input type="hidden" name="id" value="@user.Id" />
+                                <input type="hidden" name="id" value="@(user?.Id ?? string.Empty)" />
                                 <button class="btn btn-secondary btn-sm">Remove Admin</button>
                             </form>
                         }
@@ -103,7 +109,7 @@
                         @* Delete user *@
                         <form method="post" asp-action="DeleteUser" class="d-inline"
                               onsubmit="return confirm('Are you sure you want to permanently delete this user? This cannot be undone.');">
-                            <input type="hidden" name="id" value="@user.Id" />
+                            <input type="hidden" name="id" value="@(user?.Id ?? string.Empty)" />
                             <button class="btn btn-danger btn-sm">Delete</button>
                         </form>
                     }

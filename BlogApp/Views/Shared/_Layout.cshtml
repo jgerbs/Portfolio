@@ -9,7 +9,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Jack's Blog</title>
+    <title>@(ViewData["Title"] ?? "Jack's Blog") - Jack's Blog</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/BlogApp.styles.css" asp-append-version="true" />
@@ -38,25 +38,28 @@
                 <!-- LINKS + CREATE BUTTON -->
                 <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                     <ul class="navbar-nav align-items-center">
-                        @if (User.Identity.IsAuthenticated)
+                        @if (User?.Identity?.IsAuthenticated == true)
                         {
                             var currentUser = await UserManager.GetUserAsync(User);
-                            var userRoles = await UserManager.GetRolesAsync(currentUser);
-
-                            if (userRoles.Contains("Contributor") || userRoles.Contains("Admin"))
+                            if (currentUser != null)
                             {
-                                <li class="nav-item me-3">
-                                    <a href="@Url.Action("Create", "Article")" class="btn btn-primary nav-btn">
-                                        Create Article
-                                    </a>
-                                </li>
+                                var userRoles = await UserManager.GetRolesAsync(currentUser);
+
+                                if (userRoles?.Contains("Contributor") == true || userRoles?.Contains("Admin") == true)
+                                {
+                                    <li class="nav-item me-3">
+                                        <a href="@Url.Action("Create", "Article")" class="btn btn-primary nav-btn">
+                                            Create Article
+                                        </a>
+                                    </li>
+                                }
                             }
                         }
 
                         <!-- Auth Links -->
-                        @if (User.Identity.IsAuthenticated)
+                        @if (User?.Identity?.IsAuthenticated == true)
                         {
-                            @if (ViewBag.IsAdmin != null && (bool)ViewBag.IsAdmin)
+                            @if (ViewBag.IsAdmin != null && (ViewBag.IsAdmin is bool && (bool)ViewBag.IsAdmin))
                             {
                                 <li class="nav-item">
                                     <a class="nav-link" href="@Url.Action("ManageUsers", "Account")">Manage Accounts</a>
@@ -80,7 +83,6 @@
                 </div>
             </div>
         </nav>
-
     </header>
 
     <div class="container mt-4">
@@ -104,6 +106,7 @@
 
         <p>&copy; @DateTime.Now.Year Jack Gerber — All Rights Reserved</p>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

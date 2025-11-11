@@ -11,19 +11,30 @@ namespace BlogApp.Services;
 public class EmailSender : IEmailSender
 {
     private readonly IResend _resend;
-    private readonly string _fromEmail;
+    private readonly string _fromEmail = string.Empty;
 
     public EmailSender(IConfiguration config)
     {
         var apiKey = config["Resend:ApiKey"];
-        _fromEmail = config["Resend:FromEmail"];
+        _fromEmail = config["Resend:FromEmail"] ?? string.Empty;
 
-        // new static factory pattern
-        _resend = ResendClient.Create(apiKey);
+        if (string.IsNullOrWhiteSpace(apiKey))
+        {
+            throw new InvalidOperationException("Resend API key is not configured. Please set Resend:ApiKey in appsettings or environment variables.");
+        }
+
+        // Static factory pattern with guaranteed non-null token
+        _resend = ResendClient.Create(apiKey!);
     }
 
     public async Task SendEmailAsync(string email, string subject, string htmlMessage)
     {
+        if (string.IsNullOrWhiteSpace(email))
+            throw new ArgumentException("Recipient email cannot be empty.", nameof(email));
+
+        if (string.IsNullOrWhiteSpace(_fromEmail))
+            throw new InvalidOperationException("Sender email (_fromEmail) is not configured.");
+
         var message = new EmailMessage
         {
             From = _fromEmail,

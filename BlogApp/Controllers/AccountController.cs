@@ -116,13 +116,16 @@ namespace BlogApp.Controllers
             // Generate token
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
-            // ✅ Use environment-aware base URL
+            // Use environment-aware base URL
             var baseUrl = _config["APP_BASE_URL"] ?? $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
             var confirmUrl = $"{baseUrl}/Account/ConfirmEmail?userId={user.Id}&token={Uri.EscapeDataString(token)}";
 
             var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "email", "confirm.html");
             var html = await System.IO.File.ReadAllTextAsync(templatePath);
             html = html.Replace("{{confirm_link}}", confirmUrl);
+
+            if (user?.Email == null)
+                return ErrorView("Email address is missing. Please try again.");
 
             await _emailSender.SendEmailAsync(user.Email, "Confirm your BlogApp account", html);
 
@@ -197,6 +200,9 @@ namespace BlogApp.Controllers
                 return View(model);
             }
 
+            if (string.IsNullOrEmpty(user?.UserName))
+                return ErrorView("User account information is missing.");
+    
             var result = await _signInManager.PasswordSignInAsync(
                 user.UserName,
                 model.Password,
@@ -315,8 +321,8 @@ namespace BlogApp.Controllers
         public async Task<IActionResult> RemoveAdmin(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
-            if (user == null)
-                return NotFound();
+            if (string.IsNullOrEmpty(user?.Email))
+                return ErrorView("Unable to reset password. Email not found.");
 
             // Prevent removing the primary admin
             var primaryAdmin = Environment.GetEnvironmentVariable("ADMIN_EMAIL");
@@ -376,15 +382,22 @@ namespace BlogApp.Controllers
             // Generate reset token
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-            // ✅ Use environment-aware base URL
+            // Handle missing token or email safely
+            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(user?.Email))
+                return ErrorView("Password reset token or email is missing. Please try again.");
+
+            // Use environment-aware base URL
             var baseUrl = _config["APP_BASE_URL"] ?? $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
-            var resetLink = $"{baseUrl}/Account/ResetPassword?email={Uri.EscapeDataString(user.Email)}&token={Uri.EscapeDataString(token)}";
+            var resetLink = $"{baseUrl}/Account/ResetPassword?email={Uri.EscapeDataString(user.Email ?? string.Empty)}&token={Uri.EscapeDataString(token ?? string.Empty)}";
 
             // Load template
             var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "email", "resetpassword.html");
             var html = await System.IO.File.ReadAllTextAsync(path);
             html = html.Replace("{{reset_link}}", resetLink);
 
+            if (string.IsNullOrEmpty(user?.Email))
+                return ErrorView("Unable to send the reset email because the user’s email address is missing.");
+    
             await _emailSender.SendEmailAsync(
                 user.Email,
                 "Reset your password",
@@ -442,5 +455,12 @@ namespace BlogApp.Controllers
 
             return View();
         }
+
+        private IActionResult ErrorView(string message)
+        {
+            ViewBag.ErrorMessage = message;
+            return View("~/Views/Shared/Error.cshtml");
+        }
+
     }
 }

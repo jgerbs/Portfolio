@@ -25,9 +25,16 @@ public class HomeController : Controller
     // GET action to display the index page with filtered articles based on date range
     public async Task<IActionResult> Index(DateTime? startDate, DateTime? endDate)
     {
-        // Get the current logged-in user, if authenticated
-        var user = User.Identity.IsAuthenticated ? await _userManager.GetUserAsync(User) : null;
+        if (_userManager == null || _context == null)
+            return ErrorView("Internal system error: dependencies not loaded properly.");
 
+        // Get the current logged-in user, if authenticated
+        ApplicationUser? user = null;
+        if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+            user = await _userManager.GetUserAsync(User);
+        }
+        
         // Check if the user is an Admin
         bool isAdmin = user != null && await _userManager.IsInRoleAsync(user, "Admin");
 
@@ -55,9 +62,15 @@ public class HomeController : Controller
         var articles = await articlesQuery.OrderByDescending(a => a.DatePosted).ToListAsync();
 
         // Create a model with the user and the list of articles
-        var model = new Tuple<ApplicationUser, List<Article>>(user, articles);
+        var model = new Tuple<ApplicationUser?, List<Article>>(user, articles);
 
         return View(model); // Return the view with the model
+    }
+
+    private IActionResult ErrorView(string message)
+    {
+        ViewBag.ErrorMessage = message;
+        return View("~/Views/Shared/Error.cshtml");
     }
 }
 

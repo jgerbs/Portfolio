@@ -103,7 +103,7 @@ public class ArticleController : Controller
         article.Title = updatedArticle.Title;
         article.ShortDescription = updatedArticle.ShortDescription;
         article.ContentHtml = updatedArticle.ContentHtml;
-        article.CoverImageUrl = updatedArticle.CoverImageUrl; // default (URL)
+        article.CoverImageUrl = updatedArticle.CoverImageUrl;
 
         // Handle file upload (if provided)
         if (ImageFile != null)

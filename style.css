@@ -471,9 +471,9 @@ main {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* =====================================================
+/* /* =====================================================
    SKILLS
-   ===================================================== */
+   ===================================================== 
 .skills-bars {
   max-width: 800px;
   margin: 2rem auto;
@@ -529,7 +529,74 @@ main {
 @keyframes fillAnimation {
   from { width: 0; }
   to { width: var(--target-width); }
+} */
+
+/* ===========================
+   SKILLS GRID (Cyber Theme)
+   =========================== */
+.skills-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  margin-top: 2rem;
 }
+
+.skill-group h3 {
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.skills-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.skill-item {
+  background: rgba(12, 16, 20, 0.9);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.25s ease;
+}
+
+.skill-item img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  border-radius: 4px;
+  transition: all 0.25s ease;
+  filter: none; /* show color logos normally */
+  background: transparent;
+}
+
+.skill-item:hover img {
+  transform: scale(1.08);
+  filter: drop-shadow(0 0 8px var(--accent));
+}
+
+
+.skill-item:hover img {
+  filter: drop-shadow(0 0 6px var(--accent)) brightness(1.2);
+}
+
+@media (max-width: 768px) {
+  .skills-grid {
+    justify-content: center;
+  }
+  .skill-item {
+    font-size: 0.9rem;
+  }
+}
+
 
 /* =====================================================
    FOOTER

@@ -130,6 +130,7 @@ a:hover {
 /* =====================================================
    NAVIGATION BAR
    ===================================================== */
+
 .top-nav {
   position: sticky;
   top: 0;
@@ -173,25 +174,55 @@ a:hover {
   text-decoration-color: var(--accent);
 }
 
+/* === NEW TOP ARROW BUTTON === */
+/* === FINAL TOP ARROW BUTTON (MATCHES FOOTER ICON GLOW EXACTLY) === */
+
 .top-button {
   position: absolute;
   right: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 38px;
+  height: 38px;
+
+  background: rgba(12, 16, 20, 0.95); /* dark panel, no glow */
+  border-radius: 10px;
+
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.4s ease;
-  color: var(--accent);
-  text-decoration: none;
-  font-weight: bold;
-  letter-spacing: 1px;
-  border: 1px solid var(--accent);
-  border-radius: 20px;
-  padding: 6px 14px;
-  background: rgba(10, 30, 36, 0.7);
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+
+  transition:
+    opacity 0.35s ease,
+    transform 0.25s ease,
+    background 0.25s ease;
 }
 
-.top-button.show { opacity: 1; pointer-events: auto; }
-.top-nav .top-button { margin-left: auto; }
+.top-button.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.top-button:hover {
+  background: rgba(12, 16, 20, 1); /* subtle emphasis only */
+  transform: translateY(-2px);
+}
+
+/* ICON (SVG) CLEAN + GLOW ON HOVER */
+.top-button img.top-arrow-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  filter: invert(90%) brightness(1.2); /* makes the SVG white like footer */
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.top-button:hover img.top-arrow-icon {
+  transform: translateY(-1px) scale(1.1);
+  filter: drop-shadow(0 0 6px var(--accent))
+          invert(90%) sepia(30%) saturate(300%) hue-rotate(150deg);
+}
 
 /* =====================================================
    MAIN CONTENT LAYOUT

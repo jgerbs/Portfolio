@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Dictionary PIN Attack</title>
+    <link rel="stylesheet" href="../../style.css" />
+</head>
+
+<body>
+    <!-- HEADER -->
+    <header class="cs-nav">
+        <div class="cs-left">
+            <a href="../../index.html" class="cs-home-btn">
+                <img src="../../../images/home.svg" alt="Home" class="cs-home-icon">
+            </a>
+        </div>
+
+        <div class="cs-center">
+            <h1>Dictionary PIN Demonstration</h1>
+        </div>
+
+        <div class="cs-right">
+            <div id="indicator" class="record-light"></div>
+            <span id="indicator-label" class="led-text">Idle</span>
+        </div>
+    </header>
+
+    <main class="split">
+
+        <!-- LEFT PANEL -->
+        <section class="panel left">
+            <h2>Dictionary Attack (Common PINs)</h2>
+            <p class="muted">
+                Most people choose predictable PINs. A dictionary attack checks a list of the
+                <strong>most commonly used 4-digit PINs</strong> before doing any brute-force work.
+                This is <strong>dramatically faster</strong> for real-world attacks.
+            </p>
+
+            <h3>Choose a PIN</h3>
+            <p class="muted">
+                You can enter your real PIN if you want — nothing is saved or transmitted.
+                This demo runs entirely in your browser.
+            </p>
+
+            <div class="pin-select">
+                <input id="pin-input" maxlength="4" placeholder="Enter 4-digit PIN..." />
+                <button id="random-pin">Random</button>
+            </div>
+
+            <h3>Controls</h3>
+            <div class="controls">
+                <button id="start-btn">Start</button>
+                <button id="stop-btn" disabled>Stop</button>
+            </div>
+
+            <h3>Statistics</h3>
+            <div class="stats">
+                <p>Checked: <span id="attempts">0</span></p>
+                <p>Time: <span id="time">0.000s</span></p>
+                <p>Status: <span id="status-label">Waiting…</span></p>
+            </div>
+        </section>
+
+        <!-- RIGHT PANEL -->
+        <section class="panel right">
+            <h2>Dictionary Log</h2>
+            <div class="log" id="log-box"></div>
+
+            <div class="education">
+
+                <h3>Are These PINs Safe?</h3>
+                <p class="muted">
+                    These PINs come from real-world breach data and public cybersecurity reports.
+                    If your personal PIN appears in this list, it is considered
+                    <strong>high-risk</strong> and should be changed immediately.
+                </p>
+
+                <p class="muted">
+                    You can safely test your own PIN here — nothing is stored or sent anywhere.
+                    The entire simulation runs locally inside your browser.
+                </p>
+
+                <p class="muted">
+                    A 2025 investigation found that millions of leaked 4-digit PINs commonly fall into
+                    predictable patterns such as repeating digits, birth years, or simple sequences
+                    like <strong>1234</strong> or <strong>0000</strong>.
+                    These are extremely easy for attackers to guess.
+                </p>
+
+                <p class="muted">
+                    Source:
+                    <a href="https://www.cnbc.com/2025/02/12/most-common-four-digit-pins-leaked-on-the-dark-web-report.html"
+                        target="_blank" style="color: var(--accent); text-decoration: underline;">
+                        CNBC – Most common four-digit PINs leaked on the dark web
+                    </a>
+                </p>
+
+                <h3>What You’ll Notice</h3>
+                <ul class="muted">
+                    <li>Instant success if the PIN is common</li>
+                    <li>Near-zero search time</li>
+                    <li>Far fewer attempts than brute force</li>
+                </ul>
+
+                <p class="muted extra-note">
+                    If this demo finds your PIN quickly, consider switching to something stronger.
+                    Avoid repeated digits, birth years, and predictable patterns.
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Brute Force PIN Demo</title>
+    <link rel="stylesheet" href="../../style.css" />
+</head>
+
+<body>
+    <!-- HEADER -->
+    <header class="cs-nav">
+        <div class="cs-left">
+            <a href="../../index.html" class="cs-home-btn">
+                <img src="../../../images/home.svg" alt="Home" class="cs-home-icon">
+            </a>
+        </div>
+
+        <div class="cs-center">
+            <h1>Brute Force PIN Demonstration</h1>
+        </div>
+
+        <div class="cs-right">
+            <div id="indicator" class="record-light"></div>
+            <span id="indicator-label" class="led-text">Idle</span>
+        </div>
+    </header>
+
+    <main class="split">
+
+        <!-- LEFT PANEL -->
+        <section class="panel left">
+            <h2>Naive Brute Force (0000 → 9999)</h2>
+            <p class="muted">
+                This algorithm tries every possible 4-digit PIN in ascending order,
+                starting at <strong>0000</strong> and ending at <strong>9999</strong>.
+                It demonstrates the slowest and most predictable form of brute-force attack.
+            </p>
+
+            <h3>Choose a PIN</h3>
+            <p class="muted">You can set a PIN or generate a random one:</p>
+
+            <div class="pin-select">
+                <input id="pin-input" maxlength="4" placeholder="Enter 4-digit PIN..." />
+                <button id="random-pin">Random</button>
+            </div>
+
+            <h3>Controls</h3>
+            <div class="controls">
+                <button id="start-btn">Start</button>
+                <button id="stop-btn" disabled>Stop</button>
+            </div>
+
+            <h3>Statistics</h3>
+            <div class="stats">
+                <p>Attempts: <span id="attempts">0</span></p>
+                <p>Time Elapsed: <span id="time">0.000s</span></p>
+                <p>Status: <span id="status-label">Waiting…</span></p>
+            </div>
+        </section>
+
+        <!-- RIGHT PANEL -->
+        <section class="panel right">
+            <h2>Attempt Log</h2>
+            <div class="log" id="log-box"></div>
+
+            <div class="education">
+                <h3>Why Is This Slow?</h3>
+                <p class="muted">
+                    Naive brute force has to check <em>every</em> possible combination, even if the
+                    correct PIN is very early in the sequence. Attackers rarely rely on this method
+                    alone because it is slow and predictable.
+                </p>
+
+                <h3>What You'll See</h3>
+                <ul class="muted">
+                    <li>A steady, sequential count from 0000 upward</li>
+                    <li>A growing number of attempts</li>
+                    <li>Longer search times for PINs near 9999</li>
+                </ul>
+
+                <p class="muted extra-note">
+                    This simulation runs locally in your browser and is safe, educational, and does not store any data.
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

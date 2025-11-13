@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Educational Keylogger Demo</title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+
+<body>
+  <!-- HEADER -->
+  <header class="cs-nav">
+    <div class="cs-left">
+      <a href="../index.html" class="cs-home-btn">
+        <img src="../../images/home.svg" alt="Home" class="cs-home-icon">
+      </a>
+    </div>
+
+    <div class="cs-center">
+      <h1>Educational Keylogger Demonstration</h1>
+    </div>
+
+    <div class="cs-right">
+      <div id="indicator" class="record-light"></div>
+      <span id="indicator-label" class="led-text">Idle</span>
+    </div>
+  </header>
+
+  <main class="split">
+    <!-- LEFT: Explanation + Simulated environment -->
+    <section class="panel left">
+      <h2>What Is a Keylogger?</h2>
+      <p class="muted">
+        A <strong>keylogger</strong> (short for “keystroke logger”) is a tool that records keys pressed on a keyboard.
+        While sometimes used for authorized monitoring or usability testing, malicious keyloggers can secretly capture
+        everything you type —
+        such as passwords, personal messages, or financial information — without your knowledge.
+      </p>
+
+      <h3>How It Works</h3>
+      <p class="muted">
+        Keyloggers can exist as hardware devices or software programs.
+        Software keyloggers typically attach to keyboard input events, record each keystroke, and store or send that
+        data elsewhere.
+        This demo safely illustrates the concept by logging keystrokes only within the text box below, after you give
+        explicit consent.
+      </p>
+
+      <div class="notice">
+        <strong>Consent required:</strong>
+        This demo runs entirely in your browser and does <em>not</em> send or store data anywhere.
+        It only records keys from the text box once you press <strong>“Start Demo (I consent)”</strong>.
+      </div>
+
+      <h2>Simulated Environment</h2>
+      <p class="muted">Type in this box once the demo starts to see how keystrokes are captured:</p>
+      <textarea class="keylogger-input" id="demo-input" placeholder="Type here when demo is active..."></textarea>
+
+      <div class="controls">
+        <button id="start-btn">Start Demo (I consent)</button>
+        <button id="stop-btn" disabled>Stop Demo</button>
+      </div>
+    </section>
+
+    <!-- RIGHT: Logs + Education -->
+    <section class="panel right">
+      <h2>Captured Logs</h2>
+      <div class="log" id="live-log" aria-live="polite"></div>
+
+      <div class="control-row">
+        <button id="clear-log">Clear Log</button>
+        <button id="download-sample">Download Sample</button>
+      </div>
+
+      <div class="education">
+        <h3>Why Is This Dangerous?</h3>
+        <p>
+          Real keyloggers operate invisibly, recording everything you type and often sending that data to attackers.
+          This could include login credentials, emails, and even credit card numbers.
+          Even seemingly harmless browser extensions or applications can include hidden logging functionality.
+        </p>
+
+        <h3>How to Protect Yourself</h3>
+        <ul>
+          <li>Keep your operating system, browser, and antivirus software up to date.</li>
+          <li>Only download apps or extensions from trusted, verified sources.</li>
+          <li>Use strong, unique passwords and enable multi-factor authentication (MFA).</li>
+          <li>Regularly review background tasks and network connections for suspicious activity.</li>
+          <li>Educate yourself and others on how phishing and social engineering can lead to malware infections.</li>
+        </ul>
+
+        <p class="muted extra-note">
+          Remember — awareness and good digital hygiene are your best defense. This demo is a safe example of what
+          happens when
+          data is captured locally and ethically, but real-world attacks can happen without any visible signs.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+
+</html>

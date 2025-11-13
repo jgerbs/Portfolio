@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Parallel PIN Attack</title>
+    <link rel="stylesheet" href="../../style.css" />
+</head>
+
+<body>
+    <!-- HEADER -->
+    <header class="cs-nav">
+        <div class="cs-left">
+            <a href="../../index.html" class="cs-home-btn">
+                <img src="../../../images/home.svg" alt="Home" class="cs-home-icon">
+            </a>
+        </div>
+
+        <div class="cs-center">
+            <h1>Parallel Multithreading PIN Demonstration</h1>
+        </div>
+
+        <div class="cs-right">
+            <div id="indicator" class="record-light"></div>
+            <span id="indicator-label" class="led-text">Idle</span>
+        </div>
+    </header>
+
+    <main class="split">
+
+        <!-- LEFT PANEL -->
+        <section class="panel left">
+            <h2>Parallel Attack</h2>
+            <p class="muted">
+                This attack uses <strong>multiple threads</strong> to divide the search space.
+                Each worker searches a portion of the PIN range (0000–9999).
+                As soon as <strong>any thread</strong> finds the PIN, all threads stop.
+            </p>
+
+            <h3>Choose a PIN</h3>
+            <p class="muted">
+                You can enter your real PIN — nothing is saved or transmitted.
+                Everything runs locally inside your browser.
+            </p>
+
+            <div class="pin-select">
+                <input id="pin-input" maxlength="4" placeholder="Enter 4-digit PIN..." />
+                <button id="random-pin">Random</button>
+            </div>
+
+            <h3>Controls</h3>
+            <div class="controls">
+                <button id="start-btn">Start</button>
+                <button id="stop-btn" disabled>Stop</button>
+            </div>
+
+            <h3>Statistics</h3>
+            <div class="stats">
+                <p>Total Checked: <span id="attempts">0</span></p>
+                <p>Time: <span id="time">0.000s</span></p>
+                <p>Current: <span id="current-attempt">None</span></p>
+                <p>Status: <span id="status-label">Waiting…</span></p>
+                <p>Threads Running: <span id="thread-count">0</span></p>
+            </div>
+        </section>
+
+        <!-- RIGHT PANEL -->
+        <section class="panel right">
+            <h2>Thread Log</h2>
+            <div class="log" id="log-box"></div>
+
+            <div class="education">
+                <h3>How Parallel Attacks Work</h3>
+                <p class="muted">
+                    The PIN space (0000–9999) is split evenly across several workers.
+                    Each worker brute-forces its own range independently.
+                </p>
+                <ul class="muted">
+                    <li>Thread 1: 0000–2499</li>
+                    <li>Thread 2: 2500–4999</li>
+                    <li>Thread 3: 5000–7499</li>
+                    <li>Thread 4: 7500–9999</li>
+                </ul>
+                <p class="muted">
+                    This allows the attack to run up to <strong>4× faster</strong> depending on the device.
+                    When any thread finds the correct PIN, all threads immediately stop.
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

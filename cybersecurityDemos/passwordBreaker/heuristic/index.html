@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Heuristic PIN Attack</title>
+    <link rel="stylesheet" href="../../style.css" />
+</head>
+
+<body>
+    <!-- HEADER -->
+    <header class="cs-nav">
+        <div class="cs-left">
+            <a href="../../index.html" class="cs-home-btn">
+                <img src="../../../images/home.svg" alt="Home" class="cs-home-icon">
+            </a>
+        </div>
+
+        <div class="cs-center">
+            <h1>Heuristic PIN Demonstration</h1>
+        </div>
+
+        <div class="cs-right">
+            <div id="indicator" class="record-light"></div>
+            <span id="indicator-label" class="led-text">Idle</span>
+        </div>
+    </header>
+
+    <main class="split">
+
+        <!-- LEFT PANEL -->
+        <section class="panel left">
+            <h2>Heuristic Attack (Smart Guessing)</h2>
+            <p class="muted">
+                A heuristic attack uses <strong>patterns</strong>, <strong>statistics</strong>, and
+                <strong>common human choices</strong> before attempting a full brute-force search.
+                This makes it dramatically faster than naive methods.
+            </p>
+
+            <h3>Choose a PIN</h3>
+            <p class="muted">
+                You can enter your real PIN — nothing is saved or transmitted.
+                This simulation runs entirely in your browser.
+            </p>
+
+            <div class="pin-select">
+                <input id="pin-input" maxlength="4" placeholder="Enter 4-digit PIN..." />
+                <button id="random-pin">Random</button>
+            </div>
+
+            <h3>Controls</h3>
+            <div class="controls">
+                <button id="start-btn">Start</button>
+                <button id="stop-btn" disabled>Stop</button>
+            </div>
+
+            <h3>Statistics</h3>
+            <div class="stats">
+                <p>Checked: <span id="attempts">0</span></p>
+                <p>Time: <span id="time">0.000s</span></p>
+                <p>Current: <span id="current-attempt">None</span></p>
+                <p>Status: <span id="status-label">Waiting…</span></p>
+            </div>
+
+        </section>
+
+        <!-- RIGHT PANEL -->
+        <section class="panel right">
+            <h2>Heuristic Log</h2>
+            <div class="log" id="log-box"></div>
+
+            <div class="education">
+                <h3>How Heuristics Work</h3>
+                <p class="muted">
+                    Humans are predictable. Heuristic attacks use this fact by testing:
+                </p>
+                <ul class="muted">
+                    <li><strong>Common PINs</strong> (e.g., 1234, 1111, 0000)</li>
+                    <li><strong>Repetition patterns</strong> (aaaa, abab, aabb)</li>
+                    <li><strong>Birth years</strong> (1970–2025 ranges)</li>
+                    <li><strong>Simple numeric patterns</strong> (2468, 2580)</li>
+                </ul>
+
+                <p class="muted">
+                    These guesses succeed very quickly on real users.
+                    Only after exhausting smart guesses does the algorithm switch to a
+                    full brute-force search.
+                </p>
+
+                <p class="muted extra-note">
+                    If this attack finds your PIN early, consider switching to something more random.
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

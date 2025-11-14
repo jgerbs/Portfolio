@@ -19,7 +19,7 @@
         </div>
 
         <div class="cs-center">
-            <h1>Parallel Multithreading PIN Demonstration</h1>
+            <h1>Heuristic Hyperthreaded PIN Demonstration</h1>
         </div>
 
         <div class="cs-right">
@@ -32,21 +32,28 @@
 
         <!-- LEFT PANEL -->
         <section class="panel left">
-            <h2>Parallel Attack</h2>
+            <h2>Heuristic Parallel Attack</h2>
             <p class="muted">
-                This attack uses multiple threads to divide the search space.
-                Each worker takes a section of the full PIN range from 0000 to 9999.
-                The moment any thread finds the correct PIN, all threads stop at once.
+                This demonstration shows how modern PIN cracking works. 
+                Instead of checking all values in order, the attack begins with a heuristic list of highly likely PINs. 
+                These include common choices, patterns, sequences, keypad shapes, and birth years. 
+                The list also contains the full range from 0000 to 9999 at the end so the system always finds the correct value.
+            </p>
+
+            <p class="muted">
+                The list is divided between several worker threads. 
+                Each thread searches its part of the list at the same time. 
+                When any thread finds the match, all threads stop instantly.
             </p>
 
             <h3>Choose a PIN</h3>
             <p class="muted">
-                You can enter your actual PIN if you want. Nothing is stored or sent anywhere.
-                The entire simulation runs on your device.
+                All processing happens on your device only. 
+                No information is sent or stored anywhere.
             </p>
 
             <div class="pin-select">
-                <input id="pin-input" maxlength="4" placeholder="Enter 4 digit PIN..." />
+                <input id="pin-input" maxlength="4" placeholder="Enter 4 digit PIN" />
                 <button id="random-pin">Random</button>
             </div>
 
@@ -72,22 +79,31 @@
             <div class="log" id="log-box"></div>
 
             <div class="education">
-                <h3>How Parallel Attacks Work</h3>
+                <h3>How the Heuristic Search Works</h3>
+
                 <p class="muted">
-                    The full PIN range is divided into even segments, and each thread brute forces its own section.
-                    This reduces the total search time because many guesses happen at the same time.
+                    Most people do not choose PINs at random. 
+                    Attackers take advantage of this and check the most likely values first. 
+                    The list used in this demo includes:
                 </p>
 
                 <ul class="muted">
-                    <li>Thread 1: 0000 to 2499</li>
-                    <li>Thread 2: 2500 to 4999</li>
-                    <li>Thread 3: 5000 to 7499</li>
-                    <li>Thread 4: 7500 to 9999</li>
+                    <li>Common PINs like 1234, 1111, 0000</li>
+                    <li>Repeating patterns such as AABB, ABAB, AAAA</li>
+                    <li>Number sequences like 0123 and 9876</li>
+                    <li>Keypad patterns based on phone or keyboard layouts</li>
+                    <li>Years between 1950 and 2025</li>
+                    <li>The full range from 0000 to 9999</li>
                 </ul>
 
                 <p class="muted">
-                    On many devices this can run up to four times faster than a single thread.
-                    When one thread finds the correct PIN, it signals the others to stop immediately.
+                    The list is split evenly between multiple threads. 
+                    Each thread works in parallel which greatly reduces the time needed to find a match. 
+                    This is why four threads can complete the entire search much faster than a single thread.
+                </p>
+
+                <p class="muted">
+                    When one worker discovers the correct PIN, it signals the main thread and all workers are stopped immediately.
                 </p>
             </div>
         </section>

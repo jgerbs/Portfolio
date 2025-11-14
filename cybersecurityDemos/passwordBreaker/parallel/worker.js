@@ -1,21 +1,20 @@
-// This is a worker script for attempting to brute-force a 4-digit PIN in parallel
-onmessage = function(e) {
-  const { correctPIN, start, end, id } = e.data;
+onmessage = function (e) {
+  const { correctPIN, id, list, reportEvery = 50 } = e.data;
 
-  // for loop to attempt each PIN in the assigned range
-  for (let i = start; i <= end; i++) {
-    const pin = i.toString().padStart(4, "0");
+  // Heuristic + full search in one list
+  for (let i = 0; i < list.length; i++) {
+    const item = list[i];
+    const pin = item.pin;
 
-    // Send attempt back to main thread
-    postMessage({ type: "attempt", pin, id });
+    if (i % reportEvery === 0) {
+      postMessage({ type: "attempt", pin, id, category: item.type });
+    }
 
-    // Check if the attempted PIN matches the correct PIN
     if (pin === correctPIN) {
-      postMessage({ type: "found", id, pin });
+      postMessage({ type: "found", id, pin, category: item.type });
       return;
     }
   }
 
-  // Notify main thread that this worker has completed its range
   postMessage({ type: "done", id });
 };

@@ -948,6 +948,10 @@ footer p {
     font-size: clamp(0.75rem, 1%, 0.5rem) !important;
   }
 
+  .top-nav a[href="#about"] {
+    display: none;
+  }
+
   /* HERO */
   .hero {
     flex-direction: column;

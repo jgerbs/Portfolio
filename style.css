@@ -134,7 +134,8 @@ a:hover {
 .top-nav {
   position: sticky;
   top: 0;
-
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: none;
   /* SAFE AREA FIX — must stay ABOVE any padding shorthand */
   padding-top: max(12px, env(safe-area-inset-top));
 
@@ -164,7 +165,7 @@ a:hover {
   flex-wrap: nowrap;
   justify-content: center;
   align-items: center;
-  gap: clamp(0.8rem, 3vw, 2rem);
+  gap: clamp(0.4rem, 2vw, 1rem);
   flex: 1 1 auto;
 }
 
@@ -173,7 +174,7 @@ a:hover {
   text-decoration: none;
   font-weight: 600;
   letter-spacing: 0.7px;
-  font-size: clamp(0.75rem, 2.2vw, 1rem);
+  font-size: clamp(0.75rem, 2.5vw, 0.95rem);
   transition: color 0.3s ease;
   white-space: nowrap;
 }

@@ -134,10 +134,19 @@ a:hover {
 .top-nav {
   position: sticky;
   top: 0;
+
+  /* SAFE AREA FIX — must stay ABOVE any padding shorthand */
+  padding-top: max(12px, env(safe-area-inset-top));
+
+  /* Rest of padding */
+  padding-left: 0.8rem;
+  padding-right: 0.8rem;
+  padding-bottom: 0.8rem;
+
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0.8rem 0.8rem;
+
   background: rgba(12, 16, 20, 0.95);
   z-index: 10;
   width: 100%;

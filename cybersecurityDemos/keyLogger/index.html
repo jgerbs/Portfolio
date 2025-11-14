@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -9,6 +9,7 @@
 </head>
 
 <body>
+
   <!-- HEADER -->
   <header class="cs-nav">
     <div class="cs-left">
@@ -28,34 +29,36 @@
   </header>
 
   <main class="split">
-    <!-- LEFT: Explanation + Simulated environment -->
+
+    <!-- LEFT SIDE -->
     <section class="panel left">
       <h2>What Is a Keylogger?</h2>
       <p class="muted">
-        A <strong>keylogger</strong> (short for “keystroke logger”) is a tool that records keys pressed on a keyboard.
-        While sometimes used for authorized monitoring or usability testing, malicious keyloggers can secretly capture
-        everything you type —
-        such as passwords, personal messages, or financial information — without your knowledge.
+        A <strong>keylogger</strong>, short for keystroke logger, is a tool that records what you type on a keyboard.
+        While they can be used for things like authorized monitoring or usability testing, malicious keyloggers
+        can secretly capture everything you type, including passwords, messages, or financial information,
+        without you knowing.
       </p>
 
       <h3>How It Works</h3>
       <p class="muted">
-        Keyloggers can exist as hardware devices or software programs.
-        Software keyloggers typically attach to keyboard input events, record each keystroke, and store or send that
-        data elsewhere.
-        This demo safely illustrates the concept by logging keystrokes only within the text box below, after you give
-        explicit consent.
+        Keyloggers can exist as either hardware devices or software programs.
+        Software keyloggers usually attach themselves to keyboard input events, log each key press, and then store
+        or transmit that data somewhere else.
+        This demo shows the concept in a safe way by recording keystrokes only inside the text box below, and
+        only after you choose to start the demo.
       </p>
 
       <div class="notice">
         <strong>Consent required:</strong>
-        This demo runs entirely in your browser and does <em>not</em> send or store data anywhere.
-        It only records keys from the text box once you press <strong>“Start Demo (I consent)”</strong>.
+        This demo runs entirely in your browser and does not send or store data anywhere.
+        It only records what you type in the box after you press the Start Demo button.
       </div>
 
       <h2>Simulated Environment</h2>
-      <p class="muted">Type in this box once the demo starts to see how keystrokes are captured:</p>
-      <textarea class="keylogger-input" id="demo-input" placeholder="Type here when demo is active..."></textarea>
+      <p class="muted">Type in the box below once the demo is active to see how keystrokes are logged:</p>
+
+      <textarea class="keylogger-input" id="demo-input" placeholder="Type here when the demo is active..."></textarea>
 
       <div class="controls">
         <button id="start-btn">Start Demo (I consent)</button>
@@ -63,9 +66,10 @@
       </div>
     </section>
 
-    <!-- RIGHT: Logs + Education -->
+    <!-- RIGHT SIDE -->
     <section class="panel right">
       <h2>Captured Logs</h2>
+
       <div class="log" id="live-log" aria-live="polite"></div>
 
       <div class="control-row">
@@ -76,24 +80,23 @@
       <div class="education">
         <h3>Why Is This Dangerous?</h3>
         <p>
-          Real keyloggers operate invisibly, recording everything you type and often sending that data to attackers.
-          This could include login credentials, emails, and even credit card numbers.
-          Even seemingly harmless browser extensions or applications can include hidden logging functionality.
+          Real keyloggers stay hidden, recording everything you type and often sending that information to attackers.
+          This can include usernames, passwords, emails, credit card numbers, and more.
+          Even apps or browser extensions that seem harmless can contain hidden logging features.
         </p>
 
         <h3>How to Protect Yourself</h3>
         <ul>
-          <li>Keep your operating system, browser, and antivirus software up to date.</li>
-          <li>Only download apps or extensions from trusted, verified sources.</li>
-          <li>Use strong, unique passwords and enable multi-factor authentication (MFA).</li>
-          <li>Regularly review background tasks and network connections for suspicious activity.</li>
-          <li>Educate yourself and others on how phishing and social engineering can lead to malware infections.</li>
+          <li>Keep your operating system, browser, and antivirus software updated.</li>
+          <li>Only install apps or extensions from trusted sources.</li>
+          <li>Use strong and unique passwords, and enable multi-factor authentication.</li>
+          <li>Check background tasks and network activity for anything unusual.</li>
+          <li>Learn how phishing and social engineering can lead to malware infections.</li>
         </ul>
 
         <p class="muted extra-note">
-          Remember — awareness and good digital hygiene are your best defense. This demo is a safe example of what
-          happens when
-          data is captured locally and ethically, but real-world attacks can happen without any visible signs.
+          Good awareness and digital hygiene are the strongest defense.
+          This demo shows a safe and local example, but real-world keyloggers can be completely invisible.
         </p>
       </div>
     </section>

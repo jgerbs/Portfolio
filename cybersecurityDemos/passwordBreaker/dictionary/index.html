@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -9,6 +9,7 @@
 </head>
 
 <body>
+
     <!-- HEADER -->
     <header class="cs-nav">
         <div class="cs-left">
@@ -31,21 +32,21 @@
 
         <!-- LEFT PANEL -->
         <section class="panel left">
-            <h2>Dictionary Attack (Common PINs)</h2>
+            <h2>Dictionary Attack Using Common PINs</h2>
             <p class="muted">
-                Most people choose predictable PINs. A dictionary attack checks a list of the
-                <strong>most commonly used 4-digit PINs</strong> before doing any brute-force work.
-                This is <strong>dramatically faster</strong> for real-world attacks.
+                Many people choose PINs that are easy to guess. A dictionary attack checks a list of the
+                <strong>most common four digit PINs</strong> before trying anything else.
+                This makes it much faster than a traditional brute force search.
             </p>
 
             <h3>Choose a PIN</h3>
             <p class="muted">
-                You can enter your real PIN if you want — nothing is saved or transmitted.
-                This demo runs entirely in your browser.
+                You can enter your real PIN if you want. Nothing is saved or transmitted.
+                This entire demo runs only inside your browser.
             </p>
 
             <div class="pin-select">
-                <input id="pin-input" maxlength="4" placeholder="Enter 4-digit PIN..." />
+                <input id="pin-input" maxlength="4" placeholder="Enter 4 digit PIN..." />
                 <button id="random-pin">Random</button>
             </div>
 
@@ -59,7 +60,7 @@
             <div class="stats">
                 <p>Checked: <span id="attempts">0</span></p>
                 <p>Time: <span id="time">0.000s</span></p>
-                <p>Status: <span id="status-label">Waiting…</span></p>
+                <p>Status: <span id="status-label">Waiting...</span></p>
             </div>
         </section>
 
@@ -72,41 +73,39 @@
 
                 <h3>Are These PINs Safe?</h3>
                 <p class="muted">
-                    These PINs come from real-world breach data and public cybersecurity reports.
-                    If your personal PIN appears in this list, it is considered
-                    <strong>high-risk</strong> and should be changed immediately.
+                    The PINs used in this demo come from real cybersecurity reports and actual breach data.
+                    If your own PIN appears in this list, it is considered unsafe and should be changed.
                 </p>
 
                 <p class="muted">
-                    You can safely test your own PIN here — nothing is stored or sent anywhere.
-                    The entire simulation runs locally inside your browser.
+                    It is completely safe to test your PIN here. The demo does not store or send any information.
                 </p>
 
                 <p class="muted">
-                    A 2025 investigation found that millions of leaked 4-digit PINs commonly fall into
-                    predictable patterns such as repeating digits, birth years, or simple sequences
-                    like <strong>1234</strong> or <strong>0000</strong>.
-                    These are extremely easy for attackers to guess.
+                    A 2025 investigation showed that millions of leaked PINs follow simple and predictable patterns.
+                    Examples include repeating digits, birth years, or easy sequences such as
+                    <strong>1234</strong> or <strong>0000</strong>.
+                    Attackers know this and try these PINs first.
                 </p>
 
                 <p class="muted">
                     Source:
                     <a href="https://www.cnbc.com/2025/02/12/most-common-four-digit-pins-leaked-on-the-dark-web-report.html"
                         target="_blank" style="color: var(--accent); text-decoration: underline;">
-                        CNBC – Most common four-digit PINs leaked on the dark web
+                        CNBC - Most common four digit PINs leaked on the dark web
                     </a>
                 </p>
 
-                <h3>What You’ll Notice</h3>
+                <h3>What You Will Notice</h3>
                 <ul class="muted">
-                    <li>Instant success if the PIN is common</li>
-                    <li>Near-zero search time</li>
-                    <li>Far fewer attempts than brute force</li>
+                    <li>Very fast results if the PIN is common</li>
+                    <li>Low search time</li>
+                    <li>Far fewer attempts than normal brute force</li>
                 </ul>
 
                 <p class="muted extra-note">
-                    If this demo finds your PIN quickly, consider switching to something stronger.
-                    Avoid repeated digits, birth years, and predictable patterns.
+                    If your PIN appears in this dictionary, consider changing it.
+                    Avoid patterns like repeated digits, birth years, or simple sequences.
                 </p>
             </div>
         </section>

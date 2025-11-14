@@ -9,6 +9,7 @@
 </head>
 
 <body>
+
     <!-- HEADER -->
     <header class="cs-nav">
         <div class="cs-left">
@@ -31,18 +32,18 @@
 
         <!-- LEFT PANEL -->
         <section class="panel left">
-            <h2>Naive Brute Force (0000 → 9999)</h2>
+            <h2>Naive Brute Force (0000 to 9999)</h2>
             <p class="muted">
-                This algorithm tries every possible 4-digit PIN in ascending order,
-                starting at <strong>0000</strong> and ending at <strong>9999</strong>.
-                It demonstrates the slowest and most predictable form of brute-force attack.
+                This method checks every possible four digit PIN in order,
+                beginning at <strong>0000</strong> and ending at <strong>9999</strong>.
+                It shows the slowest and most basic form of a brute force attack.
             </p>
 
             <h3>Choose a PIN</h3>
-            <p class="muted">You can set a PIN or generate a random one:</p>
+            <p class="muted">You can enter your own PIN or let the system generate one:</p>
 
             <div class="pin-select">
-                <input id="pin-input" maxlength="4" placeholder="Enter 4-digit PIN..." />
+                <input id="pin-input" maxlength="4" placeholder="Enter 4 digit PIN..." />
                 <button id="random-pin">Random</button>
             </div>
 
@@ -56,7 +57,7 @@
             <div class="stats">
                 <p>Attempts: <span id="attempts">0</span></p>
                 <p>Time Elapsed: <span id="time">0.000s</span></p>
-                <p>Status: <span id="status-label">Waiting…</span></p>
+                <p>Status: <span id="status-label">Waiting...</span></p>
             </div>
         </section>
 
@@ -68,20 +69,21 @@
             <div class="education">
                 <h3>Why Is This Slow?</h3>
                 <p class="muted">
-                    Naive brute force has to check <em>every</em> possible combination, even if the
-                    correct PIN is very early in the sequence. Attackers rarely rely on this method
-                    alone because it is slow and predictable.
+                    A naive brute force attack must try every possible combination,
+                    even if the correct PIN is very early. This makes the technique slow
+                    and easy to predict, so attackers usually combine it with smarter methods.
                 </p>
 
-                <h3>What You'll See</h3>
+                <h3>What You Will See</h3>
                 <ul class="muted">
-                    <li>A steady, sequential count from 0000 upward</li>
-                    <li>A growing number of attempts</li>
-                    <li>Longer search times for PINs near 9999</li>
+                    <li>A steady count moving from 0000 upward</li>
+                    <li>The number of attempts increasing over time</li>
+                    <li>More time needed when the PIN is closer to 9999</li>
                 </ul>
 
                 <p class="muted extra-note">
-                    This simulation runs locally in your browser and is safe, educational, and does not store any data.
+                    This demo runs entirely in your browser. It is safe, educational,
+                    and does not store or send any information.
                 </p>
             </div>
         </section>

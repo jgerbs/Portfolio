@@ -20,10 +20,12 @@ body {
   margin: 0;
   font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
   background:
-    linear-gradient(to bottom,
+    linear-gradient(
+      to bottom,
       var(--bg-top) 0%,
       var(--bg-mid) 30%,
-      var(--bg-bottom) 100%),
+      var(--bg-bottom) 100%
+    ),
     url("c1711437-ebfd-4ac3-8dc7-b4d1a3af5fa6.png") no-repeat center top fixed;
   background-size: cover;
   color: var(--text);
@@ -31,9 +33,7 @@ body {
   overflow-x: hidden;
 }
 
-h1,
-h2,
-h3 {
+h1, h2, h3 {
   margin: 0 0 1rem;
   font-weight: 700;
   color: var(--accent);
@@ -66,7 +66,7 @@ a:hover {
   gap: 3rem;
   padding: 6rem 2rem 5rem;
   background:
-    linear-gradient(180deg, rgba(10, 30, 36, 0.85) 0%, rgba(2, 8, 11, 0.95) 100%),
+    linear-gradient(180deg, rgba(10,30,36,0.85) 0%, rgba(2,8,11,0.95) 100%),
     url("images/hacker2.webp") center center;
   background-size: cover;
   border-bottom: 1px solid var(--border);
@@ -146,9 +146,7 @@ a:hover {
   scrollbar-width: none;
 }
 
-.top-nav::-webkit-scrollbar {
-  display: none;
-}
+.top-nav::-webkit-scrollbar { display: none; }
 
 .nav-links {
   display: flex;
@@ -189,8 +187,7 @@ a:hover {
   width: 38px;
   height: 38px;
 
-  background: rgba(12, 16, 20, 0.95);
-  /* dark panel, no glow */
+  background: rgba(12, 16, 20, 0.95); /* dark panel, no glow */
   border-radius: 10px;
 
   opacity: 0;
@@ -208,8 +205,7 @@ a:hover {
 }
 
 .top-button:hover {
-  background: rgba(12, 16, 20, 1);
-  /* subtle emphasis only */
+  background: rgba(12, 16, 20, 1); /* subtle emphasis only */
   transform: translateY(-2px);
 }
 
@@ -218,14 +214,14 @@ a:hover {
   width: 20px;
   height: 20px;
   object-fit: contain;
-  filter: invert(90%) brightness(1.2);
-  /* makes the SVG white like footer */
+  filter: invert(90%) brightness(1.2); /* makes the SVG white like footer */
   transition: transform 0.3s ease, filter 0.3s ease;
 }
 
 .top-button:hover img.top-arrow-icon {
   transform: translateY(-1px) scale(1.1);
-  filter: drop-shadow(0 0 6px var(--accent)) invert(90%) sepia(30%) saturate(300%) hue-rotate(150deg);
+  filter: drop-shadow(0 0 6px var(--accent))
+          invert(90%) sepia(30%) saturate(300%) hue-rotate(150deg);
 }
 
 /* =====================================================
@@ -284,16 +280,8 @@ main {
   flex-wrap: wrap;
 }
 
-.about-text {
-  flex: 2;
-  min-width: 300px;
-}
-
-.about-text p {
-  margin-bottom: 1.2rem;
-  color: var(--text);
-  opacity: 0.9;
-}
+.about-text { flex: 2; min-width: 300px; }
+.about-text p { margin-bottom: 1.2rem; color: var(--text); opacity: 0.9; }
 
 .about-logos {
   flex: 1;
@@ -314,15 +302,8 @@ main {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.about-logos img:nth-child(2) {
-  margin-left: -20px;
-  z-index: 2;
-}
-
-.about-logos img:nth-child(3) {
-  margin-left: -20px;
-  z-index: 1;
-}
+.about-logos img:nth-child(2) { margin-left: -20px; z-index: 2; }
+.about-logos img:nth-child(3) { margin-left: -20px; z-index: 1; }
 
 .about-logos img:hover {
   transform: scale(1.08);
@@ -387,7 +368,7 @@ main {
 
 .photo-stack img:hover {
   box-shadow: 0 0 45px rgba(30, 182, 217, 0.75),
-    0 0 80px rgba(30, 182, 217, 0.3);
+              0 0 80px rgba(30, 182, 217, 0.3);
   filter: brightness(1.15);
 }
 
@@ -564,8 +545,7 @@ main {
   object-fit: contain;
   border-radius: 4px;
   transition: all 0.25s ease;
-  filter: none;
-  /* show color logos normally */
+  filter: none; /* show color logos normally */
   background: transparent;
 }
 
@@ -579,6 +559,14 @@ main {
   filter: drop-shadow(0 0 6px var(--accent)) brightness(1.2);
 }
 
+@media (max-width: 768px) {
+  .skills-grid {
+    justify-content: center;
+  }
+  .skill-item {
+    font-size: 0.9rem;
+  }
+}
 
 
 /* =====================================================
@@ -619,7 +607,8 @@ footer {
 }
 
 .footer-icons a:hover img {
-  filter: drop-shadow(0 0 6px var(--accent)) invert(90%) sepia(80%) saturate(500%) hue-rotate(130deg);
+  filter: drop-shadow(0 0 6px var(--accent))
+          invert(90%) sepia(80%) saturate(500%) hue-rotate(130deg);
   transform: translateY(-3px);
 }
 
@@ -693,15 +682,8 @@ footer p {
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* =====================================================
@@ -720,9 +702,9 @@ footer p {
 
 #emailModal .modal-content {
   background: rgba(8, 14, 18, 0.96);
-  border: 1px solid rgba(30, 182, 217, 0.4);
+  border: 1px solid rgba(30,182,217,0.4);
   border-radius: 14px;
-  box-shadow: 0 0 30px rgba(30, 182, 217, 0.35);
+  box-shadow: 0 0 30px rgba(30,182,217,0.35);
   padding: 2.8rem 2.2rem 2.2rem;
   max-width: 700px;
   width: 90%;
@@ -741,7 +723,6 @@ footer p {
   cursor: pointer;
   transition: transform 0.2s ease, color 0.2s ease;
 }
-
 #emailModal .close:hover {
   color: var(--accent-dark);
   transform: scale(1.1);
@@ -753,7 +734,7 @@ footer p {
   font-weight: 600;
   margin-bottom: 1.8rem;
   color: var(--accent);
-  border-bottom: 1px solid rgba(30, 182, 217, 0.2);
+  border-bottom: 1px solid rgba(30,182,217,0.2);
   padding-bottom: 0.8rem;
   text-align: center;
 }
@@ -769,7 +750,6 @@ footer p {
   display: flex;
   flex-direction: column;
 }
-
 .form-group.full {
   grid-column: 1 / 3;
 }
@@ -782,26 +762,25 @@ footer p {
 #emailModal input,
 #emailModal textarea {
   margin-top: 0.4rem;
-  background: rgba(3, 10, 15, 0.8);
+  background: rgba(3,10,15,0.8);
   color: var(--text);
-  border: 1px solid rgba(30, 182, 217, 0.25);
+  border: 1px solid rgba(30,182,217,0.25);
   border-radius: 8px;
   padding: 0.9rem 0.8rem;
   font-size: 0.95rem;
   transition: all 0.3s ease;
 }
-
 #emailModal input:focus,
 #emailModal textarea:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 12px rgba(30, 182, 217, 0.35);
+  box-shadow: 0 0 12px rgba(30,182,217,0.35);
   outline: none;
 }
 
 /* Labels */
 #emailModal label {
   font-size: 0.95rem;
-  color: rgba(230, 244, 248, 0.9);
+  color: rgba(230,244,248,0.9);
   letter-spacing: 0.3px;
 }
 
@@ -820,15 +799,23 @@ footer p {
   margin-top: 1.2rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 0 10px rgba(30, 182, 217, 0.4);
+  box-shadow: 0 0 10px rgba(30,182,217,0.4);
 }
-
 .modal-btn:hover {
   background: var(--accent-dark);
-  box-shadow: 0 0 18px rgba(30, 182, 217, 0.6);
+  box-shadow: 0 0 18px rgba(30,182,217,0.6);
   transform: translateY(-1px);
 }
 
+/* Responsive stacking */
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-group.full {
+    grid-column: 1;
+  }
+}
 
 /* =====================================================
    SCROLL ANIMATIONS
@@ -844,43 +831,16 @@ footer p {
   transform: translateY(0);
 }
 
-.fade-left {
-  opacity: 0;
-  transform: translateX(-40px);
-  transition: 0.8s;
-}
-
-.fade-right {
-  opacity: 0;
-  transform: translateX(40px);
-  transition: 0.8s;
-}
+.fade-left  { opacity: 0; transform: translateX(-40px); transition: 0.8s; }
+.fade-right { opacity: 0; transform: translateX(40px);  transition: 0.8s; }
 
 .fade-left.show,
-.fade-right.show {
-  opacity: 1;
-  transform: translateX(0);
-}
+.fade-right.show { opacity: 1; transform: translateX(0); }
 
-/* ============================================================
-   RESPONSIVE MEDIA QUERIES — CLEAN & CONSOLIDATED
-   Breakpoints:
-     900px  – tablet
-     700px  – small tablet / large mobile
-     600px  – mobile
-   All duplicated and split rules merged.
-   No behavior has been changed.
-   ============================================================ */
-
-
-/* ============================================================
-   900px — TABLET VIEW
-   Adjusts: hero layout, about section, photo stack sizing,
-   spacing, and some education/skills tweaks.
-   ============================================================ */
+/* =====================================================
+   RESPONSIVE MEDIA QUERIES
+   ===================================================== */
 @media (max-width: 900px) {
-
-  /* HERO */
   .hero {
     flex-wrap: wrap;
     gap: 1.5rem;
@@ -902,39 +862,56 @@ footer p {
     flex: 0 0 auto;
     margin: 1.5rem 0;
   }
+
+  .photo-stack {
+    width: 180px;
+    height: 260px;
+  }
+
+  .photo-stack img {
+    width: 160px;
+    height: 160px;
+  }
+
+  .about-lower-text {
+    font-size: 0.95rem;
+    max-width: 350px;
+  }
+
+  .about-lower-text {
+    flex: 1 1 auto;
+    max-width: 95%;
+    min-width: 320px;
+    margin-left: 1rem;
+    padding: 1.5rem 2rem;
+  }
 }
 
-
-/* ============================================================
-   700px — SMALL TABLET / LARGE MOBILE
-   Adjusts: about-lower text width, education layout.
-   ============================================================ */
 @media (max-width: 700px) {
+  .about-lower-text {
+    max-width: 100%;
+    min-width: 60%;
+    margin: 0 0;
+  }
+  .about-lower {
+    padding-right: 1.5rem;
+  }
 
-  /* EDUCATION */
   .edu-top {
     flex-direction: column;
     align-items: flex-start;
   }
-
   .edu-meta {
     align-self: flex-end;
     margin-top: 0.8rem;
   }
-
   .edu-logo {
     width: 48px;
     height: 48px;
   }
 }
 
-
-/* ============================================================
-   600px — MOBILE VIEW (FINAL + CLEAN)
-   ============================================================ */
 @media (max-width: 600px) {
-
-  /* HERO */
   .hero {
     flex-direction: column;
     gap: 1.5rem;
@@ -949,71 +926,180 @@ footer p {
   .hero-image img {
     width: 160px;
     height: 160px;
+    border-width: 3px;
+    box-shadow:
+      0 0 35px rgba(30, 182, 217, 0.5),
+      0 0 70px rgba(30, 182, 217, 0.3);
   }
 
-  /* ABOUT SECTION MOBILE STACK */
-  .about-lower {
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 1.5rem !important;
-    width: 100%;
-    padding: 0 !important;
+  .hero-name {
+    font-size: 1.6rem;
   }
 
-  .about-photo {
-    width: 100%;
-    display: flex;
-    justify-content: center !important; /* <-- THIS FIXES YOUR CENTERING */
-    margin: 0 auto !important;
-    padding: 0 !important;
-  }
-
-  /* MOBILE PHOTO STACK */
   .photo-stack {
-    position: relative;
-    width: 180px;   /* container width */
-    height: 150px;  /* container height */
-    margin: 0 auto !important; /* <-- force center */
+    width: 150px;
+    height: 200px;
   }
 
-  /* MOBILE-SIZED CIRCLES */
   .photo-stack img {
-    position: absolute;
     width: 130px;
     height: 130px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid var(--accent);
-    transform: none !important;
   }
 
-  /* LEFT bubble (main) */
-  .photo-stack .main-photo {
-    left: 5px !important;
-    top: 10px !important;
-    z-index: 2;
-  }
-
-  /* RIGHT bubble (overlay) */
-  .photo-stack .overlay-photo {
-    left: 75px !important;  /* LESS OVERLAP */
-    top: 10px !important;
-    z-index: 1;
-  }
-
-  /* TEXT BOX */
   .about-lower-text {
-    max-width: 90% !important;
-    margin: 0 auto !important;
-    padding: 1.2rem 1rem !important;
-    text-align: center !important;
+    font-size: 0.9rem;
+    max-width: 280px;
   }
 
-  /* EDUCATION */
   .edu-card .edu-date {
     position: static;
     display: block;
     margin-top: 0.3rem;
   }
+
+  .edu-card h3 {
+    margin-right: 0;
+  }
 }
+
+/* ============================================
+   FINAL ABOUT SECTION MOBILE FIX (PARFECT)
+   ============================================ */
+/* ============================================
+   ABSOLUTE FINAL ABOUT MOBILE FIX
+   ============================================ */
+@media (max-width: 900px) {
+
+  /* Remove desktop forcing */
+  .about-lower {
+    flex-direction: column !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 2.2rem !important;
+    margin-top: 2.5rem !important;
+    padding: 0 1rem !important;
+    width: 100%;
+  }
+
+  .about-photo {
+    order: 1 !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    min-width: 0 !important;
+    flex: unset !important;
+  }
+
+  /* Make the photo stack centered perfectly */
+  .photo-stack {
+    margin: 0 auto !important;
+    position: relative;
+    left: 0;
+    right: 0;
+  }
+
+  /* Shrink photo stack */
+  .photo-stack {
+    width: 180px !important;
+    height: 220px !important;
+  }
+
+  .photo-stack img {
+    width: 160px !important;
+    height: 160px !important;
+  }
+
+  .about-lower-text {
+    order: 2 !important;
+    width: 100% !important;
+    max-width: 550px !important;
+    margin: 0 auto !important;
+    padding: 1.5rem 1.4rem !important;
+    text-align: left;
+  }
+}
+
+/* Extra-tight mobile spacing */
+@media (max-width: 900px) {
+
+  .photo-stack {
+    width: 150px !important;
+    height: 200px !important;
+  }
+
+  .photo-stack img {
+    width: 130px !important;
+    height: 130px !important;
+  }
+
+  .about-lower-text {
+    max-width: 90% !important;
+    padding: 1.2rem 1rem !important;
+  }
+}
+
+/* ============================================================
+   MOBILE PHOTO STACK — PERFECT OFFSET + MATCHED SIZE + OVERLAP
+   ============================================================ */
+@media (max-width: 900px) {
+
+  /* Center the whole block */
+  .about-photo {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 0 auto 1.5rem auto;
+    padding: 0;
+  }
+
+  /* Reset desktop layout completely */
+  .photo-stack {
+    position: relative;
+    width: 260px;   /* container width */
+    height: 170px;  /* container height */
+  }
+
+  .photo-stack img {
+    position: absolute;
+
+    /* RESET desktop transforms */
+    top: 0 !important;
+    bottom: auto !important;
+    left: auto !important;
+    transform: none !important;
+
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--accent);
+    cursor: pointer;
+    transition:
+      transform 0.35s ease,
+      filter 0.35s ease,
+      box-shadow 0.35s ease,
+      z-index 0.2s ease;
+  }
+
+  /* LEFT bubble */
+  .photo-stack .main-photo {
+    left: 20px !important;
+    z-index: 2;
+  }
+
+  /* RIGHT bubble */
+  .photo-stack .overlay-photo {
+    left: 90px !important;   /* slight overlap */
+    z-index: 1;
+  }
+
+  /* Active photo comes forward */
+  .photo-stack img.active {
+    z-index: 10 !important;
+    transform: scale(1.07);
+    filter: brightness(1.15);
+    box-shadow: 0 0 35px rgba(30,182,217,0.5);
+  }
+}
+
+

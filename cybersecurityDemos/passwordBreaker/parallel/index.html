@@ -9,6 +9,7 @@
 </head>
 
 <body>
+
     <!-- HEADER -->
     <header class="cs-nav">
         <div class="cs-left">
@@ -33,19 +34,19 @@
         <section class="panel left">
             <h2>Parallel Attack</h2>
             <p class="muted">
-                This attack uses <strong>multiple threads</strong> to divide the search space.
-                Each worker searches a portion of the PIN range (0000–9999).
-                As soon as <strong>any thread</strong> finds the PIN, all threads stop.
+                This attack uses multiple threads to divide the search space.
+                Each worker takes a section of the full PIN range from 0000 to 9999.
+                The moment any thread finds the correct PIN, all threads stop at once.
             </p>
 
             <h3>Choose a PIN</h3>
             <p class="muted">
-                You can enter your real PIN — nothing is saved or transmitted.
-                Everything runs locally inside your browser.
+                You can enter your actual PIN if you want. Nothing is stored or sent anywhere.
+                The entire simulation runs on your device.
             </p>
 
             <div class="pin-select">
-                <input id="pin-input" maxlength="4" placeholder="Enter 4-digit PIN..." />
+                <input id="pin-input" maxlength="4" placeholder="Enter 4 digit PIN..." />
                 <button id="random-pin">Random</button>
             </div>
 
@@ -60,7 +61,7 @@
                 <p>Total Checked: <span id="attempts">0</span></p>
                 <p>Time: <span id="time">0.000s</span></p>
                 <p>Current: <span id="current-attempt">None</span></p>
-                <p>Status: <span id="status-label">Waiting…</span></p>
+                <p>Status: <span id="status-label">Waiting...</span></p>
                 <p>Threads Running: <span id="thread-count">0</span></p>
             </div>
         </section>
@@ -73,18 +74,20 @@
             <div class="education">
                 <h3>How Parallel Attacks Work</h3>
                 <p class="muted">
-                    The PIN space (0000–9999) is split evenly across several workers.
-                    Each worker brute-forces its own range independently.
+                    The full PIN range is divided into even segments, and each thread brute forces its own section.
+                    This reduces the total search time because many guesses happen at the same time.
                 </p>
+
                 <ul class="muted">
-                    <li>Thread 1: 0000–2499</li>
-                    <li>Thread 2: 2500–4999</li>
-                    <li>Thread 3: 5000–7499</li>
-                    <li>Thread 4: 7500–9999</li>
+                    <li>Thread 1: 0000 to 2499</li>
+                    <li>Thread 2: 2500 to 4999</li>
+                    <li>Thread 3: 5000 to 7499</li>
+                    <li>Thread 4: 7500 to 9999</li>
                 </ul>
+
                 <p class="muted">
-                    This allows the attack to run up to <strong>4× faster</strong> depending on the device.
-                    When any thread finds the correct PIN, all threads immediately stop.
+                    On many devices this can run up to four times faster than a single thread.
+                    When one thread finds the correct PIN, it signals the others to stop immediately.
                 </p>
             </div>
         </section>

@@ -165,7 +165,7 @@ a:hover {
   flex-wrap: nowrap;
   justify-content: center;
   align-items: center;
-  gap: clamp(0.4rem, 2vw, 1rem);
+  gap: clamp(0.4rem, 100%, 1rem);
   flex: 1 1 auto;
 }
 
@@ -174,7 +174,7 @@ a:hover {
   text-decoration: none;
   font-weight: 600;
   letter-spacing: 0.7px;
-  font-size: clamp(0.75rem, 2.5vw, 0.95rem);
+  font-size: clamp(0.75rem, 100%, 0.95rem);
   transition: color 0.3s ease;
   white-space: nowrap;
 }
@@ -940,6 +940,14 @@ footer p {
    ============================================================ */
 @media (max-width: 600px) {
 
+  .nav-links {
+    gap: clamp(0.4rem, 100%, 1rem) !important;
+  }
+
+  .top-nav a {
+    font-size: clamp(0.75rem, 1%, 0.5rem) !important;
+  }
+
   /* HERO */
   .hero {
     flex-direction: column;
@@ -970,7 +978,8 @@ footer p {
   .about-photo {
     width: 100%;
     display: flex;
-    justify-content: center !important; /* <-- THIS FIXES YOUR CENTERING */
+    justify-content: center !important;
+    /* <-- THIS FIXES YOUR CENTERING */
     margin: 0 auto !important;
     padding: 0 !important;
   }
@@ -978,9 +987,12 @@ footer p {
   /* MOBILE PHOTO STACK */
   .photo-stack {
     position: relative;
-    width: 180px;   /* container width */
-    height: 150px;  /* container height */
-    margin: 0 auto !important; /* <-- force center */
+    width: 180px;
+    /* container width */
+    height: 150px;
+    /* container height */
+    margin: 0 auto !important;
+    /* <-- force center */
   }
 
   /* MOBILE-SIZED CIRCLES */
@@ -1003,7 +1015,8 @@ footer p {
 
   /* RIGHT bubble (overlay) */
   .photo-stack .overlay-photo {
-    left: 75px !important;  /* LESS OVERLAP */
+    left: 75px !important;
+    /* LESS OVERLAP */
     top: 10px !important;
     z-index: 1;
   }

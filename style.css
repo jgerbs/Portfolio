@@ -176,12 +176,8 @@ a:hover {
   text-decoration-color: var(--accent);
 }
 
-/* === NEW TOP ARROW BUTTON === */
-/* === FINAL TOP ARROW BUTTON (MATCHES FOOTER ICON GLOW EXACTLY) === */
-
+/* === TOP ARROW BUTTON === */
 .top-button {
-  position: absolute;
-  right: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;

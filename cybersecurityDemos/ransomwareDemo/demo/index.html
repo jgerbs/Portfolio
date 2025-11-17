@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Ransomware Simulation Demo</title>
+
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="demo.css">
+</head>
+
+<body>
+
+    <!-- NAV -->
+    <header class="cs-nav">
+        <div class="cs-left">
+            <a href="../../index.html" class="cs-home-btn">
+                <img src="../../../images/home.svg" class="cs-home-icon" alt="Home">
+            </a>
+        </div>
+
+        <div class="cs-center">
+            <h1>Ransomware Attack Simulation</h1>
+        </div>
+
+        <div class="cs-right">
+            <div class="led-container">
+                <div id="statusLed" class="record-light"></div>
+                <span id="statusLabel" class="led-text">Ready</span>
+            </div>
+        </div>
+    </header>
+
+
+
+    <!-- INTRO MODAL -->
+    <div id="introModal">
+        <div class="modal-box">
+            <h2>Welcome to the Ransomware Demo</h2>
+            <p>
+                This simulation lets you experience how ransomware infections typically begin:
+                by downloading and running unapproved software.
+            </p>
+            <button id="introProceed">Proceed to Demo</button>
+        </div>
+    </div>
+
+
+    <!-- ======================================================
+         THREE PANE LAYOUT
+         ====================================================== -->
+    <main id="threePane">
+
+        <!-- PANE 1: Simulated Foogle Search / Fake Website -->
+        <section class="panel pane-left">
+            <div class="pane-title">Simulated Download</div>
+            <div id="leftContent"></div>
+        </section>
+
+
+        <!-- PANE 2: Simulated File System -->
+        <section class="panel pane-center">
+            <div class="pane-title">Simulated File System</div>
+            <div id="fileExplorer"></div>
+        </section>
+
+
+        <!-- PANE 3: Simulated Logs -->
+        <section class="panel pane-right">
+            <div class="pane-title">Simulated Logs (SOC View)</div>
+
+            <div id="splunkSearchBar">
+                <input id="splunkSearchInput" type="text"
+                    placeholder="index=workstation sourcetype=sysmon host=EmployeeWorkstation-01">
+                <button id="splunkSearchBtn">Search</button>
+            </div>
+
+            <div id="splunkHeaderRow">
+                <div class="col-time">_time</div>
+                <div class="col-host">host</div>
+                <div class="col-source">source</div>
+                <div class="col-raw">_raw</div>
+            </div>
+
+            <div id="splunkEvents"></div>
+        </section>
+    </main>
+
+    <!-- EXECUTION WARNING MODAL -->
+    <div id="executeModal">
+        <div class="modal-box">
+            <h2>Run UnapprovedApp.exe?</h2>
+            <p>
+                This application is not approved by IT.
+                Running untrusted software may expose the organization to malware.
+            </p>
+            <button id="execConfirm">Run Anyway</button>
+            <button id="execCancel" class="cancel">Cancel</button>
+        </div>
+    </div>
+
+    <!-- RANSOM MODAL -->
+    <div id="ransomModal">
+        <div class="ransom-box">
+
+            <span id="ransomClose" class="ransom-close">&times;</span>
+
+            <div class="warning-icon"></div>
+            <h1>YOUR FILES ARE ENCRYPTED</h1>
+            <p>A malicious ransomware payload has locked your documents.</p>
+
+            <h3>Encrypted Content Preview</h3>
+            <pre id="ransomEncryptedContent" class="encrypted-preview"></pre>
+
+            <button id="decryptBtn">Simulate Payment (Decrypt Files)</button>
+        </div>
+    </div>
+
+
+    <!-- FILE PREVIEW MODAL -->
+    <div id="fileModal">
+        <div class="file-modal-box">
+            <span id="fileModalClose">&times;</span>
+            <h2 id="fileModalTitle"></h2>
+            <div id="fileModalContent"></div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+
+</body>
+
+</html>

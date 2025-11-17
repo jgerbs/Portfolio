@@ -43,12 +43,12 @@ let fileSystem = {
         expanded: false,
         files: [
             {
-                name: "team-photo.jpg",
+                name: "ransomware.jpg",
                 type: "JPEG Image",
                 size: "350 KB",
                 modified: "2025-09-28 4:17 PM",
                 encrypted: false,
-                content: src = "../../../images/team-photo.jpg"
+                content: "../../../images/ransomware.jpg"
             }
         ]
     },
@@ -278,7 +278,16 @@ renderFileSystem();
 function openFilePreview(file) {
     document.getElementById("fileModal").style.display = "flex";
     document.getElementById("fileModalTitle").textContent = `${file.name} (Preview)`;
-    document.getElementById("fileModalContent").textContent = file.content;
+    const box = document.getElementById("fileModalContent");
+
+    if (file.type.includes("Image")) {
+        // Image preview
+        box.innerHTML = `<img src="${file.content}" class="preview-image">`;
+    } else {
+        // Normal text preview
+        box.textContent = file.content;
+    }
+
 }
 
 document.getElementById("fileModalClose").onclick = () => {

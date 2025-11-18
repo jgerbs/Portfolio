@@ -82,34 +82,52 @@ function wait(ms) {
 
 
 /******************************************************************
-   LOGGING → SPLUNK
+   REALISTIC SYSMon-STYLE LOGGING
 ******************************************************************/
-function log(msg) {
-
-    let severity = "info";  // default
-
-    if (msg.includes("Suspicious")) severity = "warning";
-    if (msg.includes("Encrypting")) severity = "critical";
-    if (msg.includes("shadow copy")) severity = "critical";
-    if (msg.includes("Ransomware finished")) severity = "critical";
+function logSysmonLike(msg, fileTarget = null, severity = "info") {
 
     const event = {
         time: new Date().toISOString(),
         host: "EmployeeWorkstation-01",
-        source: "ransomware-sim.js",
+        source: "Sysmon",
+        event_id: determineEventId(msg),
+        severity: severity,
         raw: msg,
-        json: {
-            event: msg,
-            host: "EmployeeWorkstation-01",
-            severity: severity,
-            action: "simulation",
-            timestamp: Date.now()
-        }
+
+        user: "WORKSTATION\\Jack",
+
+        process: {
+            image: "C:\\Users\\Jack\\Downloads\\UnapprovedApp.exe",
+            commandLine: "\"C:\\Users\\Jack\\Downloads\\UnapprovedApp.exe\"",
+            processId: 5824,
+            parentProcessId: 4321,
+            parentImage: "C:\\Windows\\explorer.exe",
+            integrityLevel: "Medium",
+            hashes: {
+                MD5: "a2c9d4f65ff83e1a",
+                SHA256: "921eab0c980d4cd3c72cbc88a901f45d0dd..."
+            }
+        },
+
+        file: fileTarget
+            ? {
+                targetFilename: fileTarget,
+                action: msg.includes("Encrypting") ? "FileEncrypted" : "FileAccessed"
+            }
+            : null,
+
+        message: msg
     };
 
     splunkAddEvent(event);
 }
 
+function determineEventId(msg) {
+    if (msg.includes("executed")) return 1;          // Process Create
+    if (msg.includes("Encrypting")) return 11;       // File Write/Create
+    if (msg.includes("shadow copy")) return 1;       // vssadmin.exe
+    return 3;                                       // Generic activity
+}
 
 
 /******************************************************************
@@ -127,7 +145,7 @@ function loadFoogleSearch() {
         <div class="foogle-searchbar">free photo editor windows</div>
 
         <div class="foogle-result">
-            <div class="foogle-link">PhotoStudioPro — Free Photo Editor for Windows</div>
+            <div class="foogle-link">PhotoStudioPro: Free Photo Editor for Windows</div>
             <div class="foogle-url">https://www.photo-editor-foogle-downloads.com</div>
             <div class="foogle-desc">Fast, powerful, and free editor. RAW support, filters, and more.</div>
 
@@ -149,23 +167,40 @@ function loadFakeSite() {
         <div class="simple-photosite">
 
             <div class="simple-banner">
-                <h2>PhotoStudioPro Photo Editing Software</h2>
-                <p>Edit your photos quickly and easily</p>
+                <h2>PhotoStudioPro: Free Photo Editing Suite</h2>
+                <p>Fast, powerful, and easy-to-use tools for photographers and creators. Completely free to use!!! (this is a simulated unapproved app, download and execute the .exe below to learn more)</p>
             </div>
 
             <div class="simple-flex">
+
+                <!-- LEFT SIDE (FEATURES + DOWNLOAD BUTTON) -->
                 <div class="simple-left">
 
-                    <ul>
-                        <li>Crop, resize, and enhance</li>
-                        <li>Retouch photos effortlessly</li>
-                        <li>Color filters and effects</li>
-                        <li>Creative tools included</li>
+                    <h3 class="simple-section-title">Key Features</h3>
+
+                    <ul class="simple-features">
+                        <li><strong>AI Auto-Enhance</strong>: Instantly fixes exposure, color, and sharpness.</li>
+                        <li><strong>Retouch Tools</strong>: Remove blemishes, smooth skin, clean backgrounds.</li>
+                        <li><strong>120+ Filters</strong>: Cinematic, HDR, retro film, portrait presets.</li>
+                        <li><strong>Layer Editing</strong>: Add text, overlays, and creative effects.</li>
+                        <li><strong>RAW Support</strong>: Compatible with DSLR & mirrorless cameras.</li>
+                        <li><strong>One-Click Export</strong>: Save for web, print, or social instantly.</li>
                     </ul>
+
+                    <div class="simple-version-box">
+                        <p><strong>Version:</strong> 4.7.2</p>
+                        <p><strong>Updated:</strong> Oct 2025</p>
+                        <p><strong>Size:</strong> 78 MB</p>
+                        <p><strong>OS:</strong> Windows 10/11 (64-bit)</p>
+                    </div>
 
                     <button id="downloadBtn" class="simple-download-btn">
                         Download for Windows
                     </button>
+
+                    <div class="simple-safe-note">
+                        <span>Secure digital signature verified</span>
+                    </div>
 
                     <button id="backToSearch" class="simple-back-btn">
                         Back to Foogle
@@ -173,6 +208,7 @@ function loadFakeSite() {
 
                 </div>
 
+                <!-- RIGHT SIDE (YOUR ORIGINAL IMAGE) -->
                 <div class="simple-right">
                     <img src="../../../images/photoeditor.jpg" class="simple-screenshot">
                 </div>
@@ -185,9 +221,8 @@ function loadFakeSite() {
     document.getElementById("backToSearch").onclick = loadFoogleSearch;
 }
 
-
 /******************************************************************
-   HANDLE DOWNLOAD (Add UnapprovedApp.exe)
+   HANDLE DOWNLOAD (Adds UnapprovedApp.exe)
 ******************************************************************/
 function handleDownload() {
 
@@ -201,7 +236,10 @@ function handleDownload() {
     });
 
     renderFileSystem();
-    log("Downloaded UnapprovedApp.exe into Downloads folder.");
+    logSysmonLike("Downloaded UnapprovedApp.exe into Downloads folder.", 
+        "C:\\Users\\Jack\\Downloads\\UnapprovedApp.exe",
+        "info"
+    );
 }
 
 
@@ -278,21 +316,20 @@ renderFileSystem();
 function openFilePreview(file) {
     document.getElementById("fileModal").style.display = "flex";
     document.getElementById("fileModalTitle").textContent = `${file.name} (Preview)`;
+
     const box = document.getElementById("fileModalContent");
 
     if (file.type.includes("Image")) {
-        // Image preview
         box.innerHTML = `<img src="${file.content}" class="preview-image">`;
     } else {
-        // Normal text preview
         box.textContent = file.content;
     }
-
 }
 
 document.getElementById("fileModalClose").onclick = () => {
     document.getElementById("fileModal").style.display = "none";
 };
+
 document.getElementById("ransomClose").onclick = () => {
     document.getElementById("ransomModal").style.display = "none";
 };
@@ -339,18 +376,17 @@ document.getElementById("execConfirm").onclick = () => {
 ******************************************************************/
 async function runSimulation() {
 
-    // Start LED: ON and pulsing
     setStatus("Ransomware Running", true);
 
-    log("User executed UnapprovedApp.exe");
+    logSysmonLike("User executed UnapprovedApp.exe", null, "info");
     await wait(700);
 
     setStatus("Suspicious Activity Detected", true);
-    log("Suspicious post-install script triggered.");
+    logSysmonLike("Suspicious post-install script triggered.", null, "warning");
     await wait(800);
 
     setStatus("Scanning Files...", true);
-    log("Scanning files silently...");
+    logSysmonLike("Scanning files silently...", null, "info");
     await wait(800);
 
     /* Encrypt each file */
@@ -360,7 +396,11 @@ async function runSimulation() {
         for (let file of folder.files) {
 
             setStatus(`Encrypting ${file.name}...`, true);
-            log("Encrypting " + file.name);
+
+            const targetFile =
+                `C:\\Users\\Jack\\${folderName}\\${file.name}`;
+
+            logSysmonLike("Encrypting " + file.name, targetFile, "critical");
 
             file.encrypted = true;
             file.content = fakeEncrypt(file.content);
@@ -372,13 +412,15 @@ async function runSimulation() {
     }
 
     setStatus("Deleting Shadow Copies...", true);
-    log("Attempting shadow copy deletion (simulated).");
+    logSysmonLike("Attempting shadow copy deletion (simulated).",
+        "C:\\Windows\\System32\\vssadmin.exe",
+        "critical"
+    );
     await wait(600);
 
     setStatus("Files Encrypted", false);
-    log("Ransomware finished encrypting files.");
+    logSysmonLike("Ransomware finished encrypting files.", null, "critical");
 }
-
 
 
 /******************************************************************
@@ -398,30 +440,29 @@ document.getElementById("decryptBtn").onclick = () => {
 
     renderFileSystem();
 
-    log("Files restored after simulated ransom payment.");
+    logSysmonLike("Files restored after simulated ransom payment.", null, "info");
     document.getElementById("ransomModal").style.display = "none";
 
-    document.getElementById("statusBar").textContent = "Status: Files restored.";
+    setStatus("Files Restored", false);
 };
 
 
 /******************************************************************
    SPLUNK ENGINE — REAL SEARCH & HIGHLIGHT
 ******************************************************************/
-
 function splunkAddEvent(event) {
     splunkEventsCache.push(event);
     renderSplunkEvents(splunkEventsCache);
 }
 
-/* Highlight */
+/* Highlight search matches */
 function highlight(text, query) {
     if (!query) return text;
     const safe = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     return text.replace(new RegExp(safe, "gi"), m => `<mark class="splunk-highlight">${m}</mark>`);
 }
 
-/* Syntax color JSON */
+/* Syntax-highlight JSON */
 function syntaxHighlightJSON(obj) {
     return JSON.stringify(obj, null, 2)
         .replace(/\"([^"]+)\"(?=\:)/g, '<span class="json-key">"$1"</span>')
@@ -430,7 +471,7 @@ function syntaxHighlightJSON(obj) {
         .replace(/\b([0-9]+)\b/g, '<span class="json-number">$1</span>');
 }
 
-/* Parse Splunk-like queries */
+/* Parse Splunk-style queries */
 function parseQuery(q) {
     const parts = q.match(/(?:[^\s"]+|"[^"]*")+/g) || [];
     const filters = { raw: [], fields: {} };
@@ -447,21 +488,17 @@ function parseQuery(q) {
     return filters;
 }
 
-/* Match event using query */
+/* Query matching engine */
 function splunkMatchEvent(ev, filters) {
 
     // field=value filters
     for (const field in filters.fields) {
         const val = filters.fields[field];
-        const src =
-            (ev[field] ||
-                ev.json[field] ||
-                "").toString().toLowerCase();
-
+        const src = (ev[field] || ev.json[field] || "").toString().toLowerCase();
         if (!src.includes(val)) return false;
     }
 
-    // raw text search
+    // raw search
     for (const kw of filters.raw) {
         const raw = (ev.raw + " " + JSON.stringify(ev.json)).toLowerCase();
         if (!raw.includes(kw)) return false;
@@ -474,7 +511,6 @@ function splunkMatchEvent(ev, filters) {
 /******************************************************************
    RENDER SPLUNK EVENTS
 ******************************************************************/
-
 function renderSplunkEvents(events, query = "") {
     const container = document.getElementById("splunkEvents");
     container.innerHTML = "";
@@ -485,7 +521,7 @@ function renderSplunkEvents(events, query = "") {
         .filter(ev => splunkMatchEvent(ev, filters))
         .forEach(ev => {
 
-            const severity = ev.json.severity?.toLowerCase() || "info";
+            const severity = ev.severity?.toLowerCase() || "info";
             const sevClass = "sev-" + severity;
 
             const row = document.createElement("div");
@@ -512,7 +548,7 @@ function renderSplunkEvents(events, query = "") {
                 } else {
                     expanded = document.createElement("div");
                     expanded.className = "splunk-expanded";
-                    expanded.innerHTML = syntaxHighlightJSON(ev.json);
+                    expanded.innerHTML = syntaxHighlightJSON(ev);
                     row.insertAdjacentElement("afterend", expanded);
                 }
             };
@@ -535,8 +571,9 @@ document.getElementById("splunkSearchInput").onkeydown = e => {
     }
 };
 
+
 /******************************************************************
-    Status LED
+   STATUS LED SYSTEM
 ******************************************************************/
 function setStatus(text, active = false) {
     const led = document.getElementById("statusLed");

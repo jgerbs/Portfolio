@@ -1,0 +1,283 @@
+/* ----------------------------------------------
+   GENERAL LAYOUT
+---------------------------------------------- */
+main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+.section h2 {
+    font-size: 1.8rem;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    padding-bottom: 6px;
+}
+
+.muted {
+    opacity: 0.9;
+    line-height: 1.6;
+}
+
+/* ----------------------------------------------
+   TABLES — MITRE, IOCs, TIMELINES
+---------------------------------------------- */
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.report-table th {
+    background: #0e1a24;
+    color: var(--accent);
+    text-align: left;
+    padding: 12px;
+    font-weight: 600;
+    border-bottom: 2px solid var(--accent-dark);
+}
+
+.report-table td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    color: #d8e8f4;
+    font-size: 0.95rem;
+}
+
+.report-table tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.report-table tr:hover {
+    background: rgba(30, 182, 217, 0.08);
+    transition: 0.2s;
+}
+
+/* ----------------------------------------------
+   SCREENSHOT PLACEHOLDERS
+---------------------------------------------- */
+.screenshot-placeholder {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px dashed var(--accent-dark);
+    border-radius: 10px;
+    height: 260px;
+    margin: 1.5rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    opacity: 0.65;
+}
+
+/* ----------------------------------------------
+   LISTS
+---------------------------------------------- */
+ul {
+    margin-top: 0.5rem;
+    padding-left: 1.2rem;
+}
+
+ul li {
+    margin-bottom: 0.4rem;
+}
+
+/* ----------------------------------------------
+   INLINE CODE
+---------------------------------------------- */
+code {
+    background: #0e1a24;
+    color: #8fceff;
+    padding: 3px 6px;
+    border-radius: 6px;
+    font-family: "JetBrains Mono", monospace;
+}
+
+/* ----------------------------------------------
+   RESPONSIVE
+---------------------------------------------- */
+@media (max-width: 700px) {
+    main {
+        padding: 1.2rem;
+    }
+    .section {
+        padding: 1.4rem;
+    }
+    .section h2 {
+        font-size: 1.5rem;
+    }
+}
+
+
+/* ============================================================
+   SCREENSHOT GRID + IMAGE STYLING (MATCHES PORTFOLIO THEME)
+   ============================================================ */
+
+/* Wrapper around each screenshot */
+.report-image {
+    background: rgba(12, 16, 20, 0.85);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1rem;
+    margin: 2rem 0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+    backdrop-filter: blur(8px);
+}
+
+/* Actual screenshot image */
+.report-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.35);
+    display: block;
+    margin-bottom: 0.75rem;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Hover effect */
+.report-image img:hover {
+    transform: scale(1.015);
+    box-shadow: 0 0 22px rgba(30, 182, 217, 0.35);
+}
+
+/* Caption under image */
+.report-caption {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-top: 0.3rem;
+    letter-spacing: 0.3px;
+}
+
+/* Layout for multiple images */
+.report-image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-top: 1.5rem;
+}
+
+/* ============================================================
+   FULL-WIDTH LARGE IMAGE OPTION (for key screenshots)
+   ============================================================ */
+.report-image.full {
+    width: 100%;
+}
+
+.report-image.full img {
+    max-height: 520px;
+    object-fit: contain;
+}
+
+
+/* ============================================================
+   MOBILE RESPONSIVE
+   ============================================================ */
+@media (max-width: 700px) {
+
+    .report-image {
+        padding: 0.7rem;
+    }
+
+    .report-image img {
+        border-radius: 8px;
+    }
+
+    .report-caption {
+        font-size: 0.85rem;
+    }
+}
+
+.embed-wrapper {
+    width: 100%;
+    height: 600px;
+    border: 1px solid var(--accent-dark);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-top: 1.2rem;
+    margin-bottom: 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.embed-wrapper iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .embed-wrapper {
+        height: 420px;
+    }
+}
+
+/* ============================================================
+   EVIDENCE VIEWER (Carousel)
+============================================================ */
+
+.evidence-viewer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2rem;
+    margin: 1.5rem 0 1rem;
+}
+
+.ev-image-wrapper {
+    width: 100%;
+    max-width: 850px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--accent-dark);
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ev-image-wrapper img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+.ev-btn {
+    background: var(--accent);
+    border: none;
+    color: #000;
+    padding: 12px 16px;
+    font-size: 2rem;
+    line-height: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+    box-shadow: 0 0 15px rgba(30, 182, 217, 0.4);
+}
+
+.ev-btn:hover {
+    background: var(--accent-dark);
+    color: white;
+    transform: scale(1.1);
+}
+
+.ev-caption {
+    text-align: center;
+    font-size: 1.05rem;
+    opacity: 0.9;
+    margin-top: 0.5rem;
+}
+
+/* Mobile */
+@media (max-width: 750px) {
+    .ev-btn {
+        font-size: 1.6rem;
+        padding: 10px 12px;
+    }
+}
+

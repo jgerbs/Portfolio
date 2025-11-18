@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ransomware Incident Report</title>
+
+    <!-- Reuse your portfolio/global theme -->
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="report.css">
+</head>
+
+<body>
+
+    <!-- NAV -->
+    <header class="cs-nav">
+        <div class="cs-left">
+            <a href="../../index.html" class="cs-home-btn">
+                <img src="../../../images/home.svg" alt="Home" class="cs-home-icon">
+            </a>
+        </div>
+
+        <div class="cs-center">
+            <h1>Ransomware Incident Report</h1>
+        </div>
+
+        <div class="cs-right"></div>
+    </header>
+
+    <!-- MAIN WRAPPER -->
+    <main class="report-container">
+
+        <!-- EXEC SUMMARY -->
+        <section class="section">
+            <h2>Executive Summary</h2>
+            <p class="muted">
+                This report documents a simulated ransomware security incident executed on a workstation environment.
+                The simulation demonstrates how a common ransomware attack unfolds, how Sysmon logs appear inside a
+                SIEM,
+                and how an analyst performs triage, timeline reconstruction, and evidence collection in accordance with
+                NIST 800-61, CompTIA Security+, and Google Cybersecurity Certificate best practices.
+            </p>
+        </section>
+
+
+        <!-- ATTACK OVERVIEW -->
+        <section class="section">
+            <h2>Attack Overview</h2>
+            <p class="muted">
+                The incident began when the user accessed a deceptive website disguised as a legitimate photo editor.
+                The site delivered a malicious executable (<strong>UnapprovedApp.exe</strong>) which the user downloaded
+                and ran. Upon execution, a script silently enumerated and encrypted files in the Documents and Pictures
+                directories, then attempted to delete shadow copies to prevent recovery.
+            </p>
+
+            <ul class="muted">
+                <li>Initial Access: Social engineering via deceptive download website</li>
+                <li>Execution: User runs <strong>UnapprovedApp.exe</strong></li>
+                <li>Discovery: Malware enumerates local files</li>
+                <li>Impact: Local file encryption</li>
+                <li>Recovery Inhibition: Shadow copy deletion attempt</li>
+            </ul>
+        </section>
+
+
+        <!-- TIMELINE -->
+        <section class="section">
+            <h2>Timeline of Events</h2>
+
+            <p class="muted">The following table reconstructs the incident timeline using collected Sysmon logs.</p>
+
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Event</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>03:26:27.359</td>
+                        <td>User Download</td>
+                        <td>UnapprovedApp.exe saved to Downloads folder</td>
+                    </tr>
+
+                    <tr>
+                        <td>03:27:04.135</td>
+                        <td>Process Execution</td>
+                        <td>User executed UnapprovedApp.exe</td>
+                    </tr>
+
+                    <tr>
+                        <td>03:27:04.843</td>
+                        <td>Suspicious Activity</td>
+                        <td>Post-install script triggered</td>
+                    </tr>
+
+                    <tr>
+                        <td>03:27:05.653</td>
+                        <td>File Enumeration</td>
+                        <td>Malware scans local files</td>
+                    </tr>
+
+                    <tr>
+                        <td>03:27:06.460</td>
+                        <td>Encryption Started</td>
+                        <td>invoice.pdf encrypted</td>
+                    </tr>
+
+                    <tr>
+                        <td>03:27:07.066</td>
+                        <td>File Encryption</td>
+                        <td>payroll.xlsx encrypted</td>
+                    </tr>
+
+                    <tr>
+                        <td>03:27:07.682</td>
+                        <td>File Encryption</td>
+                        <td>benefits.docx encrypted</td>
+                    </tr>
+
+                    <tr>
+                        <td>03:27:08.342</td>
+                        <td>File Encryption</td>
+                        <td>ransomware.jpg encrypted</td>
+                    </tr>
+
+                    <tr>
+                        <td>03:27:08.980</td>
+                        <td>File Encryption</td>
+                        <td>UnapprovedApp.exe encrypted</td>
+                    </tr>
+
+                    <tr>
+                        <td>03:27:09.492</td>
+                        <td>Shadow Copy Deletion</td>
+                        <td>vssadmin.exe invoked to remove restore points</td>
+                    </tr>
+
+                    <tr>
+                        <td>03:27:10.096</td>
+                        <td>Impact Completed</td>
+                        <td>All files encrypted; ransom modal displayed</td>
+                    </tr>
+                </tbody>
+
+            </table>
+        </section>
+
+
+        <!-- EVIDENCE VIEWER -->
+        <section class="section">
+            <h2>Evidence of Incident</h2>
+            <p class="muted">
+                Use the navigation arrows to cycle through the collected evidence from the
+                simulated ransomware attack. Each screenshot corresponds to a key phase
+                in the intrusion process.
+            </p>
+
+            <div class="evidence-viewer">
+                <button class="ev-btn ev-left" id="evPrev">&#10094;</button>
+
+                <div class="ev-image-wrapper">
+                    <img id="evImage" src="../../../images/incidentReport/fooglesim.png" alt="Evidence Image">
+                </div>
+
+                <button class="ev-btn ev-right" id="evNext">&#10095;</button>
+            </div>
+
+            <p id="evCaption" class="ev-caption">
+                <strong>Figure 1:</strong> User searches for a free photo editor and encounters the deceptive Foogle
+                result.
+            </p>
+        </section>
+
+
+
+        <!-- IOC TABLE -->
+        <section class="section">
+            <h2>Indicators of Compromise (IOCs)</h2>
+
+            <p class="muted">
+                The following indicators were extracted directly from Sysmon logs and observed host behavior.
+                These IOCs would be used to search across the environment for lateral movement, additional
+                infections, or related suspicious activity.
+            </p>
+
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Indicator</th>
+                        <th>Context / Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td><strong>File Hash (SHA-256)</strong></td>
+                        <td><code>921eab0c980d4cd3c72cbc88a901f45d0dd...</code></td>
+                        <td>Malicious binary <em>UnapprovedApp.exe</em> recorded in Sysmon process creation logs.</td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>File Hash (MD5)</strong></td>
+                        <td><code>a2c9d4f65ff83e1a</code></td>
+                        <td>MD5 signature of the malicious executable.</td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Filename</strong></td>
+                        <td>UnapprovedApp.exe</td>
+                        <td>Dropped into <code>C:\Users\Jack\Downloads\</code></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Process</strong></td>
+                        <td>C:\Users\Jack\Downloads\UnapprovedApp.exe</td>
+                        <td>Executed by <code>explorer.exe</code></td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Command Line</strong></td>
+                        <td><code>"C:\Users\Jack\Downloads\UnapprovedApp.exe"</code></td>
+                        <td>Shows no arguments; suggests embedded script or hidden payload.</td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Suspicious Command</strong></td>
+                        <td><code>vssadmin delete shadows /all /quiet</code></td>
+                        <td>Classic ransomware anti-recovery command.</td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>File Extension</strong></td>
+                        <td>.jackcrypt</td>
+                        <td>Used to overwrite all encrypted files.</td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Targeted Files</strong></td>
+                        <td>invoice.pdf, payroll.xlsx, benefits.docx, ransomware.jpg</td>
+                        <td>Sequential encryption order matched Sysmon timestamps.</td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Network Indicators</strong></td>
+                        <td>None observed</td>
+                        <td>This ransomware operated entirely offline in the simulation.</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </section>
+
+
+        <!-- MITRE MAPPING -->
+        <section class="section">
+            <h2>MITRE ATT&CK Mapping</h2>
+
+            <p class="muted">
+                The following table maps each observed activity to the corresponding MITRE ATT&CK tactic and
+                technique. This demonstrates how the attack aligns with known adversary behaviors.
+            </p>
+
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>Tactic</th>
+                        <th>Technique</th>
+                        <th>ID</th>
+                        <th>Evidence</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>Initial Access</td>
+                        <td>Drive-by Compromise</td>
+                        <td>T1189</td>
+                        <td>User sent to deceptive website (Figure 1)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Execution</td>
+                        <td>User Execution</td>
+                        <td>T1204.002</td>
+                        <td>User manually launched UnapprovedApp.exe (Figure 5–6)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Discovery</td>
+                        <td>File and Directory Discovery</td>
+                        <td>T1083</td>
+                        <td>Malware scanning files prior to encryption (Figure 8)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Impact</td>
+                        <td>Data Encrypted for Impact</td>
+                        <td>T1486</td>
+                        <td>Sysmon Event ID 11 confirming file write + extension change</td>
+                    </tr>
+
+                    <tr>
+                        <td>Defense Evasion</td>
+                        <td>Inhibit System Recovery</td>
+                        <td>T1490</td>
+                        <td>Use of <code>vssadmin delete shadows</code> (Figure 9)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Persistence</td>
+                        <td>None Observed</td>
+                        <td>-</td>
+                        <td>This simulation does not include registry or scheduled task persistence.</td>
+                    </tr>
+
+                    <tr>
+                        <td>Command and Control</td>
+                        <td>None Observed</td>
+                        <td>-</td>
+                        <td>Offline ransomware; no outbound traffic detected.</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </section>
+
+        <!-- ATTACK FLOW DIAGRAM-->
+        <section class="section">
+            <h2>Attack Flow Diagram</h2>
+            <p class="muted">
+                The attack flow diagram is embedded below for clarity and visual
+                walkthrough. This version provides a clean, scalable view directly from Figma.
+            </p>
+
+            <div class="embed-wrapper">
+                <iframe src="https://crush-legal-11277490.figma.site/" allowfullscreen loading="lazy">
+                </iframe>
+            </div>
+
+            <p class="muted">
+                <strong>Figure 13:</strong> Interactive attack chain diagram illustrating the full ransomware
+                lifecycle from user interaction to encryption and ransom display.
+            </p>
+        </section>
+
+
+        <!-- ROOT CAUSE -->
+        <section class="section">
+            <h2>Root Cause Analysis</h2>
+            <p class="muted">
+                The root cause of the incident was the user's execution of unverified software from an untrusted
+                website.
+                Lack of application allow-listing, insufficient user awareness training, and missing endpoint protection
+                tools allowed the malware to run without interruption.
+            </p>
+        </section>
+
+
+        <!-- RECOMMENDATIONS -->
+        <section class="section">
+            <h2>Recommendations</h2>
+            <ul class="muted">
+                <li>Implement Application Allow-Listing (WDAC or AppLocker)</li>
+                <li>Enhance web filtering to block deceptive download sites</li>
+                <li>Deploy EDR capable of blocking script-based post-install execution</li>
+                <li>Ensure backups are immutable and segmented</li>
+                <li>Provide cybersecurity awareness training</li>
+                <li>Enable Sysmon + centralized SIEM logging</li>
+            </ul>
+        </section>
+
+    </main>
+    <script src="script.js"></script>
+</body>
+
+
+
+</html>

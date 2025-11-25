@@ -484,3 +484,7 @@ body {
   background: #d63a00; /* darker orange hover */
 }
 
+.jr-input-error {
+  border: 2px solid #ff4d4d !important;
+  background: #fff6f6;
+}

@@ -2,14 +2,32 @@
 
 <form action="/posts/edit/<%= post.id %>" method="POST" class="jr-form">
 
+  <% if (errors && errors.length > 0) { %>
+    <div style="
+      background:#ffe4e4;
+      border:1px solid #ff9a9a;
+      padding:12px;
+      border-radius:6px;
+      margin-bottom:16px;
+      color:#a30000;
+      font-size:0.95rem;">
+      <strong>Error:</strong>
+      <ul>
+        <% errors.forEach(err => { %>
+          <li><%= err %></li>
+        <% }) %>
+      </ul>
+    </div>
+  <% } %>
+
   <!-- TITLE -->
   <label for="title">Title</label>
   <input 
     type="text" 
     id="title" 
-    name="title" 
-    required
-    value="<%= post.title %>"
+    name="title"
+    value="<%= formData.title || '' %>"
+    class="<%= errors.includes('Title is required.') ? 'jr-input-error' : '' %>"
   />
 
   <!-- LINK -->
@@ -18,7 +36,8 @@
     type="url" 
     id="link" 
     name="link"
-    value="<%= post.link || '' %>"
+    value="<%= formData.link || '' %>"
+    class="<%= errors.includes('You must provide a link OR a description.') ? 'jr-input-error' : '' %>"
   />
 
   <!-- DESCRIPTION -->
@@ -27,7 +46,8 @@
     id="description" 
     name="description"
     rows="4"
-  ><%= post.description || '' %></textarea>
+    class="<%= errors.includes('You must provide a link OR a description.') ? 'jr-input-error' : '' %>"
+  ><%= formData.description || '' %></textarea>
 
   <!-- NOTE: SUBGROUP IS NOT EDITABLE -->
   <p class="jr-note">
@@ -35,7 +55,6 @@
     (Subgroups cannot be changed after creation.)
   </p>
 
-  <!-- SUBMIT -->
   <button type="submit" class="jr-submit-btn">Save Changes</button>
 
 </form>

@@ -26,15 +26,6 @@ export function createUser(uname, password) {
     });
 }
 
-
-// get all subgroups
-// export function getSubs() {
-//   return prisma.sub.findMany({
-//     select: { name: true },
-//   }).then(subs => subs.map(s => s.name));
-// }
-
-
 // get subgroup by name
 export async function getSubs() {
     const posts = await prisma.post.findMany({
@@ -43,7 +34,6 @@ export async function getSubs() {
 
     return [...new Set(posts.map(p => p.subgroup))];
 }
-
 
 // create subgroup
 export function createSub(name) {

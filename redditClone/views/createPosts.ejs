@@ -2,45 +2,48 @@
 
 <form action="/posts/create" method="POST" class="jr-form">
 
-  <!-- TITLE -->
-  <label for="title">Title (required)</label>
-  <input 
-    type="text" 
-    id="title" 
-    name="title" 
-    required
-    placeholder="Enter a descriptive title"
-  />
+  <% if (errors && errors.length> 0) { %>
+    <div style="
+      background:#ffe4e4;
+      border:1px solid #ff9a9a;
+      padding:12px;
+      border-radius:6px;
+      margin-bottom:16px;
+      color:#a30000;
+      font-size:0.95rem;">
+      <strong>Error:</strong>
+      <ul>
+        <% errors.forEach(err=> { %>
+          <li>
+            <%= err %>
+          </li>
+          <% }) %>
+      </ul>
+    </div>
+    <% } %>
 
-  <!-- LINK -->
-  <label for="link">Link (optional)</label>
-  <input 
-    type="url" 
-    id="link" 
-    name="link"
-    placeholder="https://example.com"
-  />
+      <!-- TITLE -->
+      <label for="title">Title (required)</label>
+      <input type="text" id="title" name="title" value="<%= formData.title || '' %>"
+        class="<%= errors.includes('Title is required.') ? 'jr-input-error' : '' %>" />
 
-  <!-- DESCRIPTION -->
-  <label for="description">Description (optional)</label>
-  <textarea 
-    id="description" 
-    name="description"
-    rows="4"
-    placeholder="Write something about the link…"
-  ></textarea>
+      <!-- LINK -->
+      <label for="link">Link</label>
+      <input type="url" id="link" name="link" placeholder="https://example.com" value="<%= formData.link || '' %>"
+        class="<%= errors.includes('You must provide a link OR a description.') ? 'jr-input-error' : '' %>" />
 
-  <!-- SUBGROUP -->
-  <label for="sub">Subgroup (required)</label>
-  <input 
-    type="text" 
-    id="sub" 
-    name="sub" 
-    required
-    placeholder="e.g., programming, gaming, movies"
-  />
+      <!-- DESCRIPTION -->
+      <label for="description">Description (must provide link or description)</label>
+      <textarea id="description" name="description" rows="4" placeholder="Write something about the link"
+        class="<%= errors.includes('You must provide a link OR a description.') ? 'jr-input-error' : '' %>"><%= formData.description || '' %></textarea>
 
-  <!-- SUBMIT -->
-  <button type="submit" class="jr-submit-btn">Create Post</button>
+      <!-- SUBGROUP -->
+      <label for="sub">Subgroup (required)</label>
+      <input type="text" id="sub" name="sub" placeholder="e.g., programming, gaming, movies"
+        value="<%= formData.sub || '' %>"
+        class="<%= errors.includes('Subgroup is required.') ? 'jr-input-error' : '' %>" />
+
+      <!-- SUBMIT -->
+      <button type="submit" class="jr-submit-btn">Create Post</button>
 
 </form>

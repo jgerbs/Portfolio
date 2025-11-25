@@ -4,106 +4,114 @@
   <% if (user) { %>
     <div class="jr-vote-box">
 
-      <% 
-        const myVoteObj = post.votes.find(v => v.user_id === user?.id);
+      <% const myVoteObj=post.votes.find(v=> v.user_id === user?.id);
         const myVote = myVoteObj ? myVoteObj.value : 0;
-      %>
+        %>
 
-      <!-- UPVOTE -->
-      <form action="/posts/vote/<%= post.id %>" method="post">
-        <input type="hidden" name="setvoteto" value="<%= myVote === 1 ? 0 : 1 %>">
-        <button class="jr-vote-btn <%= myVote === 1 ? 'active-up' : '' %>">
-          <img src="/up-circle.svg" class="jr-arrow">
-        </button>
-      </form>
+        <!-- UPVOTE -->
+        <form action="/posts/vote/<%= post.id %>" method="post">
+          <input type="hidden" name="setvoteto" value="<%= myVote === 1 ? 0 : 1 %>">
+          <button class="jr-vote-btn <%= myVote === 1 ? 'active-up' : '' %>">
+            <img src="/up-circle.svg" class="jr-arrow">
+          </button>
+        </form>
 
-      <!-- SCORE -->
-      <div class="jr-vote-score 
+        <!-- SCORE -->
+        <div class="jr-vote-score 
         <%= myVote === 1 ? 'jr-score-up' : '' %>
         <%= myVote === -1 ? 'jr-score-down' : '' %>">
-        <%= post.voteTotal %>
-      </div>
+          <%= post.voteTotal %>
+        </div>
 
-      <!-- DOWNVOTE -->
-      <form action="/posts/vote/<%= post.id %>" method="post">
-        <input type="hidden" name="setvoteto" value="<%= myVote === -1 ? 0 : -1 %>">
-        <button class="jr-vote-btn <%= myVote === -1 ? 'active-down' : '' %>">
-          <img src="/down-circle.svg" class="jr-arrow">
-        </button>
-      </form>
+        <!-- DOWNVOTE -->
+        <form action="/posts/vote/<%= post.id %>" method="post">
+          <input type="hidden" name="setvoteto" value="<%= myVote === -1 ? 0 : -1 %>">
+          <button class="jr-vote-btn <%= myVote === -1 ? 'active-down' : '' %>">
+            <img src="/down-circle.svg" class="jr-arrow">
+          </button>
+        </form>
 
     </div>
-  <% } %>
-
-  <!-- MAIN CONTENT -->
-  <div class="jr-post-content">
-
-    <h1 class="jr-post-title-main"><%= post.title %></h1>
-
-    <% if (post.link) { %>
-      <p class="jr-post-link-wrapper">
-        <a href="<%= post.link %>" target="_blank" class="jr-post-link">
-          <%= post.link %>
-        </a>
-      </p>
     <% } %>
 
-    <div class="jr-meta">
-      Posted by <span class="jr-user-tag">u/<%= post.creator.uname %></span>
-      in <a href="/subs/show/<%= post.subgroup %>" class="jr-sub-link">r/<%= post.subgroup %></a>
-      • <%= new Date(post.timestamp).toLocaleString() %>
-    </div>
+      <!-- MAIN CONTENT -->
+      <div class="jr-post-content">
 
-    <% if (post.description) { %>
-      <p class="jr-description jr-description-main"><%= post.description %></p>
-    <% } %>
+        <h1 class="jr-post-title-main">
+          <%= post.title %>
+        </h1>
 
-    <!-- OWNER BUTTONS -->
-    <% if (user && user.uname === post.creator.uname) { %>
-      <div class="jr-owner-actions-single">
-        <a href="/posts/edit/<%= post.id %>" class="jr-btn-edit jr-orange">✏️</a>
-        <a href="/posts/deleteconfirm/<%= post.id %>" class="jr-btn-delete">🗑</a>
+        <% if (post.link) { %>
+          <p class="jr-post-link-wrapper">
+            <a href="<%= post.link %>" target="_blank" class="jr-post-link">
+              <%= post.link %>
+            </a>
+          </p>
+          <% } %>
+
+            <div class="jr-meta">
+              Posted by <span class="jr-user-tag">u/<%= post.creator.uname %></span>
+              in <a href="/subs/show/<%= post.subgroup %>" class="jr-sub-link">r/<%= post.subgroup %></a>
+              • <%= new Date(Number(post.timestamp)).toLocaleString("en-US", { timeZone: "America/Vancouver" }) %>
+
+            </div>
+
+            <% if (post.description) { %>
+              <p class="jr-description jr-description-main">
+                <%= post.description %>
+              </p>
+              <% } %>
+
+                <!-- OWNER BUTTONS -->
+                <% if (user && user.uname===post.creator.uname) { %>
+                  <div class="jr-owner-actions-single">
+                    <a href="/posts/edit/<%= post.id %>" class="jr-btn-edit jr-orange">✏️</a>
+                    <a href="/posts/deleteconfirm/<%= post.id %>" class="jr-btn-delete">🗑</a>
+                  </div>
+                  <% } %>
+
       </div>
-    <% } %>
-
-  </div>
 </div>
 
 <!-- COMMENTS -->
 <h2 class="jr-comments-title">Comments</h2>
 
-<% if (comments.length === 0) { %>
+<% if (comments.length===0) { %>
   <p class="jr-no-comments">No comments yet — be the first!</p>
-<% } %>
+  <% } %>
 
-<div class="jr-comments-wrapper">
-  <% comments.forEach(comment => { %>
-    <div class="jr-comment">
+    <div class="jr-comments-wrapper">
+      <% comments.forEach(comment=> { %>
+        <div class="jr-comment">
 
-      <div class="jr-comment-header">
-        <span class="jr-comment-author">u/<%= comment.creator.uname %></span>
-        <span class="jr-comment-time">• <%= new Date(comment.timestamp).toLocaleString() %></span>
-      </div>
+          <div class="jr-comment-header">
+            <span class="jr-comment-author">u/<%= comment.creator.uname %></span>
+            <span class="jr-comment-time"> • <%= new Date(Number(comment.timestamp)).toLocaleString("en-US", {
+                timeZone: "America/Vancouver" }) %>
+            </span>
+          </div>
 
-      <div class="jr-comment-body"><%= comment.description %></div>
+          <div class="jr-comment-body">
+            <%= comment.description %>
+          </div>
 
-      <% if (user && user.uname === comment.creator.uname) { %>
-        <form action="/posts/comment-delete/<%= comment.id %>" method="POST">
-          <button class="jr-comment-delete-btn">Delete</button>
-        </form>
-      <% } %>
+          <% if (user && user.uname===comment.creator.uname) { %>
+            <form action="/posts/comment-delete/<%= comment.id %>" method="POST">
+              <button class="jr-comment-delete-btn">Delete</button>
+            </form>
+            <% } %>
 
+        </div>
+        <% }) %>
     </div>
-  <% }) %>
-</div>
 
-<!-- NEW COMMENT FORM -->
-<% if (user) { %>
-  <h3 class="jr-add-comment-title">Add a Comment</h3>
-  <form action="/posts/comment-create/<%= post.id %>" method="POST" class="jr-comment-form">
-    <textarea name="description" rows="3" placeholder="What are your thoughts?" required></textarea>
-    <button type="submit" class="jr-submit-btn">Post Comment</button>
-  </form>
-<% } else { %>
-  <p><a href="/auth/login">Log in</a> to comment.</p>
-<% } %>
+    <!-- NEW COMMENT FORM -->
+    <% if (user) { %>
+      <h3 class="jr-add-comment-title">Add a Comment</h3>
+      <form action="/posts/comment-create/<%= post.id %>" method="POST" class="jr-comment-form">
+        <textarea name="description" rows="3" placeholder="What are your thoughts?" required></textarea>
+        <button type="submit" class="jr-submit-btn">Post Comment</button>
+      </form>
+      <% } else { %>
+        <p><a href="/auth/login">Log in</a> to comment.</p>
+        <% } %>

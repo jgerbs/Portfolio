@@ -59,7 +59,8 @@
                   <a href="/subs/show/<%= post.subgroup %>" class="jr-sub-link">
                     r/<%= post.subgroup %>
                   </a>
-                  • <%= new Date(post.timestamp).toLocaleString() %>
+                  • <%= new Date(Number(post.timestamp)).toLocaleString("en-US", { timeZone: "America/Vancouver" }) %>
+
               </div>
 
               <!-- DESCRIPTION (optional) -->

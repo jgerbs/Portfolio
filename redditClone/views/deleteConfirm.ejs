@@ -1,0 +1,20 @@
+<h2>Delete Post</h2>
+
+<div class="jr-form">
+
+  <p>
+    Are you sure you want to delete the post:<br>
+    <strong>"<%= post.title %>"</strong>?
+  </p>
+
+  <p>This action cannot be undone.</p>
+
+  <!-- DELETE FORM -->
+  <form action="/posts/delete/<%= post.id %>" method="POST" style="display:inline;">
+    <button type="submit" class="jr-delete-btn">Yes, Delete</button>
+  </form>
+
+  <!-- CANCEL BUTTON -->
+  <a href="/posts/show/<%= post.id %>" class="jr-cancel-btn">Cancel</a>
+
+</div>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="/css/style.css" rel="stylesheet" />
+  <title>Login</title>
+</head>
+
+<body class="jr-auth-body">
+
+  <div class="jr-auth-container">
+
+    <h1 class="jr-auth-title">Login</h1>
+
+    <% if (error) { %>
+      <p class="jr-auth-error">
+        <%= error %>
+      </p>
+      <% } %>
+
+        <% if (devMode) { %>
+          <div class="jr-auth-info-orange">
+            <span class="jr-auth-info-label">Dev Mode</span>
+            Autofilled credentials: <strong>jack</strong> or <strong>alice</strong> / <strong>alpha</strong>.
+          </div>
+          <% } %>
+
+            <form action="/auth/login" method="post" class="jr-auth-form">
+
+              <input type="text" name="uname" placeholder="Username" value="<%= devMode ? 'jack' : '' %>"
+                class="jr-auth-input" />
+
+              <input type="password" name="password" placeholder="Password" value="<%= devMode ? 'alpha' : '' %>"
+                class="jr-auth-input" />
+
+              <button type="submit" class="jr-auth-btn jr-orange">Login</button>
+
+            </form>
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>JackReddit</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- JackReddit global CSS -->
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="jr-nav">
+        <div class="jr-nav-left">
+            <a href="/" class="jr-logo">JackReddit</a>
+            <a href="/subs/list" class="jr-nav-link">Subs</a>
+            <% if (user) { %>
+                <a href="/posts/create" class="jr-nav-link">Create Post</a>
+                <% } %>
+        </div>
+
+        <div class="jr-nav-right">
+            <% if (user) { %>
+                <span class="jr-user">u/<%= user.uname %></span>
+                <form action="/auth/logout" method="post" class="jr-inline">
+                    <button class="jr-logout-btn">Logout</button>
+                </form>
+                <% } else { %>
+                    <a href="/auth/login" class="jr-login-btn jr-orange">Login</a>
+                    <% } %>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="jr-main">
+        <%- body %>
+    </main>
+
+</body>
+
+</html>

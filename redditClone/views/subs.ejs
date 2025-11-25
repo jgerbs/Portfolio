@@ -1,0 +1,13 @@
+<h2>All Subgroups</h2>
+
+<% if (!subs || subs.length === 0) { %>
+  <p>No subgroups exist yet.</p>
+<% } %>
+
+<ul class="jr-sub-list">
+  <% subs.forEach(sub => { %>
+    <li class="jr-sub-item">
+      <a href="/subs/show/<%= sub %>" class="jr-sub-link">r/<%= sub %></a>
+    </li>
+  <% }) %>
+</ul>

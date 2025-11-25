@@ -1,0 +1,76 @@
+<h2>Top Posts</h2>
+
+<% if (!posts || posts.length===0) { %>
+  <p>No posts yet.</p>
+  <% } %>
+
+    <% posts.forEach(post=> { %>
+
+      <div class="jr-post">
+
+        <!-- LEFT VOTE COLUMN -->
+        <% if (user) { %>
+          <div class="jr-vote-box">
+
+            <% const myVoteObj=post.votes.find(v=> v.user_id === user?.id);
+              const myVote = myVoteObj ? myVoteObj.value : 0;
+              %>
+
+              <!-- UPVOTE -->
+              <form action="/posts/vote/<%= post.id %>" method="post">
+                <input type="hidden" name="setvoteto" value="<%= myVote === 1 ? 0 : 1 %>">
+                <button class="jr-vote-btn <%= myVote === 1 ? 'active-up' : '' %>">
+                  <img src="/up-circle.svg" class="jr-arrow">
+                </button>
+              </form>
+
+              <!-- SCORE -->
+              <div class="jr-vote-score 
+                <%= myVote === 1 ? 'jr-score-up' : '' %>
+                <%= myVote === -1 ? 'jr-score-down' : '' %>">
+                <%= post.voteTotal %>
+              </div>
+
+              <!-- DOWNVOTE -->
+              <form action="/posts/vote/<%= post.id %>" method="post">
+                <input type="hidden" name="setvoteto" value="<%= myVote === -1 ? 0 : -1 %>">
+                <button class="jr-vote-btn <%= myVote === -1 ? 'active-down' : '' %>">
+                  <img src="/down-circle.svg" class="jr-arrow">
+                </button>
+              </form>
+
+          </div>
+          <% } %>
+
+            <!-- MAIN CONTENT -->
+            <div class="jr-post-content">
+
+              <!-- TITLE -->
+              <div class="jr-post-title">
+                <a href="/posts/show/<%= post.id %>">
+                  <%= post.title %>
+                </a>
+              </div>
+
+              <!-- META INFO -->
+              <div class="jr-meta">
+                Posted by u/<%= post.creator.uname %>
+                  in
+                  <a href="/subs/show/<%= post.subgroup %>" class="jr-sub-link">
+                    r/<%= post.subgroup %>
+                  </a>
+                  • <%= new Date(post.timestamp).toLocaleString() %>
+              </div>
+
+              <!-- DESCRIPTION (optional) -->
+              <% if (post.description) { %>
+                <p class="jr-description">
+                  <%= post.description %>
+                </p>
+                <% } %>
+
+            </div>
+
+      </div>
+
+      <% }) %>

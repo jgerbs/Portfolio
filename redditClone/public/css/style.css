@@ -1,0 +1,486 @@
+/* =====================================================
+   AUTH OPTIONS
+===================================================== */
+.authOptions {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+/* =====================================================
+   GLOBAL JACKREDDIT STYLE
+   Modern Reddit-inspired + Clean + Custom
+===================================================== */
+body {
+  margin: 0;
+  padding: 0;
+  background: #f6f7f8;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* =====================================================
+   NAVBAR
+===================================================== */
+.jr-nav {
+  background: white;
+  padding: 10px 20px;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.jr-logo {
+  font-size: 22px;
+  font-weight: bold;
+  color: #FF4500;
+  text-decoration: none;
+  margin-right: 20px;
+}
+
+.jr-nav-link {
+  margin-right: 15px;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+}
+
+.jr-nav-link:hover { text-decoration: underline; }
+
+.jr-user {
+  margin-right: 15px;
+  font-weight: bold;
+}
+
+.jr-login-btn,
+.jr-logout-btn {
+  background: #FF4500;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.jr-inline { display: inline; }
+
+.jr-main {
+  max-width: 760px;
+  margin: 20px auto;
+  padding: 0 10px;
+}
+
+/* =====================================================
+   POST CARDS (LIST VIEW)
+===================================================== */
+.jr-post {
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 18px;
+  padding: 15px;
+  display: flex;
+  border: 1px solid #ddd;
+}
+
+/* =====================================================
+   VOTE COLUMN (LIST & POST PAGE)
+===================================================== */
+.jr-votes {
+  width: 50px;
+  text-align: center;
+  margin-right: 15px;
+}
+
+.jr-vote-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 22px;
+  color: #888;
+}
+
+.jr-vote-btn-active { color: #FF4500; }
+
+.jr-vote-count {
+  font-weight: bold;
+  margin: 5px 0;
+}
+
+/* VOTE BOX LAYOUT */
+.jr-vote-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 48px;
+  padding-right: 12px;
+}
+
+/* Buttons */
+.jr-vote-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  opacity: 0.45;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.jr-vote-btn:hover {
+  opacity: 0.75;
+  transform: scale(1.05);
+}
+
+/* SVG Icons */
+.jr-vote-icon {
+  width: 28px;
+  height: 28px;
+}
+
+/* Active States */
+.active-up .jr-vote-icon {
+  filter: drop-shadow(0 0 2px green);
+  opacity: 1;
+}
+
+.active-down .jr-vote-icon {
+  filter: drop-shadow(0 0 2px red);
+  opacity: 1;
+}
+
+/* Score */
+.jr-vote-score {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #a3a3a3;
+  margin: 6px 0;
+}
+
+/* Fix sizing */
+.jr-vote-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 40px;
+  margin-right: 15px;
+}
+
+.jr-vote-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.jr-arrow {
+  width: 26px;
+  height: 26px;
+  opacity: 1;
+  transition: opacity 0.15s ease, filter 0.15s ease;
+}
+
+.jr-vote-btn:hover .jr-arrow { opacity: 1; }
+
+/* Active Upvote */
+.active-up .jr-arrow {
+  filter: brightness(0) saturate(100%) 
+          invert(71%) sepia(26%) saturate(1031%) 
+          hue-rotate(72deg) brightness(90%) contrast(95%);
+}
+
+/* Active Downvote */
+.active-down .jr-arrow {
+  filter: brightness(0) saturate(100%) 
+          invert(22%) sepia(93%) saturate(7483%) 
+          hue-rotate(353deg) brightness(90%) contrast(105%);
+}
+
+/* =====================================================
+   POST CONTENT
+===================================================== */
+.jr-post-content { flex: 1; }
+
+.jr-post-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.jr-post-title a {
+  color: #333;
+  text-decoration: none;
+}
+
+.jr-post-title a:hover { text-decoration: underline; }
+
+.jr-meta {
+  color: #666;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.jr-description { margin-top: 8px; }
+
+.jr-sub-link {
+  color: #FF4500;
+  text-decoration: none;
+}
+
+.jr-sub-link:hover { text-decoration: underline; }
+
+/* =====================================================
+   SUB LIST PAGE
+===================================================== */
+.jr-sub-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.jr-sub-item {
+  background: white;
+  border-radius: 8px;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+}
+
+.jr-sub-item .jr-sub-link {
+  font-size: 18px;
+  color: #FF4500;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.jr-sub-item .jr-sub-link:hover { text-decoration: underline; }
+
+/* =====================================================
+   FORMS (CREATE / EDIT POST)
+===================================================== */
+.jr-form {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  margin-top: 15px;
+}
+
+.jr-form label {
+  font-weight: bold;
+  margin-top: 12px;
+  display: block;
+}
+
+.jr-form input,
+.jr-form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 6px;
+  border: 1px solid #bbb;
+  font-size: 15px;
+}
+
+.jr-submit-btn {
+  background: #FF4500;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 15px;
+  font-size: 16px;
+}
+
+.jr-submit-btn:hover { background: #d33c00; }
+
+/* =====================================================
+   COMMENTS
+===================================================== */
+.jr-comments-wrapper { margin-top: 20px; }
+
+.jr-comment {
+  background: white;
+  border-radius: 8px;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  margin-bottom: 12px;
+}
+
+.jr-comment-header {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.jr-comment-author { font-weight: bold; }
+
+.jr-comment-body { font-size: 15px; }
+
+.jr-comment-actions { margin-top: 5px; }
+
+.jr-comment-delete {
+  background: #cc0000;
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.jr-comment-delete:hover { background: #990000; }
+
+/* Comment Form */
+.jr-comment-form textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #bbb;
+}
+
+.jr-comment-form button { margin-top: 8px; }
+
+/* =====================================================
+   DELETE CONFIRM PAGE
+===================================================== */
+.jr-delete-btn {
+  background: #cc0000;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.jr-delete-btn:hover { background: #990000; }
+
+.jr-cancel-btn {
+  background: #ccc;
+  color: black;
+  padding: 10px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+}
+
+.jr-cancel-btn:hover { background: #bbb; }
+
+.jr-note {
+  font-size: 13px;
+  color: #555;
+  margin-top: 10px;
+}
+
+/* =====================================================
+   SINGLE POST PAGE
+===================================================== */
+.jr-post-single {
+  display: flex;
+  padding: 25px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  margin-bottom: 30px;
+}
+
+.jr-post-title-main {
+  font-size: 2rem;
+  margin-bottom: 5px;
+}
+
+.jr-description-main {
+  font-size: 1.2rem;
+  margin-top: 15px;
+  line-height: 1.6;
+}
+
+.jr-owner-actions-single {
+  margin-top: 20px;
+  display: flex;
+  gap: 12px;
+}
+
+.jr-btn-edit,
+.jr-btn-delete {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  text-decoration: none;
+  color: #fff;
+}
+
+.jr-btn-edit { background: #FF4500; }
+
+.jr-btn-delete { background: #dc2626; }
+
+/* =====================================================
+   LOGIN PAGE
+===================================================== */
+.jr-auth-title {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.jr-auth-error {
+  color: #dc2626;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+.jr-auth-info-orange {
+  background: #fff4e6;
+  border-left: 4px solid #ff8a00;
+  color: #7a3f00;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.jr-auth-info-label {
+  font-weight: 700;
+  color: #ff8a00;
+  margin-right: 6px;
+}
+
+
+.jr-auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.jr-auth-input {
+  padding: 12px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #d4d4d4;
+}
+
+.jr-auth-btn {
+  padding: 12px;
+  background: #ff4500;
+  font-weight: bold;
+  color: white;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+/* UNIVERSAL ORANGE BUTTON STYLE */
+.jr-orange {
+  background: #FF4500;
+  color: white;
+  transition: background 0.15s ease;
+}
+
+.jr-orange:hover {
+  background: #d63a00; /* darker orange hover */
+}
+

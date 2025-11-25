@@ -1,0 +1,46 @@
+<h2>Create a New Post</h2>
+
+<form action="/posts/create" method="POST" class="jr-form">
+
+  <!-- TITLE -->
+  <label for="title">Title (required)</label>
+  <input 
+    type="text" 
+    id="title" 
+    name="title" 
+    required
+    placeholder="Enter a descriptive title"
+  />
+
+  <!-- LINK -->
+  <label for="link">Link (optional)</label>
+  <input 
+    type="url" 
+    id="link" 
+    name="link"
+    placeholder="https://example.com"
+  />
+
+  <!-- DESCRIPTION -->
+  <label for="description">Description (optional)</label>
+  <textarea 
+    id="description" 
+    name="description"
+    rows="4"
+    placeholder="Write something about the link…"
+  ></textarea>
+
+  <!-- SUBGROUP -->
+  <label for="sub">Subgroup (required)</label>
+  <input 
+    type="text" 
+    id="sub" 
+    name="sub" 
+    required
+    placeholder="e.g., programming, gaming, movies"
+  />
+
+  <!-- SUBMIT -->
+  <button type="submit" class="jr-submit-btn">Create Post</button>
+
+</form>

@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  uname String @unique
+  password String
+
+  posts    Post[]    @relation("UserToPosts")
+  comments Comment[] @relation("UserToComments")
+  votes    Vote[]    @relation("UserToVotes")
+
+  createdAt DateTime @default(now())
+}
+
+model Sub {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+}
+
+model Post {
+  id          Int     @id @default(autoincrement())
+  title       String
+  link        String?
+  description String?
+  creator     Int
+  subgroup    String
+  timestamp   BigInt
+
+  // relations
+  author   User      @relation("UserToPosts", fields: [creator], references: [id])
+  comments Comment[]
+  votes    Vote[]
+}
+
+model Comment {
+  id          Int    @id @default(autoincrement())
+  post_id     Int
+  creator     Int
+  description String
+  timestamp   BigInt
+
+  post   Post @relation(fields: [post_id], references: [id])
+  author User @relation("UserToComments", fields: [creator], references: [id])
+}
+
+model Vote {
+  id      Int @id @default(autoincrement())
+  user_id Int
+  post_id Int
+  value   Int
+
+  user User @relation("UserToVotes", fields: [user_id], references: [id])
+  post Post @relation(fields: [post_id], references: [id])
+
+  @@unique([user_id, post_id])
+}

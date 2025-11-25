@@ -5,8 +5,6 @@ let activeTimeout;
 
 photos.forEach((photo) => {
   photo.addEventListener("click", () => {
-    if (photo.classList.contains("active")) return;
-
     // clear pending animation
     if (activeTimeout) clearTimeout(activeTimeout);
 

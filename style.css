@@ -269,10 +269,29 @@ main {
   position: relative;
 }
 
+.about-lower-text h4 {
+  text-align: center;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.about-lower-text h4::after {
+  content: "";
+  display: block;
+  width: 80px;    
+  height: 3px;
+  background: var(--accent);
+  margin: 0.5rem auto 0;
+  border-radius: 3px;
+}
+
 .section h2::after {
   content: "";
   display: block;
-  width: 60px;
+  width: 150px;
   height: 3px;
   background: var(--accent);
   margin: 0.5rem auto 0;

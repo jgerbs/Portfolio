@@ -29,7 +29,7 @@ if (string.IsNullOrWhiteSpace(host))
     port = builder.Configuration["Database:Port"] ?? "5432";
     database = builder.Configuration["Database:Name"] ?? "blogappdb";
     username = builder.Configuration["Database:User"] ?? "postgres";
-    password = builder.Configuration["Database:Password"] ?? "Kilimanjar0!";
+    password = builder.Configuration["Database:Password"] ?? "P@$$w0rd";
 }
 
 // Build connection string dynamically

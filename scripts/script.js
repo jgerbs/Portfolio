@@ -11,19 +11,60 @@
 
         lerp(start, end, amount) {
             return start + (end - start) * amount;
+        },
+
+        mapRange(value, inMin, inMax, outMin, outMax) {
+            if (inMax === inMin) return outMin;
+            const t = utils.clamp((value - inMin) / (inMax - inMin), 0, 1);
+            return outMin + (outMax - outMin) * t;
+        },
+
+        easeOut3(t) {
+            return 1 - Math.pow(1 - t, 3);
+        },
+
+        easeInOut3(t) {
+            return t < 0.5
+                ? 4 * t * t * t
+                : 1 - Math.pow(-2 * t + 2, 3) / 2;
         }
     };
 
+    const dom = {
+        winW: window.innerWidth,
+        winH: window.innerHeight,
+        reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    };
+
+    const resizeSubscribers = new Set();
+
+    function onResize(callback) {
+        resizeSubscribers.add(callback);
+    }
+
+    function runResizeSubscribers() {
+        dom.winW = window.innerWidth;
+        dom.winH = window.innerHeight;
+        dom.reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        resizeSubscribers.forEach((callback) => callback());
+    }
+
+    let resizeRaf = 0;
+    window.addEventListener("resize", () => {
+        if (resizeRaf) cancelAnimationFrame(resizeRaf);
+        resizeRaf = requestAnimationFrame(() => {
+            resizeRaf = 0;
+            runResizeSubscribers();
+        });
+    });
+
     /* =========================================================
        HERO LAPTOP JOURNEY
-       Flow:
-         0.00–0.08  — closed laptop + hello text on black hero
-         0.08–0.30  — lid opens, color powers on, hello fades away
-         0.16–0.44  — loader appears in screen while opening
-         0.30–0.70  — laptop zooms toward viewer
-         0.68–0.82  — laptop fades away
-         0.80–0.92  — welcome text appears on background
-         0.90–1.00  — projects fade in below
+       Optimized:
+       - caches hero metrics
+       - avoids repeated DOM queries inside render
+       - keeps all style writes grouped in one frame
        ========================================================= */
     function initHeroSection() {
         const hero = document.querySelector(".hero-laptop");
@@ -51,9 +92,6 @@
         const root = document.documentElement;
         const body = document.body;
 
-        /* ---------------------------------------------------------
-           BACKGROUND SYSTEM
-        --------------------------------------------------------- */
         const CLOSED_BG = `
             radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.10), transparent 22%),
             radial-gradient(circle at 78% 24%, rgba(210, 210, 210, 0.08), transparent 18%),
@@ -78,20 +116,24 @@
         heroBg.style.overflow = "hidden";
 
         const closedLayer = document.createElement("div");
-        closedLayer.style.position = "absolute";
-        closedLayer.style.inset = "0";
-        closedLayer.style.pointerEvents = "none";
-        closedLayer.style.background = CLOSED_BG;
-        closedLayer.style.opacity = "1";
-        closedLayer.style.transition = "none";
+        Object.assign(closedLayer.style, {
+            position: "absolute",
+            inset: "0",
+            pointerEvents: "none",
+            background: CLOSED_BG,
+            opacity: "1",
+            transition: "none"
+        });
 
         const insideLayer = document.createElement("div");
-        insideLayer.style.position = "absolute";
-        insideLayer.style.inset = "0";
-        insideLayer.style.pointerEvents = "none";
-        insideLayer.style.background = INSIDE_BG;
-        insideLayer.style.opacity = "0";
-        insideLayer.style.transition = "none";
+        Object.assign(insideLayer.style, {
+            position: "absolute",
+            inset: "0",
+            pointerEvents: "none",
+            background: INSIDE_BG,
+            opacity: "0",
+            transition: "none"
+        });
 
         heroBg.prepend(insideLayer);
         heroBg.prepend(closedLayer);
@@ -100,7 +142,7 @@
         const glow1 = heroBg.querySelector(".hero-laptop__glow--1");
         const glow2 = heroBg.querySelector(".hero-laptop__glow--2");
 
-        const s = {
+        const state = {
             mouseX: 0,
             mouseY: 0,
             targetMouseX: 0,
@@ -110,32 +152,29 @@
             ticking: false
         };
 
-        function clamp(v, lo, hi) {
-            return Math.min(Math.max(v, lo), hi);
-        }
+        const metrics = {
+            heroTop: 0,
+            heroHeight: 0,
+            heroScrollable: 1,
+            workTopViewport: 0,
+            workHeight: 0
+        };
 
-        function lerp(a, b, t) {
-            return a + (b - a) * t;
-        }
+        function measure() {
+            const heroRect = hero.getBoundingClientRect();
+            const workRect = workSection.getBoundingClientRect();
 
-        function mapRange(v, a, b, c, d) {
-            return clamp((v - a) / (b - a), 0, 1) * (d - c) + c;
-        }
+            metrics.heroTop = heroRect.top + window.scrollY;
+            metrics.heroHeight = hero.offsetHeight;
+            metrics.heroScrollable = Math.max(metrics.heroHeight - dom.winH, 1);
 
-        function easeOut3(t) {
-            return 1 - Math.pow(1 - t, 3);
-        }
-
-        function easeInOut3(t) {
-            return t < 0.5
-                ? 4 * t * t * t
-                : 1 - Math.pow(-2 * t + 2, 3) / 2;
+            metrics.workTopViewport = workRect.top;
+            metrics.workHeight = workRect.height;
         }
 
         function readScrollProgress() {
-            const rect = hero.getBoundingClientRect();
-            const total = Math.max(hero.offsetHeight - window.innerHeight, 1);
-            return clamp(-rect.top / total, 0, 1);
+            const heroTopInViewport = metrics.heroTop - window.scrollY;
+            return utils.clamp(-heroTopInViewport / metrics.heroScrollable, 0, 1);
         }
 
         function syncShellToScreen(zoomP) {
@@ -145,31 +184,24 @@
             }
 
             const sr = screen.getBoundingClientRect();
-            const work = document.getElementById("work");
 
-            const vw = window.innerWidth;
-            const vh = window.innerHeight;
-
-            const startScale = Math.min(sr.width / vw, sr.height / vh);
-            const scale = lerp(startScale, 1, zoomP);
+            const startScale = Math.min(sr.width / dom.winW, sr.height / dom.winH);
+            const scale = utils.lerp(startScale, 1, zoomP);
 
             const screenCx = sr.left + sr.width / 2;
             const screenCy = sr.top + sr.height / 2;
 
-            let targetCx = vw / 2;
-            let targetCy = vh / 2;
+            const targetCx = dom.winW / 2;
+            const targetCy = Math.min(
+                dom.winH * 0.34,
+                metrics.workTopViewport + Math.max(140, metrics.workHeight * 0.12)
+            );
 
-            if (work) {
-                const workRect = work.getBoundingClientRect();
-                targetCx = vw / 2;
-                targetCy = Math.min(vh * 0.34, workRect.top + Math.max(140, workRect.height * 0.12));
-            }
+            const dx = utils.lerp(screenCx - targetCx, 0, zoomP);
+            const dy = utils.lerp(screenCy - targetCy, 0, zoomP);
 
-            const dx = lerp(screenCx - targetCx, 0, zoomP);
-            const dy = lerp(screenCy - targetCy, 0, zoomP);
-
-            const radius = lerp(8, 0, easeOut3(zoomP));
-            const opacity = clamp(mapRange(zoomP, 0.0, 0.10, 0, 1), 0, 1);
+            const radius = utils.lerp(8, 0, utils.easeOut3(zoomP));
+            const opacity = utils.clamp(utils.mapRange(zoomP, 0.0, 0.10, 0, 1), 0, 1);
 
             root.style.setProperty("--shell-scale", String(scale));
             root.style.setProperty("--shell-x", `${dx}px`);
@@ -179,61 +211,65 @@
         }
 
         function render() {
-            s.ticking = false;
+            state.ticking = false;
 
-            s.progress = lerp(s.progress, s.targetProgress, 0.10);
-            s.mouseX = lerp(s.mouseX, s.targetMouseX, 0.07);
-            s.mouseY = lerp(s.mouseY, s.targetMouseY, 0.07);
+            state.progress = dom.reducedMotion
+                ? state.targetProgress
+                : utils.lerp(state.progress, state.targetProgress, 0.10);
 
-            const p = s.progress;
+            state.mouseX = dom.reducedMotion
+                ? state.targetMouseX
+                : utils.lerp(state.mouseX, state.targetMouseX, 0.07);
 
-            const openP = easeInOut3(clamp(mapRange(p, 0.05, 0.28, 0, 1), 0, 1));
-            const powerP = easeInOut3(clamp(mapRange(p, 0.16, 0.34, 0, 1), 0, 1));
-            const zoomP = easeInOut3(clamp(mapRange(p, 0.28, 0.70, 0, 1), 0, 1));
-            const fadeP = easeInOut3(clamp(mapRange(p, 0.68, 0.82, 0, 1), 0, 1));
-            const finalWelcomeP = easeInOut3(clamp(mapRange(p, 0.80, 0.92, 0, 1), 0, 1));
-            const workRevealP = easeInOut3(clamp(mapRange(p, 0.90, 1.00, 0, 1), 0, 1));
+            state.mouseY = dom.reducedMotion
+                ? state.targetMouseY
+                : utils.lerp(state.mouseY, state.targetMouseY, 0.07);
 
-            const bgShiftP = easeInOut3(clamp(mapRange(p, 0.10, 0.30, 0, 1), 0, 1));
-            const heroFadeOutP = easeInOut3(clamp(mapRange(p, 0.84, 0.98, 0, 1), 0, 1));
+            const p = state.progress;
+
+            const openP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.05, 0.28, 0, 1), 0, 1));
+            const powerP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.16, 0.34, 0, 1), 0, 1));
+            const zoomP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.28, 0.70, 0, 1), 0, 1));
+            const fadeP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.68, 0.82, 0, 1), 0, 1));
+            const finalWelcomeP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.80, 0.92, 0, 1), 0, 1));
+            const workRevealP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.90, 1.00, 0, 1), 0, 1));
+            const bgShiftP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.10, 0.30, 0, 1), 0, 1));
+            const heroFadeOutP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.84, 0.98, 0, 1), 0, 1));
 
             closedLayer.style.opacity = String(1 - bgShiftP);
             insideLayer.style.opacity = String(bgShiftP);
 
             if (heroGrid) {
-                heroGrid.style.opacity = String(lerp(0.065, 0.045, bgShiftP));
+                heroGrid.style.opacity = String(utils.lerp(0.065, 0.045, bgShiftP));
             }
 
             if (glow1) {
-                glow1.style.opacity = String(lerp(0.78, 0.42, bgShiftP));
-                glow1.style.transform = `scale(${lerp(1, 0.9, bgShiftP)})`;
+                glow1.style.opacity = String(utils.lerp(0.78, 0.42, bgShiftP));
+                glow1.style.transform = `scale(${utils.lerp(1, 0.9, bgShiftP)})`;
             }
 
             if (glow2) {
-                glow2.style.opacity = String(lerp(0.72, 0.36, bgShiftP));
-                glow2.style.transform = `scale(${lerp(1, 0.88, bgShiftP)})`;
+                glow2.style.opacity = String(utils.lerp(0.72, 0.36, bgShiftP));
+                glow2.style.transform = `scale(${utils.lerp(1, 0.88, bgShiftP)})`;
             }
 
             heroBg.style.opacity = String(1 - heroFadeOutP * 0.92);
 
-            /* ---------------------------------------------------------
-               DEVICE / MOTION
-            --------------------------------------------------------- */
-            const tiltInfluence = 1 - zoomP;
-            const tiltX = s.mouseY * -3.5 * tiltInfluence;
-            const tiltY = s.mouseX * 5.0 * tiltInfluence;
+            const tiltInfluence = dom.reducedMotion ? 0 : 1 - zoomP;
+            const tiltX = state.mouseY * -3.5 * tiltInfluence;
+            const tiltY = state.mouseX * 5.0 * tiltInfluence;
 
             const lidAngle = -95 + openP * 95;
             const restTilt = (1 - openP) * 2.5;
             lid.style.transform = `rotateX(${lidAngle + restTilt}deg)`;
 
-            const deviceScale = lerp(1, 3.2, zoomP);
-            const liftY = lerp(0, -18, openP);
+            const deviceScale = utils.lerp(1, 3.2, zoomP);
+            const liftY = utils.lerp(0, -18, openP);
 
             deviceWrap.style.transform = `
                 translate3d(
-                    ${s.mouseX * 8 * tiltInfluence}px,
-                    ${liftY + s.mouseY * 3 * tiltInfluence}px,
+                    ${state.mouseX * 8 * tiltInfluence}px,
+                    ${liftY + state.mouseY * 3 * tiltInfluence}px,
                     0
                 )
                 rotateX(${tiltX}deg)
@@ -241,7 +277,7 @@
                 scale(${deviceScale})
             `;
 
-            deviceWrap.style.opacity = String(clamp(1 - fadeP * 1.4, 0, 1));
+            deviceWrap.style.opacity = String(utils.clamp(1 - fadeP * 1.4, 0, 1));
 
             const brightness = 0.18 + powerP * 0.82;
             const saturation = 0.15 + powerP * 1.1;
@@ -251,61 +287,46 @@
             screen.style.filter = `brightness(${brightness}) saturate(${saturation}) grayscale(${grayscale})`;
 
             if (base) {
-                base.style.opacity = String(clamp(1 - zoomP * 1.6, 0, 1));
+                base.style.opacity = String(utils.clamp(1 - zoomP * 1.6, 0, 1));
             }
 
             if (shadow) {
-                shadow.style.opacity = String(clamp(0.82 - zoomP * 1.1, 0, 1));
+                shadow.style.opacity = String(utils.clamp(0.82 - zoomP * 1.1, 0, 1));
             }
 
-            /* ---------------------------------------------------------
-               HELLO TEXT
-            --------------------------------------------------------- */
             if (welcome) {
-                const wFade = easeInOut3(clamp(mapRange(p, 0.06, 0.20, 0, 1), 0, 1));
+                const wFade = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.06, 0.20, 0, 1), 0, 1));
                 welcome.style.opacity = String(1 - wFade);
                 welcome.style.transform = `translate3d(0, ${wFade * -30}px, 0) scale(${1 - wFade * 0.04})`;
                 welcome.style.filter = `blur(${wFade * 6}px)`;
             }
 
-            /* ---------------------------------------------------------
-               LOADER IN SCREEN
-            --------------------------------------------------------- */
-            const loaderP = easeInOut3(clamp(mapRange(p, 0.16, 0.34, 0, 1), 0, 1));
-            const loaderOutP = easeInOut3(clamp(mapRange(p, 0.34, 0.48, 0, 1), 0, 1));
+            const loaderP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.16, 0.34, 0, 1), 0, 1));
+            const loaderOutP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.34, 0.48, 0, 1), 0, 1));
             const loaderVisible = loaderP * (1 - loaderOutP);
 
             loader.style.opacity = String(loaderVisible);
-            loader.style.transform = `scale(${lerp(0.92, 1, loaderVisible)})`;
-            loader.style.filter = `blur(${lerp(8, 0, loaderVisible)}px)`;
+            loader.style.transform = `scale(${utils.lerp(0.92, 1, loaderVisible)})`;
+            loader.style.filter = `blur(${utils.lerp(8, 0, loaderVisible)}px)`;
 
             if (indicator) {
-                const hide = clamp(mapRange(p, 0.04, 0.14, 0, 1), 0, 1);
+                const hide = utils.clamp(utils.mapRange(p, 0.04, 0.14, 0, 1), 0, 1);
                 indicator.style.opacity = String(1 - hide);
                 indicator.style.transform = `translateX(-50%) translateY(${hide * 10}px)`;
             }
 
-            /* ---------------------------------------------------------
-               FINAL WELCOME
-            --------------------------------------------------------- */
             finalWelcome.style.opacity = String(finalWelcomeP);
             finalWelcome.style.transform = `
-                translate(-50%, calc(-50% + ${lerp(28, 0, finalWelcomeP)}px))
-                scale(${lerp(0.96, 1, finalWelcomeP)})
+                translate(-50%, calc(-50% + ${utils.lerp(28, 0, finalWelcomeP)}px))
+                scale(${utils.lerp(0.96, 1, finalWelcomeP)})
             `;
-            finalWelcome.style.filter = `blur(${lerp(12, 0, finalWelcomeP)}px)`;
+            finalWelcome.style.filter = `blur(${utils.lerp(12, 0, finalWelcomeP)}px)`;
 
-            /* ---------------------------------------------------------
-               WORK SECTION REVEAL
-            --------------------------------------------------------- */
             workSection.style.opacity = String(workRevealP);
-            workSection.style.transform = `translate3d(0, ${lerp(34, 0, workRevealP)}px, 0) scale(${lerp(0.985, 1, workRevealP)})`;
-            workSection.style.filter = `blur(${lerp(18, 0, workRevealP)}px)`;
+            workSection.style.transform = `translate3d(0, ${utils.lerp(34, 0, workRevealP)}px, 0) scale(${utils.lerp(0.985, 1, workRevealP)})`;
+            workSection.style.filter = `blur(${utils.lerp(18, 0, workRevealP)}px)`;
             workSection.classList.toggle("is-visible", workRevealP > 0.02);
 
-            /* ---------------------------------------------------------
-               SHELL HANDOFF
-            --------------------------------------------------------- */
             const isEmbedded = zoomP > 0.02 && p < 0.90;
             const isFull = p >= 0.90;
 
@@ -315,45 +336,44 @@
             }
 
             syncShellToScreen(zoomP);
-
             hero.classList.toggle("hero-laptop--done", fadeP > 0.9);
 
             if (
-                Math.abs(s.progress - s.targetProgress) > 0.0003 ||
-                Math.abs(s.mouseX - s.targetMouseX) > 0.0003 ||
-                Math.abs(s.mouseY - s.targetMouseY) > 0.0003
+                Math.abs(state.progress - state.targetProgress) > 0.0003 ||
+                Math.abs(state.mouseX - state.targetMouseX) > 0.0003 ||
+                Math.abs(state.mouseY - state.targetMouseY) > 0.0003
             ) {
                 requestTick();
             }
         }
 
         function requestTick() {
-            if (s.ticking) return;
-            s.ticking = true;
+            if (state.ticking) return;
+            state.ticking = true;
             requestAnimationFrame(render);
         }
 
-        window.addEventListener(
-            "scroll",
-            () => {
-                s.targetProgress = readScrollProgress();
-                requestTick();
-            },
-            { passive: true }
-        );
-
-        window.addEventListener("resize", () => {
-            s.targetProgress = readScrollProgress();
+        function updateProgress() {
+            metrics.workTopViewport = workSection.getBoundingClientRect().top;
+            state.targetProgress = readScrollProgress();
             requestTick();
-        });
+        }
+
+        window.addEventListener("scroll", updateProgress, { passive: true });
 
         window.addEventListener("mousemove", (e) => {
-            s.targetMouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-            s.targetMouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+            state.targetMouseX = (e.clientX / dom.winW - 0.5) * 2;
+            state.targetMouseY = (e.clientY / dom.winH - 0.5) * 2;
             requestTick();
+        }, { passive: true });
+
+        onResize(() => {
+            measure();
+            updateProgress();
         });
 
-        s.targetProgress = readScrollProgress();
+        measure();
+        state.targetProgress = readScrollProgress();
         requestTick();
     }
 
@@ -383,6 +403,7 @@
             link.addEventListener("click", (e) => {
                 const href = link.getAttribute("href");
                 if (!href?.startsWith("#")) return;
+
                 const id = href.slice(1);
 
                 if (id === "top") {
@@ -401,6 +422,10 @@
 
     /* =========================================================
        WORK RAIL
+       Optimized:
+       - caches stage metrics
+       - avoids repeated getBoundingClientRect in card loop
+       - pauses animation work when offscreen
        ========================================================= */
     function initWorkRail() {
         const stage = document.getElementById("workRailStage");
@@ -422,11 +447,9 @@
         const state = {
             railOffset: 0,
             railVelocity: 0,
-
             isDragging: false,
             grabbedIndex: -1,
             grabbedCardOffset: 0,
-            dragStartX: 0,
             lastPointerX: 0,
             lastTime: 0,
 
@@ -438,39 +461,20 @@
             swingLimit: 10,
             swingSpring: 0.09,
             swingDamping: 0.86,
-            dragThreshold: 6
+
+            stageLeft: 0,
+            stageWidth: 0,
+            stageCenterX: 0,
+            cardWidth: 360,
+            edgeInset: 54,
+            minOffset: 0,
+            maxOffset: 0,
+            isInView: true
         };
 
-        function getStageRect() {
-            return stage.getBoundingClientRect();
-        }
-
-        function getStageCenterX() {
-            const rect = getStageRect();
-            return rect.left + rect.width / 2;
-        }
-
-        function getCardWidth() {
-            const firstCard = cards[0];
-            if (!firstCard) return 360;
-            return firstCard.getBoundingClientRect().width || 360;
-        }
-
-        function getEdgeInset() {
-            const rect = getStageRect();
-            const vw = window.innerWidth;
-
-            if (vw <= 480) return Math.max(34, rect.width * 0.11);
-            if (vw <= 640) return Math.max(38, rect.width * 0.10);
-            if (vw <= 760) return Math.max(42, rect.width * 0.09);
-            if (vw <= 980) return Math.max(46, rect.width * 0.085);
-
-            return Math.max(54, rect.width * 0.08);
-        }
-
         function getResponsiveGap() {
-            const vw = window.innerWidth;
-            const cardWidth = getCardWidth();
+            const vw = dom.winW;
+            const cardWidth = state.cardWidth;
 
             let gutter;
             if (vw <= 480) gutter = 20;
@@ -483,9 +487,9 @@
 
             return cardWidth + gutter;
         }
-        
+
         function getSwingLimit() {
-            const vw = window.innerWidth;
+            const vw = dom.winW;
             if (vw <= 640) return 7;
             if (vw <= 980) return 8;
             if (vw <= 1400) return 9;
@@ -502,31 +506,40 @@
         }
 
         function getCardCenterX(index) {
-            return getStageCenterX() + getCardX(index);
+            return state.stageCenterX + getCardX(index);
         }
 
-        function getClampBounds() {
-            const rect = getStageRect();
-            const stageCenterX = rect.width / 2;
-            const cardWidth = getCardWidth();
-            const edgeInset = getEdgeInset();
+        function measure() {
+            const rect = stage.getBoundingClientRect();
+            state.stageLeft = rect.left;
+            state.stageWidth = rect.width;
+            state.stageCenterX = rect.left + rect.width / 2;
+            state.cardWidth = cards[0]?.getBoundingClientRect().width || 360;
+
+            if (dom.winW <= 480) state.edgeInset = Math.max(34, rect.width * 0.11);
+            else if (dom.winW <= 640) state.edgeInset = Math.max(38, rect.width * 0.10);
+            else if (dom.winW <= 760) state.edgeInset = Math.max(42, rect.width * 0.09);
+            else if (dom.winW <= 980) state.edgeInset = Math.max(46, rect.width * 0.085);
+            else state.edgeInset = Math.max(54, rect.width * 0.08);
+
+            state.gap = getResponsiveGap();
+            state.swingLimit = getSwingLimit();
+
+            const stageCenterLocalX = rect.width / 2;
             const lastIndex = cards.length - 1;
 
-            const minOffset =
-                stageCenterX + getBaseX(0) - (edgeInset + cardWidth / 2);
+            state.minOffset =
+                stageCenterLocalX + getBaseX(0) - (state.edgeInset + state.cardWidth / 2);
 
-            const maxOffset =
-                stageCenterX + getBaseX(lastIndex) - (rect.width - edgeInset - cardWidth / 2);
+            state.maxOffset =
+                stageCenterLocalX + getBaseX(lastIndex) - (rect.width - state.edgeInset - state.cardWidth / 2);
 
-            return {
-                minOffset,
-                maxOffset
-            };
+            state.isInView = rect.top < dom.winH && rect.bottom > 0;
+            state.railOffset = clampRailOffset(state.railOffset);
         }
 
         function clampRailOffset(value) {
-            const { minOffset, maxOffset } = getClampBounds();
-            return utils.clamp(value, minOffset, maxOffset);
+            return utils.clamp(value, state.minOffset, state.maxOffset);
         }
 
         function applyNeighborImpulse(centerIndex, strength) {
@@ -534,7 +547,6 @@
                 const distance = Math.abs(cardState.index - centerIndex);
                 const falloff = Math.max(0, 1 - distance * 0.28);
                 if (falloff <= 0) return;
-
                 cardState.impulseVelocity += strength * falloff * 0.08;
             });
         }
@@ -554,7 +566,8 @@
         function render() {
             const now = performance.now();
 
-            cardStates.forEach((cardState) => {
+            for (let i = 0; i < cardStates.length; i++) {
+                const cardState = cardStates[i];
                 const { el, index, swingFactor, phase } = cardState;
 
                 const x = getCardX(index);
@@ -563,7 +576,7 @@
 
                 const railAngle = -normalized * 3.1;
                 const motionInfluence = state.railVelocity * 0.9 * swingFactor;
-                const microOscillation = Math.sin(now * 0.0015 + phase) * 0.06;
+                const microOscillation = dom.reducedMotion ? 0 : Math.sin(now * 0.0015 + phase) * 0.06;
 
                 cardState.impulseVelocity += (0 - cardState.impulse) * 0.08;
                 cardState.impulseVelocity *= 0.84;
@@ -575,8 +588,7 @@
                     state.swingLimit
                 );
 
-                const swingPull = (targetSwing - cardState.swing) * state.swingSpring;
-                cardState.swingVelocity += swingPull;
+                cardState.swingVelocity += (targetSwing - cardState.swing) * state.swingSpring;
                 cardState.swingVelocity *= state.swingDamping;
                 cardState.swing += cardState.swingVelocity;
 
@@ -593,24 +605,27 @@
                     rotate(${cardState.swing}deg)
                     scale(${scale})
                 `;
-            });
+            }
         }
 
         function tick() {
-            const { minOffset, maxOffset } = getClampBounds();
+            if (!state.isInView && !state.isDragging && Math.abs(state.railVelocity) < 0.002) {
+                requestAnimationFrame(tick);
+                return;
+            }
 
             if (!state.isDragging) {
                 state.railOffset += state.railVelocity;
                 state.railVelocity *= state.friction;
 
-                if (state.railOffset < minOffset) {
-                    const over = minOffset - state.railOffset;
+                if (state.railOffset < state.minOffset) {
+                    const over = state.minOffset - state.railOffset;
                     state.railVelocity += over * state.edgeResistance;
                     state.railVelocity *= state.bounce;
                 }
 
-                if (state.railOffset > maxOffset) {
-                    const over = state.railOffset - maxOffset;
+                if (state.railOffset > state.maxOffset) {
+                    const over = state.railOffset - state.maxOffset;
                     state.railVelocity -= over * state.edgeResistance;
                     state.railVelocity *= state.bounce;
                 }
@@ -628,18 +643,8 @@
             requestAnimationFrame(tick);
         }
 
-        function updateMetrics() {
-            state.gap = getResponsiveGap();
-            state.swingLimit = getSwingLimit();
-            state.railOffset = clampRailOffset(state.railOffset);
-            render();
-        }
-
         function handleWheel(event) {
-            const rect = stage.getBoundingClientRect();
-            const inView = rect.top < window.innerHeight && rect.bottom > 0;
-
-            if (!inView || state.isDragging) return;
+            if (!state.isInView || state.isDragging) return;
 
             const dominantDelta =
                 Math.abs(event.deltaX) > Math.abs(event.deltaY)
@@ -663,7 +668,6 @@
 
             state.isDragging = true;
             state.grabbedIndex = grabbedIndex;
-            state.dragStartX = event.clientX;
             state.lastPointerX = event.clientX;
             state.lastTime = performance.now();
             state.railVelocity = 0;
@@ -684,9 +688,8 @@
             const pointerDx = event.clientX - state.lastPointerX;
 
             const baseX = getBaseX(state.grabbedIndex);
-            const stageCenterX = getStageCenterX();
             const desiredCardCenterX = event.clientX - state.grabbedCardOffset;
-            const desiredRailOffset = stageCenterX + baseX - desiredCardCenterX;
+            const desiredRailOffset = state.stageCenterX + baseX - desiredCardCenterX;
 
             state.railOffset = clampRailOffset(desiredRailOffset);
             state.railVelocity = -(pointerDx / dt) * 16;
@@ -716,15 +719,24 @@
         }
 
         window.addEventListener("wheel", handleWheel, { passive: true });
-        window.addEventListener("resize", updateMetrics);
+        window.addEventListener("scroll", () => {
+            const rect = stage.getBoundingClientRect();
+            state.isInView = rect.top < dom.winH && rect.bottom > 0;
+        }, { passive: true });
+
+        onResize(() => {
+            measure();
+            render();
+        });
 
         stage.addEventListener("pointerdown", handlePointerDown);
         stage.addEventListener("pointermove", handlePointerMove);
         stage.addEventListener("pointerup", endDrag);
         stage.addEventListener("pointercancel", endDrag);
 
+        measure();
         requestAnimationFrame(() => {
-            updateMetrics();
+            render();
             tick();
         });
     }
@@ -739,28 +751,46 @@
 
         if (!sections.length || !dots.length) return;
 
-        function updateActiveDot() {
-            let activeId = sections[0].id;
-            const mid = window.innerHeight * 0.38;
+        let ticking = false;
 
-            sections.forEach((sec) => {
-                const r = sec.getBoundingClientRect();
-                if (r.top <= mid && r.bottom >= mid) activeId = sec.id;
-            });
+        function updateActiveDot() {
+            ticking = false;
+
+            let activeId = sections[0].id;
+            const mid = dom.winH * 0.38;
+
+            for (let i = 0; i < sections.length; i++) {
+                const r = sections[i].getBoundingClientRect();
+                if (r.top <= mid && r.bottom >= mid) {
+                    activeId = sections[i].id;
+                    break;
+                }
+            }
 
             dots.forEach((dot) => {
                 dot.classList.toggle("is-active", dot.getAttribute("href") === `#${activeId}`);
             });
         }
 
-        if (pageShell) pageShell.addEventListener("scroll", updateActiveDot, { passive: true });
-        window.addEventListener("scroll", updateActiveDot, { passive: true });
-        window.addEventListener("resize", updateActiveDot);
+        function requestUpdate() {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(updateActiveDot);
+        }
+
+        if (pageShell) pageShell.addEventListener("scroll", requestUpdate, { passive: true });
+        window.addEventListener("scroll", requestUpdate, { passive: true });
+        onResize(requestUpdate);
+
         updateActiveDot();
     }
 
     /* =========================================================
        EDUCATION PATH
+       Optimized:
+       - one section measurement cache
+       - less layout work per frame
+       - card lookup cached
        ========================================================= */
     function initEducationPath() {
         const section = document.getElementById("education");
@@ -772,35 +802,47 @@
 
         if (!section || !track || !hero || !nodes.length || !progressFill || !yearFloat) return;
 
+        const nodeRefs = nodes.map((node) => ({
+            node,
+            card: node.querySelector(".edu-node__card"),
+            dot: node.querySelector(".edu-node__dot"),
+            year: node.dataset.year || ""
+        }));
+
         const state = {
             current: 0,
             target: 0,
             ticking: false
         };
 
-        function clamp(value, min, max) {
-            return Math.min(Math.max(value, min), max);
-        }
+        const metrics = {
+            sectionTop: 0,
+            sectionHeight: 0,
+            sectionScrollable: 1
+        };
 
-        function lerp(start, end, amount) {
-            return start + (end - start) * amount;
+        function measure() {
+            const rect = section.getBoundingClientRect();
+            metrics.sectionTop = rect.top + window.scrollY;
+            metrics.sectionHeight = section.offsetHeight;
+            metrics.sectionScrollable = Math.max(metrics.sectionHeight - dom.winH, 1);
         }
 
         function getScrollProgress() {
-            const rect = section.getBoundingClientRect();
-            const total = Math.max(section.offsetHeight - window.innerHeight, 1);
-            return clamp(-rect.top / total, 0, 1);
+            const sectionTopInViewport = metrics.sectionTop - window.scrollY;
+            return utils.clamp(-sectionTopInViewport / metrics.sectionScrollable, 0, 1);
         }
 
         function updateScene(progress) {
-            const viewportH = window.innerHeight;
+            const viewportH = dom.winH;
+            const viewportMidTarget = viewportH * 0.52;
 
-            const travel = Math.max((nodes.length - 1) * viewportH * 0.9, 3200);
+            const travel = Math.max((nodeRefs.length - 1) * viewportH * 0.9, 3200);
             const trackY = -progress * travel;
 
             track.style.transform = `translate3d(0, ${trackY}px, 0)`;
 
-            const introFade = clamp(progress / 0.1, 0, 1);
+            const introFade = utils.clamp(progress / 0.1, 0, 1);
             const heroY = -introFade * 140;
             const heroScale = 1 - introFade * 0.14;
             const heroOpacity = 1 - introFade * 1.2;
@@ -811,17 +853,16 @@
 
             progressFill.style.height = `${progress * 100}%`;
 
-            let closestNode = nodes[0];
+            let closestIndex = 0;
             let closestDistance = Infinity;
 
-            nodes.forEach((node, index) => {
-                const rect = node.getBoundingClientRect();
+            for (let i = 0; i < nodeRefs.length; i++) {
+                const ref = nodeRefs[i];
+                const rect = ref.node.getBoundingClientRect();
                 const center = rect.top + rect.height / 2;
+                const distance = Math.abs(center - viewportMidTarget);
 
-                const targetCenter = viewportH * 0.52;
-                const distance = Math.abs(center - targetCenter);
-
-                const normalized = clamp(distance / (viewportH * 0.42), 0, 1);
+                const normalized = utils.clamp(distance / (viewportH * 0.42), 0, 1);
                 const focus = 1 - normalized;
 
                 const scale = 0.82 + focus * 0.18;
@@ -830,46 +871,47 @@
                 const y = (1 - focus) * 36;
                 const blur = (1 - focus) * 7;
 
-                node.style.opacity = String(opacity);
-                node.style.transform = `translateX(-50%) translateY(${y}px) scale(${scale})`;
-                node.style.filter = `blur(${blur}px)`;
+                ref.node.style.opacity = String(opacity);
+                ref.node.style.transform = `translateX(-50%) translateY(${y}px) scale(${scale})`;
+                ref.node.style.filter = `blur(${blur}px)`;
 
-                const card = node.querySelector(".edu-node__card");
-                if (card) {
-                    card.style.transform = `perspective(1200px) rotateX(${rotateX}deg)`;
+                if (ref.card) {
+                    ref.card.style.transform = `perspective(1200px) rotateX(${rotateX}deg)`;
                 }
 
-                const dot = node.querySelector(".edu-node__dot");
-                if (dot) {
-                    dot.style.transform = `scale(${0.88 + focus * 0.38})`;
-                    dot.style.borderColor = focus > 0.7 ? "#9ee7ff" : "rgba(255,255,255,0.2)";
-                    dot.style.boxShadow = focus > 0.7
+                if (ref.dot) {
+                    ref.dot.style.transform = `scale(${0.88 + focus * 0.38})`;
+                    ref.dot.style.borderColor = focus > 0.7 ? "#9ee7ff" : "rgba(255,255,255,0.2)";
+                    ref.dot.style.boxShadow = focus > 0.7
                         ? "0 0 0 10px rgba(158, 231, 255, 0.09), 0 0 22px rgba(158, 231, 255, 0.28)"
                         : "0 0 0 8px rgba(158, 231, 255, 0.05)";
                 }
 
                 if (distance < closestDistance) {
                     closestDistance = distance;
-                    closestNode = node;
-                    state.target = index;
+                    closestIndex = i;
                 }
-            });
+            }
 
-            const activeYear = closestNode.dataset.year || "";
-            yearFloat.textContent = activeYear;
+            state.target = closestIndex;
+            yearFloat.textContent = nodeRefs[closestIndex].year;
 
-            const floatShift = state.target * -6;
+            const floatShift = closestIndex * -6;
             yearFloat.style.transform =
-                window.innerWidth <= 980
+                dom.winW <= 980
                     ? `translate3d(0, ${floatShift}px, 0)`
                     : `translate3d(0, calc(-50% + ${floatShift}px), 0)`;
 
-            yearFloat.style.opacity = String(0.35 + clamp(progress * 1.1, 0, 0.55));
+            yearFloat.style.opacity = String(0.35 + utils.clamp(progress * 1.1, 0, 0.55));
         }
 
         function animate() {
             const targetProgress = getScrollProgress();
-            state.current = lerp(state.current, targetProgress, 0.16);
+
+            state.current = dom.reducedMotion
+                ? targetProgress
+                : utils.lerp(state.current, targetProgress, 0.16);
+
             updateScene(state.current);
 
             if (Math.abs(state.current - targetProgress) > 0.0005) {
@@ -886,8 +928,13 @@
         }
 
         window.addEventListener("scroll", requestTick, { passive: true });
-        window.addEventListener("resize", requestTick);
 
+        onResize(() => {
+            measure();
+            requestTick();
+        });
+
+        measure();
         requestTick();
     }
 
@@ -928,9 +975,8 @@
     }
 
     if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", init);
+        document.addEventListener("DOMContentLoaded", init, { once: true });
     } else {
         init();
     }
 })();
-

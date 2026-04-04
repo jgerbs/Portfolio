@@ -35,29 +35,102 @@
         const screen = document.getElementById("heroLaptopScreen");
         const indicator = document.getElementById("heroLaptopScrollIndicator");
         const pageShell = document.getElementById("laptopPageShell");
+        const workSection = document.getElementById("work");
+        const heroBg = hero ? hero.querySelector(".hero-laptop__bg") : null;
+
         const base = device ? device.querySelector(".hero-laptop__base") : null;
         const shadow = device ? device.querySelector(".hero-laptop__shadow") : null;
 
-        if (!hero || !scene || !deviceWrap || !device || !lid || !screen || !pageShell) return;
+        if (!hero || !scene || !deviceWrap || !device || !lid || !screen || !pageShell || !heroBg || !workSection) return;
 
         const root = document.documentElement;
+        const body = document.body;
+
+        /* ---------------------------------------------------------
+           BACKGROUND SYSTEM
+           closed hero bg = wider / softer / more "outside the laptop"
+           inside laptop bg = darker / deeper / more distinct / used
+           for opened hero + rest of page
+        --------------------------------------------------------- */
+        const CLOSED_BG = `
+            radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.10), transparent 22%),
+            radial-gradient(circle at 78% 24%, rgba(210, 210, 210, 0.08), transparent 18%),
+            radial-gradient(circle at 24% 70%, rgba(170, 170, 170, 0.06), transparent 18%),
+            radial-gradient(circle at 82% 78%, rgba(235, 235, 235, 0.05), transparent 16%),
+            linear-gradient(180deg, #020202 0%, #070707 30%, #0d0d0d 65%, #141414 100%)
+        `;
+
+                const INSIDE_BG = `
+            radial-gradient(circle at 18% 20%, rgba(86, 117, 255, 0.18), transparent 18%),
+            radial-gradient(circle at 78% 24%, rgba(158, 231, 255, 0.10), transparent 16%),
+            radial-gradient(circle at 24% 66%, rgba(62, 92, 210, 0.12), transparent 16%),
+            radial-gradient(circle at 82% 78%, rgba(90, 170, 255, 0.10), transparent 14%),
+            linear-gradient(180deg, #030814 0%, #040a16 24%, #050d1a 56%, #030711 100%)
+        `;
+
+        // Rest of page always uses the "inside laptop" world.
+        body.style.background = INSIDE_BG;
+        body.style.backgroundAttachment = "fixed";
+        pageShell.style.background = INSIDE_BG;
+
+        // Build two stacked bg layers inside the hero so we can crossfade.
+        heroBg.style.background = "none";
+        heroBg.style.overflow = "hidden";
+
+        const closedLayer = document.createElement("div");
+        closedLayer.style.position = "absolute";
+        closedLayer.style.inset = "0";
+        closedLayer.style.pointerEvents = "none";
+        closedLayer.style.background = CLOSED_BG;
+        closedLayer.style.opacity = "1";
+        closedLayer.style.transition = "none";
+
+        const insideLayer = document.createElement("div");
+        insideLayer.style.position = "absolute";
+        insideLayer.style.inset = "0";
+        insideLayer.style.pointerEvents = "none";
+        insideLayer.style.background = INSIDE_BG;
+        insideLayer.style.opacity = "0";
+        insideLayer.style.transition = "none";
+
+        heroBg.prepend(insideLayer);
+        heroBg.prepend(closedLayer);
+
+        const heroGrid = heroBg.querySelector(".hero-laptop__grid");
+        const glow1 = heroBg.querySelector(".hero-laptop__glow--1");
+        const glow2 = heroBg.querySelector(".hero-laptop__glow--2");
 
         // Smoothed state
         const s = {
-            mouseX: 0, mouseY: 0,
-            targetMouseX: 0, targetMouseY: 0,
-            progress: 0, targetProgress: 0,
+            mouseX: 0,
+            mouseY: 0,
+            targetMouseX: 0,
+            targetMouseY: 0,
+            progress: 0,
+            targetProgress: 0,
             ticking: false
         };
 
-        function clamp(v, lo, hi) { return Math.min(Math.max(v, lo), hi); }
-        function lerp(a, b, t) { return a + (b - a) * t; }
+        function clamp(v, lo, hi) {
+            return Math.min(Math.max(v, lo), hi);
+        }
+
+        function lerp(a, b, t) {
+            return a + (b - a) * t;
+        }
+
         function mapRange(v, a, b, c, d) {
             return clamp((v - a) / (b - a), 0, 1) * (d - c) + c;
         }
-        function easeOut3(t) { return 1 - Math.pow(1 - t, 3); }
+
+        function easeOut3(t) {
+            return 1 - Math.pow(1 - t, 3);
+        }
+
         function easeInOut3(t) {
-            return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+            return t < 0.5
+                ? 4 * t * t * t
+                : 1 - Math.pow(-2 * t + 2, 3) / 2;
         }
 
         function readScrollProgress() {
@@ -66,12 +139,6 @@
             return clamp(-rect.top / total, 0, 1);
         }
 
-        /* ----------------------------------------------------------
-           syncShellToScreen
-           The page-shell overlay must look exactly like it's painted
-           onto the laptop screen. We read the live screen rect each
-           frame and transform accordingly.
-        ---------------------------------------------------------- */
         function syncShellToScreen(zoomP) {
             if (zoomP <= 0.01) {
                 root.style.setProperty("--shell-opacity", "0");
@@ -79,22 +146,31 @@
             }
 
             const sr = screen.getBoundingClientRect();
+            const work = document.getElementById("work");
+
             const vw = window.innerWidth;
             const vh = window.innerHeight;
 
-            // Scale: screen is a fraction of the viewport; we grow to 1
             const startScale = Math.min(sr.width / vw, sr.height / vh);
             const scale = lerp(startScale, 1, zoomP);
 
-            // Center-offset so the shell stays locked to screen center
-            const cx = sr.left + sr.width / 2;
-            const cy = sr.top + sr.height / 2;
-            const dx = lerp(cx - vw / 2, 0, zoomP);
-            const dy = lerp(cy - vh / 2, 0, zoomP);
+            const screenCx = sr.left + sr.width / 2;
+            const screenCy = sr.top + sr.height / 2;
 
-            // Border-radius matches screen corners, collapses as we fill viewport
+            let targetCx = vw / 2;
+            let targetCy = vh / 2;
+
+            if (work) {
+                const workRect = work.getBoundingClientRect();
+                targetCx = vw / 2;
+                targetCy = Math.min(vh * 0.34, workRect.top + Math.max(140, workRect.height * 0.12));
+            }
+
+            const dx = lerp(screenCx - targetCx, 0, zoomP);
+            const dy = lerp(screenCy - targetCy, 0, zoomP);
+
             const radius = lerp(8, 0, easeOut3(zoomP));
-            const opacity = clamp(mapRange(zoomP, 0.0, 0.12, 0, 1), 0, 1);
+            const opacity = clamp(mapRange(zoomP, 0.0, 0.10, 0, 1), 0, 1);
 
             root.style.setProperty("--shell-scale", String(scale));
             root.style.setProperty("--shell-x", `${dx}px`);
@@ -105,61 +181,92 @@
 
         function render() {
             s.ticking = false;
+
             s.progress = lerp(s.progress, s.targetProgress, 0.10);
             s.mouseX = lerp(s.mouseX, s.targetMouseX, 0.07);
             s.mouseY = lerp(s.mouseY, s.targetMouseY, 0.07);
 
             const p = s.progress;
 
-            // ── Phase 1: lid opens (0.05 → 0.30) ────────────────────
             const openP = easeInOut3(clamp(mapRange(p, 0.05, 0.30, 0, 1), 0, 1));
-            // ── Phase 1b: screen powers on (0.18 → 0.38) ────────────
             const powerP = easeInOut3(clamp(mapRange(p, 0.18, 0.38, 0, 1), 0, 1));
-            // ── Phase 2: whole laptop zooms toward viewer (0.32 → 0.88)
-            const zoomP = easeInOut3(clamp(mapRange(p, 0.32, 0.88, 0, 1), 0, 1));
-            // ── Phase 3: final device fade at very end (0.80 → 1.00)
-            const fadeP = easeInOut3(clamp(mapRange(p, 0.80, 1.00, 0, 1), 0, 1));
+            const workRevealP = easeInOut3(clamp(mapRange(p, 0.28, 0.50, 0, 1), 0, 1));
+            const zoomP = easeInOut3(clamp(mapRange(p, 0.28, 0.78, 0, 1), 0, 1));
+            const fadeP = easeInOut3(clamp(mapRange(p, 0.72, 0.90, 0, 1), 0, 1));
 
-            // Mouse tilt — reduces as laptop comes closer
+            /* ---------------------------------------------------------
+               BACKGROUND CROSSFADE
+               - hero starts with CLOSED_BG
+               - while laptop opens, hero transitions into INSIDE_BG
+               - after the device disappears, everything still feels like
+                 the same world because the page shell is already INSIDE_BG
+            --------------------------------------------------------- */
+            const bgShiftP = easeInOut3(clamp(mapRange(p, 0.10, 0.30, 0, 1), 0, 1));
+            const heroFadeOutP = easeInOut3(clamp(mapRange(p, 0.82, 0.96, 0, 1), 0, 1));
+
+            closedLayer.style.opacity = String(1 - bgShiftP);
+            insideLayer.style.opacity = String(bgShiftP);
+
+            if (heroGrid) {
+                heroGrid.style.opacity = String(lerp(0.065, 0.045, bgShiftP));
+            }
+
+            if (glow1) {
+                glow1.style.opacity = String(lerp(0.78, 0.42, bgShiftP));
+                glow1.style.transform = `scale(${lerp(1, 0.9, bgShiftP)})`;
+            }
+
+            if (glow2) {
+                glow2.style.opacity = String(lerp(0.72, 0.36, bgShiftP));
+                glow2.style.transform = `scale(${lerp(1, 0.88, bgShiftP)})`;
+            }
+
+            // Once the laptop is basically gone, the hero bg itself fades away
+            // so only the page-shell world remains.
+            heroBg.style.opacity = String(1 - heroFadeOutP * 0.92);
+
+            /* ---------------------------------------------------------
+               DEVICE / MOTION
+            --------------------------------------------------------- */
             const tiltInfluence = 1 - zoomP;
             const tiltX = s.mouseY * -3.5 * tiltInfluence;
             const tiltY = s.mouseX * 5.0 * tiltInfluence;
 
-            // ── Lid (rotates open around bottom edge) ────────────────
-            const lidAngle = -112 + openP * 112;
-            lid.style.transform = `rotateX(${lidAngle}deg)`;
+            const lidAngle = -95 + openP * 95;
+            const restTilt = (1 - openP) * 2.5;
+            lid.style.transform = `rotateX(${lidAngle + restTilt}deg)`;
 
-            // ── Whole laptop zooms forward ───────────────────────────
-            // We scale the deviceWrap from 1× up to ~3×, making it
-            // feel like the machine rushes toward the camera.
             const deviceScale = lerp(1, 3.2, zoomP);
-            const liftY = lerp(0, -18, openP);        // slight lift as lid opens
+            const liftY = lerp(0, -18, openP);
 
             deviceWrap.style.transform = `
-        translate3d(
-          ${s.mouseX * 8 * tiltInfluence}px,
-          ${liftY + s.mouseY * 3 * tiltInfluence}px,
-          0
-        )
-        rotateX(${tiltX}deg)
-        rotateY(${tiltY}deg)
-        scale(${deviceScale})
-      `;
+            translate3d(
+                ${s.mouseX * 8 * tiltInfluence}px,
+                ${liftY + s.mouseY * 3 * tiltInfluence}px,
+                0
+            )
+            rotateX(${tiltX}deg)
+            rotateY(${tiltY}deg)
+            scale(${deviceScale})
+        `;
 
-            // Fade the whole device out in the last phase
             deviceWrap.style.opacity = String(clamp(1 - fadeP * 1.4, 0, 1));
 
-            // ── Screen brightness/opacity ────────────────────────────
             const brightness = 0.18 + powerP * 0.82;
+            const saturation = 0.15 + powerP * 1.1;
+            const grayscale = 1 - powerP;
+
             screen.style.opacity = String(0.2 + powerP * 0.8);
-            screen.style.filter = `brightness(${brightness}) saturate(${0.8 + powerP * 0.35})`;
-            screen.style.transform = "none"; // no extra screen scale — device does it
+            screen.style.filter = `brightness(${brightness}) saturate(${saturation}) grayscale(${grayscale})`;
 
-            // ── Base & shadow fade ───────────────────────────────────
-            if (base) base.style.opacity = String(clamp(1 - zoomP * 1.6, 0, 1));
-            if (shadow) shadow.style.opacity = String(clamp(0.82 - zoomP * 1.1, 0, 1));
+            if (base) {
+                base.style.opacity = String(clamp(1 - zoomP * 1.6, 0, 1));
+            }
 
-            // ── Welcome text ─────────────────────────────────────────
+            if (shadow) {
+                shadow.style.opacity = String(clamp(0.82 - zoomP * 1.1, 0, 1));
+            }
+
             if (welcome) {
                 const wFade = easeInOut3(clamp(mapRange(p, 0.08, 0.28, 0, 1), 0, 1));
                 welcome.style.opacity = String(1 - wFade);
@@ -167,18 +274,27 @@
                 welcome.style.filter = `blur(${wFade * 6}px)`;
             }
 
-            // ── Scroll indicator ────────────────────────────────────
             if (indicator) {
                 const hide = clamp(mapRange(p, 0.04, 0.14, 0, 1), 0, 1);
                 indicator.style.opacity = String(1 - hide);
                 indicator.style.transform = `translateX(-50%) translateY(${hide * 10}px)`;
             }
 
-            // ── Page shell overlay ───────────────────────────────────
-            // Appears as content overlaid exactly on the screen during zoom,
-            // then becomes the real page once zoom completes.
-            const isEmbedded = zoomP > 0.03 && p < 0.995;
-            const isFull = p >= 0.995;
+            /* ---------------------------------------------------------
+   WORK SECTION REVEAL
+   fades in where it already is so it feels like
+   the laptop screen powers on instead of scrolling into it
+--------------------------------------------------------- */
+            workSection.style.opacity = String(workRevealP);
+            workSection.style.transform = `scale(${lerp(0.985, 1, workRevealP)})`;
+            workSection.style.filter = `blur(${lerp(14, 0, workRevealP)}px)`;
+            workSection.classList.toggle("is-visible", workRevealP > 0.02);
+
+            /* ---------------------------------------------------------
+               SHELL HANDOFF
+            --------------------------------------------------------- */
+            const isEmbedded = zoomP > 0.02 && p < 0.90;
+            const isFull = p >= 0.90;
 
             if (!pageShell.classList.contains("is-laptop-full") || !isFull) {
                 pageShell.classList.toggle("is-laptop-embedded", isEmbedded);
@@ -187,10 +303,8 @@
 
             syncShellToScreen(zoomP);
 
-            // ── Handoff ──────────────────────────────────────────────
             hero.classList.toggle("hero-laptop--done", fadeP > 0.9);
 
-            // Keep ticking while animating
             if (
                 Math.abs(s.progress - s.targetProgress) > 0.0003 ||
                 Math.abs(s.mouseX - s.targetMouseX) > 0.0003 ||
@@ -206,15 +320,26 @@
             requestAnimationFrame(render);
         }
 
-        window.addEventListener("scroll", () => { s.targetProgress = readScrollProgress(); requestTick(); }, { passive: true });
-        window.addEventListener("resize", () => { s.targetProgress = readScrollProgress(); requestTick(); });
+        window.addEventListener(
+            "scroll",
+            () => {
+                s.targetProgress = readScrollProgress();
+                requestTick();
+            },
+            { passive: true }
+        );
+
+        window.addEventListener("resize", () => {
+            s.targetProgress = readScrollProgress();
+            requestTick();
+        });
+
         window.addEventListener("mousemove", (e) => {
             s.targetMouseX = (e.clientX / window.innerWidth - 0.5) * 2;
             s.targetMouseY = (e.clientY / window.innerHeight - 0.5) * 2;
             requestTick();
         });
 
-        // Run once immediately
         s.targetProgress = readScrollProgress();
         requestTick();
     }

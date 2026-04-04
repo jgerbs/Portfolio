@@ -242,7 +242,7 @@
             const openP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.05, 0.28, 0, 1), 0, 1));
             const powerP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.16, 0.34, 0, 1), 0, 1));
             const zoomP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.28, 0.70, 0, 1), 0, 1));
-            const fadeP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.80, 0.92, 0, 1), 0, 1));
+            const fadeP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.68, 0.82, 0, 1), 0, 1));
             const finalWelcomeP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.80, 0.92, 0, 1), 0, 1));
             const workRevealP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.90, 1.00, 0, 1), 0, 1));
             const bgShiftP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.10, 0.30, 0, 1), 0, 1));
@@ -298,12 +298,14 @@
             screen.style.opacity = String(0.2 + powerP * 0.8);
             screen.style.filter = `brightness(${brightness}) saturate(${saturation}) grayscale(${grayscale})`;
 
+            const deviceOpacity = utils.clamp(1 - fadeP * 1.4, 0, 1);
+
             if (base) {
-                base.style.opacity = String(utils.clamp(1 - zoomP * 1.6, 0, 1));
+                base.style.opacity = String(deviceOpacity);
             }
 
             if (shadow) {
-                shadow.style.opacity = String(utils.clamp(0.82 - zoomP * 1.1, 0, 1));
+                shadow.style.opacity = String(deviceOpacity * 0.82);
             }
 
             if (welcome) {
@@ -314,7 +316,7 @@
             }
 
             const loaderP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.16, 0.34, 0, 1), 0, 1));
-            const loaderOutP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.80, 0.92, 0, 1), 0, 1));
+            const loaderOutP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.68, 0.82, 0, 1), 0, 1));
             const loaderVisible = loaderP * (1 - loaderOutP);
 
             loader.style.opacity = String(loaderVisible);

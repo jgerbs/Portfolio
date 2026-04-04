@@ -56,7 +56,7 @@ body {
         radial-gradient(circle at 84% 26%, rgba(158, 231, 255, 0.11), transparent 18%),
         radial-gradient(circle at 79% 74%, rgba(158, 231, 255, 0.13), transparent 18%),
         linear-gradient(180deg, #071329 0%, #061026 46%, #040b1d 100%);
-    background-attachment: fixed;
+    background-attachment: scroll;
 }
 
 a {

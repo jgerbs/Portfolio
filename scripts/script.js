@@ -36,6 +36,10 @@
         reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches
     };
 
+    function isMobileLike() {
+        return dom.winW <= 980;
+    }
+
     const resizeSubscribers = new Set();
 
     function onResize(callback) {
@@ -109,7 +113,6 @@
         `;
 
         body.style.background = INSIDE_BG;
-        body.style.backgroundAttachment = "fixed";
         pageShell.style.background = INSIDE_BG;
 
         heroBg.style.background = "none";
@@ -213,16 +216,18 @@
         function render() {
             state.ticking = false;
 
-            state.progress = dom.reducedMotion
+            const mobileLike = isMobileLike();
+
+            state.progress = (dom.reducedMotion || mobileLike)
                 ? state.targetProgress
                 : utils.lerp(state.progress, state.targetProgress, 0.10);
 
-            state.mouseX = dom.reducedMotion
-                ? state.targetMouseX
+            state.mouseX = (dom.reducedMotion || mobileLike)
+                ? 0
                 : utils.lerp(state.mouseX, state.targetMouseX, 0.07);
 
-            state.mouseY = dom.reducedMotion
-                ? state.targetMouseY
+            state.mouseY = (dom.reducedMotion || mobileLike)
+                ? 0
                 : utils.lerp(state.mouseY, state.targetMouseY, 0.07);
 
             const p = state.progress;
@@ -255,16 +260,16 @@
 
             heroBg.style.opacity = String(1 - heroFadeOutP * 0.92);
 
-            const tiltInfluence = dom.reducedMotion ? 0 : 1 - zoomP;
-            const tiltX = state.mouseY * -3.5 * tiltInfluence;
-            const tiltY = state.mouseX * 5.0 * tiltInfluence;
+            const tiltInfluence = (dom.reducedMotion || mobileLike) ? 0 : 1 - zoomP;
+            const tiltX = state.mouseY * -2.2 * tiltInfluence;
+            const tiltY = state.mouseX * 3.2 * tiltInfluence;
 
             const lidAngle = -95 + openP * 95;
             const restTilt = (1 - openP) * 2.5;
             lid.style.transform = `rotateX(${lidAngle + restTilt}deg)`;
 
-            const deviceScale = utils.lerp(1, 3.2, zoomP);
-            const liftY = utils.lerp(0, -18, openP);
+            const deviceScale = utils.lerp(1, mobileLike ? 2.2 : 3.2, zoomP);
+            const liftY = utils.lerp(0, mobileLike ? -10 : -18, openP);
 
             deviceWrap.style.transform = `
                 translate3d(
@@ -298,7 +303,7 @@
                 const wFade = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.06, 0.20, 0, 1), 0, 1));
                 welcome.style.opacity = String(1 - wFade);
                 welcome.style.transform = `translate3d(0, ${wFade * -30}px, 0) scale(${1 - wFade * 0.04})`;
-                welcome.style.filter = `blur(${wFade * 6}px)`;
+                welcome.style.filter = mobileLike ? "none" : `blur(${wFade * 6}px)`;
             }
 
             const loaderP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.16, 0.34, 0, 1), 0, 1));
@@ -307,7 +312,7 @@
 
             loader.style.opacity = String(loaderVisible);
             loader.style.transform = `scale(${utils.lerp(0.92, 1, loaderVisible)})`;
-            loader.style.filter = `blur(${utils.lerp(8, 0, loaderVisible)}px)`;
+            loader.style.filter = mobileLike ? "none" : `blur(${utils.lerp(8, 0, loaderVisible)}px)`;
 
             if (indicator) {
                 const hide = utils.clamp(utils.mapRange(p, 0.04, 0.14, 0, 1), 0, 1);
@@ -320,12 +325,11 @@
                 translate(-50%, calc(-50% + ${utils.lerp(28, 0, finalWelcomeP)}px))
                 scale(${utils.lerp(0.96, 1, finalWelcomeP)})
             `;
-            finalWelcome.style.filter = `blur(${utils.lerp(12, 0, finalWelcomeP)}px)`;
+            finalWelcome.style.filter = mobileLike ? "none" : `blur(${utils.lerp(12, 0, finalWelcomeP)}px)`;
 
             workSection.style.opacity = String(workRevealP);
             workSection.style.transform = `translate3d(0, ${utils.lerp(34, 0, workRevealP)}px, 0) scale(${utils.lerp(0.985, 1, workRevealP)})`;
-            workSection.style.filter = `blur(${utils.lerp(18, 0, workRevealP)}px)`;
-            workSection.classList.toggle("is-visible", workRevealP > 0.02);
+            workSection.style.filter = mobileLike ? "none" : `blur(${utils.lerp(18, 0, workRevealP)}px)`; workSection.classList.toggle("is-visible", workRevealP > 0.02);
 
             const isEmbedded = zoomP > 0.02 && p < 0.90;
             const isFull = p >= 0.90;
@@ -361,11 +365,13 @@
 
         window.addEventListener("scroll", updateProgress, { passive: true });
 
-        window.addEventListener("mousemove", (e) => {
-            state.targetMouseX = (e.clientX / dom.winW - 0.5) * 2;
-            state.targetMouseY = (e.clientY / dom.winH - 0.5) * 2;
-            requestTick();
-        }, { passive: true });
+        if (!window.matchMedia("(pointer: coarse)").matches) {
+            window.addEventListener("mousemove", (e) => {
+                state.targetMouseX = (e.clientX / dom.winW - 0.5) * 2;
+                state.targetMouseY = (e.clientY / dom.winH - 0.5) * 2;
+                requestTick();
+            }, { passive: true });
+        }
 
         onResize(() => {
             measure();
@@ -608,11 +614,18 @@
             }
         }
 
+        let rafId = 0;
+
+        function needsAnimation() {
+            return (
+                state.isDragging ||
+                Math.abs(state.railVelocity) > 0.002 ||
+                state.isInView
+            );
+        }
+
         function tick() {
-            if (!state.isInView && !state.isDragging && Math.abs(state.railVelocity) < 0.002) {
-                requestAnimationFrame(tick);
-                return;
-            }
+            rafId = 0;
 
             if (!state.isDragging) {
                 state.railOffset += state.railVelocity;
@@ -640,7 +653,15 @@
             }
 
             render();
-            requestAnimationFrame(tick);
+
+            if (needsAnimation()) {
+                rafId = requestAnimationFrame(tick);
+            }
+        }
+
+        function requestTick() {
+            if (rafId) return;
+            rafId = requestAnimationFrame(tick);
         }
 
         function handleWheel(event) {
@@ -653,6 +674,7 @@
 
             state.railVelocity += dominantDelta * state.wheelForce * 0.01;
             applyNeighborImpulse(Math.floor(cards.length / 2), dominantDelta * 0.01);
+            requestTick();
         }
 
         function handlePointerDown(event) {
@@ -698,6 +720,7 @@
 
             state.lastPointerX = event.clientX;
             state.lastTime = now;
+            requestTick();
         }
 
         function endDrag(event) {
@@ -716,6 +739,8 @@
                 card.style.zIndex = "";
                 card.classList.remove("is-grabbed");
             });
+
+            requestTick();
         }
 
         window.addEventListener("wheel", handleWheel, { passive: true });
@@ -735,10 +760,8 @@
         stage.addEventListener("pointercancel", endDrag);
 
         measure();
-        requestAnimationFrame(() => {
-            render();
-            tick();
-        });
+        render();
+        requestTick();
     }
 
     /* =========================================================

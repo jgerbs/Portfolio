@@ -1591,11 +1591,24 @@ img {
     padding: clamp(5rem, 10vw, 8rem) clamp(1.25rem, 4vw, 3rem);
     overflow: hidden;
     background:
-        radial-gradient(circle at 12% 18%, rgba(124, 140, 255, 0.14), transparent 24%),
-        radial-gradient(circle at 84% 20%, rgba(158, 231, 255, 0.08), transparent 20%),
-        linear-gradient(180deg, rgba(4, 9, 20, 0.96) 0%, rgba(3, 7, 15, 1) 100%);
+        radial-gradient(circle at 14% 18%, rgba(255, 255, 255, 0.04), transparent 22%),
+        radial-gradient(circle at 82% 16%, rgba(158, 231, 255, 0.05), transparent 18%),
+        linear-gradient(180deg, #060b16 0%, #040914 38%, #020611 100%);
     border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
+
+.contact-section::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 110px;
+    pointer-events: none;
+    background: linear-gradient(180deg,
+            rgba(255, 255, 255, 0.035) 0%,
+            rgba(255, 255, 255, 0.012) 45%,
+            rgba(255, 255, 255, 0) 100%);
+}
+
 
 .contact-shell {
     display: grid;
@@ -1621,6 +1634,7 @@ img {
     padding: clamp(1.4rem, 3vw, 2.2rem);
     border-radius: 28px;
     box-shadow: var(--shadow-lg);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.04));
 }
 
 .contact-card h3 {

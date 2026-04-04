@@ -242,7 +242,7 @@
             const openP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.05, 0.28, 0, 1), 0, 1));
             const powerP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.16, 0.34, 0, 1), 0, 1));
             const zoomP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.28, 0.70, 0, 1), 0, 1));
-            const fadeP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.68, 0.82, 0, 1), 0, 1));
+            const fadeP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.80, 0.92, 0, 1), 0, 1));
             const finalWelcomeP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.80, 0.92, 0, 1), 0, 1));
             const workRevealP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.90, 1.00, 0, 1), 0, 1));
             const bgShiftP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.10, 0.30, 0, 1), 0, 1));
@@ -314,7 +314,7 @@
             }
 
             const loaderP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.16, 0.34, 0, 1), 0, 1));
-            const loaderOutP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.34, 0.48, 0, 1), 0, 1));
+            const loaderOutP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.80, 0.92, 0, 1), 0, 1));
             const loaderVisible = loaderP * (1 - loaderOutP);
 
             loader.style.opacity = String(loaderVisible);

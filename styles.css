@@ -50,12 +50,6 @@ body {
     color: var(--text);
     font-family: Inter, system-ui, sans-serif;
     overflow-x: hidden;
-    background:
-        radial-gradient(circle at 18% 18%, rgba(76, 114, 255, 0.22), transparent 18%),
-        radial-gradient(circle at 61% 34%, rgba(111, 155, 255, 0.15), transparent 20%),
-        radial-gradient(circle at 84% 26%, rgba(158, 231, 255, 0.11), transparent 18%),
-        radial-gradient(circle at 79% 74%, rgba(158, 231, 255, 0.13), transparent 18%),
-        linear-gradient(180deg, #071329 0%, #061026 46%, #040b1d 100%);
     background-attachment: scroll;
 }
 
@@ -86,12 +80,6 @@ img {
 .laptop-page-shell {
     position: relative;
     z-index: 2;
-    background:
-        radial-gradient(circle at 18% 18%, rgba(76, 114, 255, 0.22), transparent 18%),
-        radial-gradient(circle at 61% 34%, rgba(111, 155, 255, 0.15), transparent 20%),
-        radial-gradient(circle at 84% 26%, rgba(158, 231, 255, 0.11), transparent 18%),
-        radial-gradient(circle at 79% 74%, rgba(158, 231, 255, 0.13), transparent 18%),
-        linear-gradient(180deg, #071329 0%, #061026 46%, #040b1d 100%);
 }
 
 .laptop-page-shell::before {
@@ -101,15 +89,11 @@ img {
     z-index: 0;
     pointer-events: none;
     opacity: 0.035;
-    background-image:
-        linear-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
     background-size: 54px 54px;
 }
 
 .laptop-page-shell>section {
     position: relative;
-    background: transparent;
 }
 
 /* =========================================================
@@ -348,11 +332,7 @@ img {
     pointer-events: none;
     opacity: var(--hero-closed-opacity);
     transition: opacity 0.18s linear;
-    background:
-        radial-gradient(circle at 12% 18%, rgba(165, 180, 255, 0.22), transparent 20%),
-        radial-gradient(circle at 84% 18%, rgba(111, 143, 255, 0.12), transparent 18%),
-        radial-gradient(circle at 84% 72%, rgba(125, 229, 255, 0.08), transparent 18%),
-        linear-gradient(180deg, rgba(7, 11, 21, 0.96) 0%, rgba(6, 10, 18, 0.92) 46%, rgba(4, 8, 15, 0.90) 100%);
+
 }
 
 .hero-laptop__grid {
@@ -702,13 +682,8 @@ img {
 }
 
 .hero-laptop:not(.hero-laptop--closed) .hero-laptop__sticky::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: linear-gradient(180deg, rgba(2, 7, 19, 0.04) 0%, rgba(2, 7, 19, 0) 28%, rgba(2, 7, 19, 0.12) 100%);
+    content: none;
 }
-
 /* hero loader / final welcome */
 .hero-laptop__loader {
     position: absolute;
@@ -809,7 +784,6 @@ img {
     position: relative;
     z-index: 10;
     overflow: hidden;
-    margin-top: -2px;
     padding: clamp(34px, 4vw, 56px) 0 clamp(84px, 8vw, 128px);
     opacity: 0;
     filter: blur(14px);
@@ -2474,3 +2448,4 @@ img {
         transition: none !important;
     }
 }
+

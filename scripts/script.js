@@ -105,12 +105,19 @@
         `;
 
         const INSIDE_BG = `
-            radial-gradient(circle at 18% 20%, rgba(86, 117, 255, 0.18), transparent 18%),
-            radial-gradient(circle at 78% 24%, rgba(158, 231, 255, 0.10), transparent 16%),
-            radial-gradient(circle at 24% 66%, rgba(62, 92, 210, 0.12), transparent 16%),
-            radial-gradient(circle at 82% 78%, rgba(90, 170, 255, 0.10), transparent 14%),
-            linear-gradient(180deg, #030814 0%, #040a16 24%, #050d1a 56%, #030711 100%)
-        `;
+    radial-gradient(circle at 18% 20%, rgba(86, 117, 255, 0.16), transparent 18%),
+    radial-gradient(circle at 78% 24%, rgba(158, 231, 255, 0.08), transparent 16%),
+    radial-gradient(circle at 24% 66%, rgba(62, 92, 210, 0.10), transparent 18%),
+    radial-gradient(circle at 82% 78%, rgba(90, 170, 255, 0.08), transparent 16%),
+    linear-gradient(
+        180deg,
+        #020814 0%,
+        #020a18 22%,
+        #030c1c 46%,
+        #16264c 72%,
+        #1b2b55 100%
+    )
+`;
 
         body.style.background = INSIDE_BG;
         pageShell.style.background = INSIDE_BG;
@@ -258,7 +265,7 @@
                 glow2.style.transform = `scale(${utils.lerp(1, 0.88, bgShiftP)})`;
             }
 
-            heroBg.style.opacity = String(1 - heroFadeOutP * 0.92);
+            heroBg.style.opacity = String(1 - heroFadeOutP);
 
             const tiltInfluence = (dom.reducedMotion || mobileLike) ? 0 : 1 - zoomP;
             const tiltX = state.mouseY * -2.2 * tiltInfluence;

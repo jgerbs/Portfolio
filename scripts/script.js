@@ -225,7 +225,8 @@
 
             const mobileLike = isMobileLike();
 
-            const progressLerp = dom.reducedMotion ? 1 : (mobileLike ? 0.22 : 0.10);
+            // very smooth / more delayed
+            const progressLerp = dom.reducedMotion ? 1 : (mobileLike ? 0.06 : 0.10);
             state.progress = utils.lerp(state.progress, state.targetProgress, progressLerp);
 
             state.mouseX = (dom.reducedMotion || mobileLike)

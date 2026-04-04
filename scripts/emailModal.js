@@ -1,78 +1,183 @@
-// emailModal.js — polished version with validation + status UI
+// emailModal.js — inline contact form with custom validation + button states
 document.addEventListener("DOMContentLoaded", () => {
-  const modal = document.getElementById("emailModal");
-  const openBtn = document.getElementById("emailButton");
-  const closeBtn = modal?.querySelector(".close");
-  const form = document.getElementById("emailForm");
+    const openBtn = document.getElementById("emailButton");
+    const contactSection = document.getElementById("contact");
+    const form = document.getElementById("emailForm");
 
-  if (!modal || !openBtn || !closeBtn || !form) return;
+    if (!form) return;
 
-  const statusMsg = document.createElement("p");
-  statusMsg.className = "status-message";
-  form.appendChild(statusMsg);
+    const submitBtn = form.querySelector('button[type="submit"]');
 
-  /* ---------- OPEN / CLOSE MODAL ---------- */
-  openBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    modal.style.display = "flex";
-    statusMsg.textContent = "";
-  });
+    const fields = {
+        name: form.querySelector("#name"),
+        email: form.querySelector("#email"),
+        message: form.querySelector("#message")
+    };
 
-  closeBtn.addEventListener("click", () => (modal.style.display = "none"));
-  window.addEventListener("click", (e) => {
-    if (e.target === modal) modal.style.display = "none";
-  });
+    if (openBtn && contactSection) {
+        openBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            contactSection.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
 
-  /* ---------- FORM SUBMIT ---------- */
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    statusMsg.textContent = "";
-    statusMsg.className = "status-message";
-
-    const name = form.name.value.trim();
-    const company = form.company.value.trim();
-    const email = form.email.value.trim();
-    const message = form.message.value.trim();
-
-    // ---- Validation ----
-    const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
-    if (!name || !email || !message) {
-      showStatus("Please fill in all required fields.", "error");
-      return;
-    }
-    if (!emailRegex.test(email)) {
-      showStatus("Please enter a valid email address.", "error");
-      return;
+            setTimeout(() => {
+                form.querySelector("input, textarea")?.focus();
+            }, 500);
+        });
     }
 
-    // ---- Sending ----
-    showStatus("Sending message...", "sending");
+    Object.values(fields).forEach((field) => {
+        if (!field) return;
 
-    try {
-      await emailjs.send("service_rq8f16l", "template_pk40ijl", {
-        name,
-        company,
-        email,
-        message,
-      });
+        field.addEventListener("input", () => {
+            validateField(field, true);
+        });
 
-      showStatus("Message sent successfully!", "success");
-      form.reset();
+        field.addEventListener("blur", () => {
+            validateField(field);
+        });
+    });
 
-      // fade out success message then close
-      setTimeout(() => {
-        modal.style.display = "none";
-        statusMsg.textContent = "";
-      }, 1500);
-    } catch (err) {
-      console.error("Email send failed:", err);
-      showStatus("Something went wrong. Please try again later.", "error");
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        clearAllErrors();
+
+        const name = fields.name.value.trim();
+        const company = form.company.value.trim();
+        const email = fields.email.value.trim();
+        const message = fields.message.value.trim();
+
+        let hasError = false;
+
+        if (!name) {
+            setFieldError(fields.name);
+            hasError = true;
+        }
+
+        if (!email || !isValidEmail(email)) {
+            setFieldError(fields.email);
+            hasError = true;
+        }
+
+        if (!message) {
+            setFieldError(fields.message);
+            hasError = true;
+        }
+
+        if (hasError) {
+            setButtonState("invalid");
+            return;
+        }
+
+        setButtonState("sending");
+
+        try {
+            await emailjs.send("service_rq8f16l", "template_pk40ijl", {
+                name,
+                company,
+                email,
+                message
+            });
+
+            form.reset();
+            clearAllErrors();
+            setButtonState("success");
+
+            setTimeout(() => {
+                setButtonState("idle");
+            }, 1800);
+        } catch (err) {
+            console.error("Email send failed:", err);
+            setButtonState("error");
+
+            setTimeout(() => {
+                setButtonState("idle");
+            }, 2200);
+        }
+    });
+
+    function isValidEmail(value) {
+        return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value);
     }
-  });
 
-  /* ---------- Helper ---------- */
-  function showStatus(msg, type) {
-    statusMsg.textContent = msg;
-    statusMsg.className = `status-message ${type}`;
-  }
+    function validateField(field, soft = false) {
+        const value = field.value.trim();
+
+        if (field.hasAttribute("required") && !value) {
+            if (!soft) setFieldError(field);
+            else clearFieldError(field);
+            return false;
+        }
+
+        if (field.type === "email" && value && !isValidEmail(value)) {
+            setFieldError(field);
+            return false;
+        }
+
+        clearFieldError(field);
+        return true;
+    }
+
+    function setFieldError(field) {
+        field.classList.add("field-error");
+        field.setAttribute("aria-invalid", "true");
+    }
+
+    function clearFieldError(field) {
+        field.classList.remove("field-error");
+        field.removeAttribute("aria-invalid");
+    }
+
+    function clearAllErrors() {
+        form.querySelectorAll(".field-error").forEach((field) => {
+            field.classList.remove("field-error");
+            field.removeAttribute("aria-invalid");
+        });
+    }
+
+    function setButtonState(state) {
+        if (!submitBtn) return;
+
+        submitBtn.classList.remove("is-sending", "is-success", "is-error", "is-invalid");
+
+        switch (state) {
+            case "sending":
+                submitBtn.disabled = true;
+                submitBtn.textContent = "Sending...";
+                submitBtn.classList.add("is-sending");
+                break;
+
+            case "success":
+                submitBtn.disabled = true;
+                submitBtn.textContent = "Sent!";
+                submitBtn.classList.add("is-success");
+                break;
+
+            case "error":
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Try Again";
+                submitBtn.classList.add("is-error");
+                break;
+
+            case "invalid":
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Please Fill Required Fields";
+                submitBtn.classList.add("is-invalid");
+
+                setTimeout(() => {
+                    if (submitBtn.classList.contains("is-invalid")) {
+                        setButtonState("idle");
+                    }
+                }, 1800);
+                break;
+
+            default:
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Send Message";
+                break;
+        }
+    }
 });

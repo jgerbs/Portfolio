@@ -16,19 +16,21 @@
 
     /* =========================================================
        HERO LAPTOP JOURNEY
-       
-       Sequence (scroll progress 0→1):
-         0.00–0.05  — intro: laptop sits closed, welcome text visible
-         0.05–0.30  — lid opens (rotateX from -112° → 0°), screen powers on
-         0.15–0.30  — welcome text fades out
-         0.30–0.85  — whole laptop zooms forward (scale up) toward viewer,
-                      device remains fully visible, ENTIRE machine comes closer
-         0.85–1.00  — final merge: device fades, shell content takes over
+       Flow:
+         0.00–0.08  — closed laptop + hello text on black hero
+         0.08–0.30  — lid opens, color powers on, hello fades away
+         0.16–0.44  — loader appears in screen while opening
+         0.30–0.70  — laptop zooms toward viewer
+         0.68–0.82  — laptop fades away
+         0.80–0.92  — welcome text appears on background
+         0.90–1.00  — projects fade in below
        ========================================================= */
     function initHeroSection() {
         const hero = document.querySelector(".hero-laptop");
         const scene = document.getElementById("heroLaptopScene");
         const welcome = document.getElementById("heroLaptopWelcome");
+        const finalWelcome = document.getElementById("heroLaptopWelcomeFinal");
+        const loader = document.getElementById("heroLaptopLoader");
         const deviceWrap = document.getElementById("heroLaptopDeviceWrap");
         const device = document.getElementById("heroLaptopDevice");
         const lid = document.getElementById("heroLaptopLid");
@@ -41,16 +43,16 @@
         const base = device ? device.querySelector(".hero-laptop__base") : null;
         const shadow = device ? device.querySelector(".hero-laptop__shadow") : null;
 
-        if (!hero || !scene || !deviceWrap || !device || !lid || !screen || !pageShell || !heroBg || !workSection) return;
+        if (
+            !hero || !scene || !deviceWrap || !device || !lid || !screen ||
+            !pageShell || !heroBg || !workSection || !finalWelcome || !loader
+        ) return;
 
         const root = document.documentElement;
         const body = document.body;
 
         /* ---------------------------------------------------------
            BACKGROUND SYSTEM
-           closed hero bg = wider / softer / more "outside the laptop"
-           inside laptop bg = darker / deeper / more distinct / used
-           for opened hero + rest of page
         --------------------------------------------------------- */
         const CLOSED_BG = `
             radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.10), transparent 22%),
@@ -60,7 +62,7 @@
             linear-gradient(180deg, #020202 0%, #070707 30%, #0d0d0d 65%, #141414 100%)
         `;
 
-                const INSIDE_BG = `
+        const INSIDE_BG = `
             radial-gradient(circle at 18% 20%, rgba(86, 117, 255, 0.18), transparent 18%),
             radial-gradient(circle at 78% 24%, rgba(158, 231, 255, 0.10), transparent 16%),
             radial-gradient(circle at 24% 66%, rgba(62, 92, 210, 0.12), transparent 16%),
@@ -68,12 +70,10 @@
             linear-gradient(180deg, #030814 0%, #040a16 24%, #050d1a 56%, #030711 100%)
         `;
 
-        // Rest of page always uses the "inside laptop" world.
         body.style.background = INSIDE_BG;
         body.style.backgroundAttachment = "fixed";
         pageShell.style.background = INSIDE_BG;
 
-        // Build two stacked bg layers inside the hero so we can crossfade.
         heroBg.style.background = "none";
         heroBg.style.overflow = "hidden";
 
@@ -100,7 +100,6 @@
         const glow1 = heroBg.querySelector(".hero-laptop__glow--1");
         const glow2 = heroBg.querySelector(".hero-laptop__glow--2");
 
-        // Smoothed state
         const s = {
             mouseX: 0,
             mouseY: 0,
@@ -188,21 +187,15 @@
 
             const p = s.progress;
 
-            const openP = easeInOut3(clamp(mapRange(p, 0.05, 0.30, 0, 1), 0, 1));
-            const powerP = easeInOut3(clamp(mapRange(p, 0.18, 0.38, 0, 1), 0, 1));
-            const workRevealP = easeInOut3(clamp(mapRange(p, 0.28, 0.50, 0, 1), 0, 1));
-            const zoomP = easeInOut3(clamp(mapRange(p, 0.28, 0.78, 0, 1), 0, 1));
-            const fadeP = easeInOut3(clamp(mapRange(p, 0.72, 0.90, 0, 1), 0, 1));
+            const openP = easeInOut3(clamp(mapRange(p, 0.05, 0.28, 0, 1), 0, 1));
+            const powerP = easeInOut3(clamp(mapRange(p, 0.16, 0.34, 0, 1), 0, 1));
+            const zoomP = easeInOut3(clamp(mapRange(p, 0.28, 0.70, 0, 1), 0, 1));
+            const fadeP = easeInOut3(clamp(mapRange(p, 0.68, 0.82, 0, 1), 0, 1));
+            const finalWelcomeP = easeInOut3(clamp(mapRange(p, 0.80, 0.92, 0, 1), 0, 1));
+            const workRevealP = easeInOut3(clamp(mapRange(p, 0.90, 1.00, 0, 1), 0, 1));
 
-            /* ---------------------------------------------------------
-               BACKGROUND CROSSFADE
-               - hero starts with CLOSED_BG
-               - while laptop opens, hero transitions into INSIDE_BG
-               - after the device disappears, everything still feels like
-                 the same world because the page shell is already INSIDE_BG
-            --------------------------------------------------------- */
             const bgShiftP = easeInOut3(clamp(mapRange(p, 0.10, 0.30, 0, 1), 0, 1));
-            const heroFadeOutP = easeInOut3(clamp(mapRange(p, 0.82, 0.96, 0, 1), 0, 1));
+            const heroFadeOutP = easeInOut3(clamp(mapRange(p, 0.84, 0.98, 0, 1), 0, 1));
 
             closedLayer.style.opacity = String(1 - bgShiftP);
             insideLayer.style.opacity = String(bgShiftP);
@@ -221,8 +214,6 @@
                 glow2.style.transform = `scale(${lerp(1, 0.88, bgShiftP)})`;
             }
 
-            // Once the laptop is basically gone, the hero bg itself fades away
-            // so only the page-shell world remains.
             heroBg.style.opacity = String(1 - heroFadeOutP * 0.92);
 
             /* ---------------------------------------------------------
@@ -240,15 +231,15 @@
             const liftY = lerp(0, -18, openP);
 
             deviceWrap.style.transform = `
-            translate3d(
-                ${s.mouseX * 8 * tiltInfluence}px,
-                ${liftY + s.mouseY * 3 * tiltInfluence}px,
-                0
-            )
-            rotateX(${tiltX}deg)
-            rotateY(${tiltY}deg)
-            scale(${deviceScale})
-        `;
+                translate3d(
+                    ${s.mouseX * 8 * tiltInfluence}px,
+                    ${liftY + s.mouseY * 3 * tiltInfluence}px,
+                    0
+                )
+                rotateX(${tiltX}deg)
+                rotateY(${tiltY}deg)
+                scale(${deviceScale})
+            `;
 
             deviceWrap.style.opacity = String(clamp(1 - fadeP * 1.4, 0, 1));
 
@@ -267,12 +258,26 @@
                 shadow.style.opacity = String(clamp(0.82 - zoomP * 1.1, 0, 1));
             }
 
+            /* ---------------------------------------------------------
+               HELLO TEXT
+            --------------------------------------------------------- */
             if (welcome) {
-                const wFade = easeInOut3(clamp(mapRange(p, 0.08, 0.28, 0, 1), 0, 1));
+                const wFade = easeInOut3(clamp(mapRange(p, 0.06, 0.20, 0, 1), 0, 1));
                 welcome.style.opacity = String(1 - wFade);
                 welcome.style.transform = `translate3d(0, ${wFade * -30}px, 0) scale(${1 - wFade * 0.04})`;
                 welcome.style.filter = `blur(${wFade * 6}px)`;
             }
+
+            /* ---------------------------------------------------------
+               LOADER IN SCREEN
+            --------------------------------------------------------- */
+            const loaderP = easeInOut3(clamp(mapRange(p, 0.16, 0.34, 0, 1), 0, 1));
+            const loaderOutP = easeInOut3(clamp(mapRange(p, 0.34, 0.48, 0, 1), 0, 1));
+            const loaderVisible = loaderP * (1 - loaderOutP);
+
+            loader.style.opacity = String(loaderVisible);
+            loader.style.transform = `scale(${lerp(0.92, 1, loaderVisible)})`;
+            loader.style.filter = `blur(${lerp(8, 0, loaderVisible)}px)`;
 
             if (indicator) {
                 const hide = clamp(mapRange(p, 0.04, 0.14, 0, 1), 0, 1);
@@ -281,13 +286,21 @@
             }
 
             /* ---------------------------------------------------------
-   WORK SECTION REVEAL
-   fades in where it already is so it feels like
-   the laptop screen powers on instead of scrolling into it
---------------------------------------------------------- */
+               FINAL WELCOME
+            --------------------------------------------------------- */
+            finalWelcome.style.opacity = String(finalWelcomeP);
+            finalWelcome.style.transform = `
+                translate(-50%, calc(-50% + ${lerp(28, 0, finalWelcomeP)}px))
+                scale(${lerp(0.96, 1, finalWelcomeP)})
+            `;
+            finalWelcome.style.filter = `blur(${lerp(12, 0, finalWelcomeP)}px)`;
+
+            /* ---------------------------------------------------------
+               WORK SECTION REVEAL
+            --------------------------------------------------------- */
             workSection.style.opacity = String(workRevealP);
-            workSection.style.transform = `scale(${lerp(0.985, 1, workRevealP)})`;
-            workSection.style.filter = `blur(${lerp(14, 0, workRevealP)}px)`;
+            workSection.style.transform = `translate3d(0, ${lerp(34, 0, workRevealP)}px, 0) scale(${lerp(0.985, 1, workRevealP)})`;
+            workSection.style.filter = `blur(${lerp(18, 0, workRevealP)}px)`;
             workSection.classList.toggle("is-visible", workRevealP > 0.02);
 
             /* ---------------------------------------------------------
@@ -346,8 +359,6 @@
 
     /* =========================================================
        SMART ANCHOR SCROLLING
-       Routes nav/dot clicks to the inner shell when embedded,
-       or to the normal window when in full mode.
        ========================================================= */
     function initAnchorScrolling() {
         const pageShell = document.getElementById("laptopPageShell");
@@ -358,13 +369,11 @@
             if (!target) return;
 
             if (pageShell.classList.contains("is-laptop-embedded")) {
-                // Scroll inside the fixed shell overlay
                 const sr = pageShell.getBoundingClientRect();
                 const tr = target.getBoundingClientRect();
                 const top = tr.top - sr.top + pageShell.scrollTop - 80;
                 pageShell.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
             } else {
-                // Normal page scroll
                 const y = target.getBoundingClientRect().top + window.scrollY - 80;
                 window.scrollTo({ top: y, behavior: "smooth" });
             }
@@ -375,11 +384,13 @@
                 const href = link.getAttribute("href");
                 if (!href?.startsWith("#")) return;
                 const id = href.slice(1);
+
                 if (id === "top") {
                     e.preventDefault();
                     window.scrollTo({ top: 0, behavior: "smooth" });
                     return;
                 }
+
                 if (document.getElementById(id)) {
                     e.preventDefault();
                     scrollToSection(id);
@@ -390,10 +401,6 @@
 
     /* =========================================================
        WORK RAIL
-       - cards move as a group
-       - grabbed card stays attached to pointer
-       - nearby cards jiggle/react
-       - page scroll remains normal
        ========================================================= */
     function initWorkRail() {
         const stage = document.getElementById("workRailStage");
@@ -426,8 +433,8 @@
             gap: 520,
             friction: 0.965,
             wheelForce: 0.34,
-            edgeResistance: 0.12,
-            bounce: 0.1,
+            edgeResistance: 0.05,
+            bounce: 0.05,
             swingLimit: 10,
             swingSpring: 0.09,
             swingDamping: 0.86,
@@ -453,13 +460,12 @@
             const rect = getStageRect();
             const vw = window.innerWidth;
 
-            let baseInset;
+            if (vw <= 480) return Math.max(34, rect.width * 0.11);
+            if (vw <= 640) return Math.max(38, rect.width * 0.10);
+            if (vw <= 760) return Math.max(42, rect.width * 0.09);
+            if (vw <= 980) return Math.max(46, rect.width * 0.085);
 
-            if (vw <= 640) baseInset = Math.max(14, rect.width * 0.03);
-            else if (vw <= 980) baseInset = Math.max(20, rect.width * 0.04);
-            else baseInset = Math.max(28, rect.width * 0.05);
-
-            return baseInset + Math.min(80, rect.width * 0.06);
+            return Math.max(54, rect.width * 0.08);
         }
 
         function getResponsiveGap() {
@@ -467,16 +473,17 @@
             const cardWidth = getCardWidth();
 
             let gutter;
-            if (vw <= 640) gutter = 34;
-            else if (vw <= 760) gutter = 42;
-            else if (vw <= 980) gutter = 56;
+            if (vw <= 480) gutter = 20;
+            else if (vw <= 640) gutter = 24;
+            else if (vw <= 760) gutter = 30;
+            else if (vw <= 980) gutter = 42;
             else if (vw <= 1200) gutter = 74;
             else if (vw <= 1500) gutter = 92;
             else gutter = 110;
 
             return cardWidth + gutter;
         }
-
+        
         function getSwingLimit() {
             const vw = window.innerWidth;
             if (vw <= 640) return 7;
@@ -581,11 +588,11 @@
                 }
 
                 el.style.transform = `
-          translateX(calc(-50% + ${x}px))
-          translateY(${y}px)
-          rotate(${cardState.swing}deg)
-          scale(${scale})
-        `;
+                    translateX(calc(-50% + ${x}px))
+                    translateY(${y}px)
+                    rotate(${cardState.swing}deg)
+                    scale(${scale})
+                `;
             });
         }
 
@@ -647,9 +654,7 @@
             const grabbedCard = event.target.closest(".rail-card");
             if (!grabbedCard) return;
 
-            if (
-                event.target.closest("a, button, input, textarea, select, label")
-            ) {
+            if (event.target.closest("a, button, input, textarea, select, label")) {
                 return;
             }
 
@@ -756,7 +761,6 @@
 
     /* =========================================================
        EDUCATION PATH
-       continuous journey animation
        ========================================================= */
     function initEducationPath() {
         const section = document.getElementById("education");
@@ -929,3 +933,4 @@
         init();
     }
 })();
+

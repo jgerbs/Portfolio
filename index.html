@@ -51,11 +51,14 @@
 
                 <div class="hero-laptop__scene" id="heroLaptopScene">
                     <div class="hero-laptop__welcome" id="heroLaptopWelcome">
-                        <span class="hero-laptop__eyebrow">JACK GERBER</span>
-                        <h1>Hello, welcome.</h1>
-                        <p>
-                            Open the laptop and step into my work — software, security, and interactive
-                            projects built to feel like a journey instead of a list.
+                        <span class="hero-laptop__eyebrow reveal-on-scroll is-visible">PORTFOLIO</span>
+
+                        <h1 class="reveal-on-scroll is-visible">
+                            Hi, I’m Jack.
+                        </h1>
+
+                        <p class="reveal-on-scroll is-visible">
+                            I build security-focused software and create interactive digital experiences.
                         </p>
                     </div>
 
@@ -74,6 +77,19 @@
                                             </div>
 
                                             <div class="hero-laptop__screen-content" id="heroLaptopScreenContent">
+                                                <div class="hero-laptop__loader" id="heroLaptopLoader"
+                                                    aria-hidden="true">
+                                                    <div class="hero-laptop__loader-logo">
+                                                        <span>JG</span>
+                                                    </div>
+
+                                                    <div class="hero-laptop__loader-dots">
+                                                        <span></span>
+                                                        <span></span>
+                                                        <span></span>
+                                                    </div>
+                                                </div>
+
                                                 <div class="hero-laptop__screen-viewport" id="heroLaptopScreenViewport">
                                                     <!-- real work content gets visually mapped here -->
                                                 </div>
@@ -92,6 +108,12 @@
                         </div>
                     </div>
 
+                    <div class="hero-laptop__welcome-final" id="heroLaptopWelcomeFinal">
+                        <span class="hero-laptop__eyebrow">HELLO</span>
+                        <h2>Welcome!</h2>
+                        <p>Please take a look at some of my latest work.</p>
+                    </div>
+
                     <div class="hero-laptop__scroll-indicator" id="heroLaptopScrollIndicator">
                         <span></span>
                         <p>Scroll to open the laptop</p>
@@ -104,10 +126,10 @@
             <section class="work-rail" id="work">
                 <div class="work-rail__inner">
                     <div class="work-rail__heading">
-                        <span class="work-rail__eyebrow">Recent Work</span>
-                        <h2 class="work-rail__title">Projects</h2>
-                        <p class="work-rail__intro">
-                            Drag or scroll sideways through featured projects designed to feel like hanging room cards.
+                        <span class="work-rail__eyebrow reveal-on-scroll">Recent Work</span>
+                        <h2 class="work-rail__title reveal-on-scroll">Projects</h2>
+                        <p class="work-rail__intro reveal-on-scroll">
+                            Browse a mix of full-stack projects, security-focused builds, websites, and more.
                         </p>
                     </div>
 
@@ -115,6 +137,10 @@
                         <div class="work-rail__pole"></div>
 
                         <div class="work-rail__cards" id="workRailCards">
+                            <!-- =========================================================
+                                 PROJECT 1 — SPRINGBOK MEDICAL WEBSITE
+                                 Updated tech stack to use skill-style icons
+                                 ========================================================= -->
                             <article class="rail-card theme-web" data-swing-factor="0.85">
                                 <div class="rail-card__strap"></div>
                                 <div class="rail-card__hole"></div>
@@ -138,12 +164,18 @@
                                         </p>
 
                                         <div class="rail-card__meta">
-                                            <span>HTML</span>
-                                            <span>CSS</span>
-                                            <span>JavaScript</span>
+                                            <span>
+                                                <img src="images/languages/HTML5.svg" alt="HTML icon">
+                                            </span>
+                                            <span>
+                                                <img src="images/languages/CSS3.svg" alt="CSS icon">
+                                            </span>
+                                            <span>
+                                                <img src="images/languages/JavaScript.svg" alt="JavaScript icon">
+                                            </span>
                                         </div>
 
-                                        <a href="https://jgerbs.github.io/Springbok/SpringbokSpa.html" target="_blank"
+                                        <a href="https://jgerbs.github.io/Springbok/Spa.html" target="_blank"
                                             rel="noopener">
                                             View Project
                                         </a>
@@ -151,6 +183,10 @@
                                 </div>
                             </article>
 
+                            <!-- =========================================================
+                                 PROJECT 2 — MVC BLOG APPLICATION
+                                 Updated tech stack to use skill-style icons
+                                 ========================================================= -->
                             <article class="rail-card theme-fullstack" data-swing-factor="1.05">
                                 <div class="rail-card__strap"></div>
                                 <div class="rail-card__hole"></div>
@@ -172,9 +208,15 @@
                                         </p>
 
                                         <div class="rail-card__meta">
-                                            <span>C#</span>
-                                            <span>ASP.NET</span>
-                                            <span>PostgreSQL</span>
+                                            <span>
+                                                <img src="images/languages/c-sharp.svg" alt="C# icon">
+                                            </span>
+                                            <span>
+                                                <img src="images/languages/NET core.svg" alt=".NET icon">
+                                            </span>
+                                            <span>
+                                                <img src="images/languages/postgresql.svg" alt="PostgreSQL icon">
+                                            </span>
                                         </div>
 
                                         <a href="https://blog.jackgerber.ca" target="_blank" rel="noopener">
@@ -184,6 +226,10 @@
                                 </div>
                             </article>
 
+                            <!-- =========================================================
+                                 PROJECT 3 — CYBERSECURITY DEMOS
+                                 Updated tech stack to use skill-style icons
+                                 ========================================================= -->
                             <article class="rail-card theme-cyber" data-swing-factor="0.92">
                                 <div class="rail-card__strap"></div>
                                 <div class="rail-card__hole"></div>
@@ -207,9 +253,15 @@
                                         </p>
 
                                         <div class="rail-card__meta">
-                                            <span>JavaScript</span>
-                                            <span>HTML</span>
-                                            <span>CSS</span>
+                                            <span>
+                                                <img src="images/languages/JavaScript.svg" alt="JavaScript icon">
+                                            </span>
+                                            <span>
+                                                <img src="images/languages/HTML5.svg" alt="HTML icon">
+                                            </span>
+                                            <span>
+                                                <img src="images/languages/CSS3.svg" alt="CSS icon">
+                                            </span>
                                         </div>
 
                                         <a href="https://jgerbs.github.io/Portfolio/cybersecurityDemos/index.html"
@@ -220,6 +272,10 @@
                                 </div>
                             </article>
 
+                            <!-- =========================================================
+                                 PROJECT 4 — NODE.JS REDDIT CLONE
+                                 Updated tech stack to use skill-style icons
+                                 ========================================================= -->
                             <article class="rail-card theme-fullstack" data-swing-factor="1.12">
                                 <div class="rail-card__strap"></div>
                                 <div class="rail-card__hole"></div>
@@ -242,9 +298,15 @@
                                         </p>
 
                                         <div class="rail-card__meta">
-                                            <span>Node.js</span>
-                                            <span>TypeScript</span>
-                                            <span>PostgreSQL</span>
+                                            <span>
+                                                <img src="images/languages/Node.js.svg" alt="Node.js icon">
+                                            </span>
+                                            <span>
+                                                <img src="images/languages/TypeScript.svg" alt="TypeScript icon">
+                                            </span>
+                                            <span>
+                                                <img src="images/languages/postgresql.svg" alt="PostgreSQL icon">
+                                            </span>
                                         </div>
 
                                         <a href="https://reddit.jackgerber.ca" target="_blank" rel="noopener">
@@ -254,6 +316,10 @@
                                 </div>
                             </article>
 
+                            <!-- =========================================================
+                                 PROJECT 5 — SIMPLE PLATFORMER GAME
+                                 Updated tech stack to use icon-based chips
+                                 ========================================================= -->
                             <article class="rail-card theme-other" data-swing-factor="0.98">
                                 <div class="rail-card__strap"></div>
                                 <div class="rail-card__hole"></div>
@@ -276,9 +342,15 @@
                                         </p>
 
                                         <div class="rail-card__meta">
-                                            <span>Godot</span>
-                                            <span>2D</span>
-                                            <span>Itch.io</span>
+                                            <span>
+                                                <img src="images/languages/Godot.svg" alt="Godot icon">
+                                            </span>
+                                            <span>
+                                                <img src="images/languages/game-controller.svg" alt="2D game icon">
+                                            </span>
+                                            <span>
+                                                <img src="images/languages/itch-io.svg" alt="Itch.io icon">
+                                            </span>
                                         </div>
 
                                         <a href="https://gamesbygerber.itch.io/first-game" target="_blank"
@@ -289,6 +361,10 @@
                                 </div>
                             </article>
 
+                            <!-- =========================================================
+                                 PROJECT 6 — PASSWORD STRENGTH CHECKER
+                                 Updated tech stack to use skill-style icons
+                                 ========================================================= -->
                             <article class="rail-card theme-cyber" data-swing-factor="1.08">
                                 <div class="rail-card__strap"></div>
                                 <div class="rail-card__hole"></div>
@@ -311,9 +387,15 @@
                                         </p>
 
                                         <div class="rail-card__meta">
-                                            <span>Python</span>
-                                            <span>Streamlit</span>
-                                            <span>Security</span>
+                                            <span>
+                                                <img src="images/languages/Python.svg" alt="Python icon">
+                                            </span>
+                                            <span>
+                                                <img src="images/languages/Streamlit.svg" alt="Streamlit icon">
+                                            </span>
+                                            <span>
+                                                <img src="images/languages/shield.svg" alt="Security icon">
+                                            </span>
                                         </div>
 
                                         <a href="https://password-feedback.streamlit.app/" target="_blank"
@@ -342,13 +424,14 @@
                             <span class="edu-path__progress-fill" id="eduPathProgress"></span>
                         </div>
 
-                        <div class="edu-path__hero" id="eduPathHero">
+                        <div class="edu-path__hero reveal-on-scroll" id="eduPathHero">
                             <span class="edu-path__eyebrow">Education</span>
-                            <h2 id="education-title" class="edu-path__title">Following the path through the years</h2>
+                            <h2 id="education-title" class="edu-path__title">Built over the years</h2>
                             <p class="edu-path__intro">
-                                From early computing foundations to software development and cybersecurity,
-                                this timeline is designed to feel like a journey instead of a list.
+                                A progression through a wide range of languages, tools, and technologies, building strong
+                                foundations in software, cybersecurity, and core concepts along the way.
                             </p>
+
                         </div>
 
                         <div class="edu-path__track" id="eduPathTrack">
@@ -456,11 +539,13 @@
 
                 <div class="skills-orbit__inner">
                     <div class="skills-orbit__intro">
-                        <span class="skills-orbit__eyebrow">Technical Skills</span>
-                        <h2 id="skills-title" class="skills-orbit__title">Tools I build with</h2>
-                        <p class="skills-orbit__text">
-                            A rotating wall of languages, frameworks, security tools, and data technologies
-                            that reflects both my development and cybersecurity background.
+                        <span class="skills-orbit__eyebrow reveal-on-scroll">Technical Skills</span>
+                        <h2 id="skills-title" class="skills-orbit__title reveal-on-scroll">
+                            Tools I build with
+                        </h2>
+                        <p class="skills-orbit__text reveal-on-scroll">
+                            A selection of my strongest tools across development and cybersecurity, not an exhaustive
+                            list.
                         </p>
                     </div>
 
@@ -503,7 +588,6 @@
                                     <span>Node.js</span>
                                 </a>
 
-                                <!-- duplicate for seamless loop -->
                                 <a class="skill-orb" href="https://www.java.com/en/" target="_blank" rel="noopener">
                                     <img src="images/languages/Java.svg" alt="Java icon">
                                     <span>Java</span>
@@ -575,7 +659,6 @@
                                     <span>PowerShell</span>
                                 </a>
 
-                                <!-- duplicate -->
                                 <a class="skill-orb" href="https://www.wireshark.org/" target="_blank" rel="noopener">
                                     <img src="images/languages/Wireshark_icon.svg" alt="Wireshark icon">
                                     <span>Wireshark</span>
@@ -647,7 +730,6 @@
                                     <span>Syslog</span>
                                 </a>
 
-                                <!-- duplicate -->
                                 <a class="skill-orb" href="https://www.microsoft.com/en-ca/sql-server/" target="_blank"
                                     rel="noopener">
                                     <img src="images/languages/SQL Developer.svg" alt="SQL Server icon">
@@ -695,13 +777,14 @@
                     <div class="about-journey__grid"></div>
                 </div>
 
-                <div class="about-journey__inner">
-                    <div class="about-journey__intro reveal-on-scroll is-visible">
-                        <span class="about-journey__eyebrow">About Me</span>
-                        <h2 id="about-title" class="about-journey__title">The story behind the work</h2>
-                        <p class="about-journey__lead">
-                            I’m Jack Gerber, a recent BCIT CST graduate focused on software development,
-                            cybersecurity, and building systems that are both useful and resilient.
+                <div class="about-journey__inner reveal-on-scroll">
+                    <div class="about-journey__intro">
+                        <span class="about-journey__eyebrow reveal-on-scroll">About Me</span>
+                        <h2 id="about-title" class="about-journey__title reveal-on-scroll">
+                            The story behind the work
+                        </h2>
+                        <p class="about-journey__lead reveal-on-scroll">
+                            A look into the mindset, motivation, and challenges behind my work.
                         </p>
                     </div>
 
@@ -942,8 +1025,8 @@
         emailjs.init("ipB8VRm5PEGM4glET");
     </script>
 
-    <script src="emailModal.js" defer></script>
-    <script src="script.js"></script>
+    <script src="scripts/emailModal.js" defer></script>
+    <script src="scripts/script.js"></script>
 
 </body>
 

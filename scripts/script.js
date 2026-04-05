@@ -425,7 +425,19 @@
                LOADER IN SCREEN
             --------------------------------------------------------- */
             const loaderP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.16, 0.34, 0, 1), 0, 1));
-            const loaderOutP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.34, 0.48, 0, 1), 0, 1));
+            const loaderOutP = utils.easeInOut3(
+                utils.clamp(
+                    utils.mapRange(
+                        p,
+                        mobileLike ? 0.60 : 0.82,
+                        mobileLike ? 0.76 : 0.94,
+                        0,
+                        1
+                    ),
+                    0,
+                    1
+                )
+            );
             const loaderVisible = loaderP * (1 - loaderOutP);
 
             loader.style.opacity = String(loaderVisible);

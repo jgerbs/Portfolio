@@ -208,6 +208,57 @@
             }
         }
 
+        /* ----------------------------------------------------------
+           MOBILE TOUCH INTERCEPT
+           On touch devices we intercept vertical swipes while the
+           hero animation is running and convert them into virtual
+           scroll progress instead of letting the browser scroll.
+           This prevents the jitter caused by window.scrollTo()
+           fighting against momentum scrolling.
+        ---------------------------------------------------------- */
+        function initMobileTouchIntercept() {
+            if (!isMobileLike()) return;
+            if (window.matchMedia("(pointer: fine)").matches) return;
+
+            const sticky = hero.querySelector(".hero-laptop__sticky");
+            if (!sticky) return;
+
+            let touchStartY = 0;
+            let touchStartScrollY = 0;
+            let intercepting = false;
+
+            sticky.addEventListener("touchstart", (e) => {
+                if (state.heroUnlocked) return;
+                touchStartY = e.touches[0].clientY;
+                touchStartScrollY = window.scrollY;
+                intercepting = true;
+            }, { passive: true });
+
+            sticky.addEventListener("touchmove", (e) => {
+                if (!intercepting || state.heroUnlocked) return;
+
+                const dy = touchStartY - e.touches[0].clientY;
+                const targetScrollY = touchStartScrollY + dy;
+                const lockScrollY = getHeroLockScrollY();
+
+                // If we would scroll past the lock point, prevent it
+                if (targetScrollY > lockScrollY) {
+                    e.preventDefault();
+                    // Clamp to lock point — visual rubber band capped
+                    const clamped = lockScrollY;
+                    window.scrollTo(0, clamped);
+                }
+            }, { passive: false });
+
+            sticky.addEventListener("touchend", () => {
+                intercepting = false;
+            }, { passive: true });
+
+            sticky.addEventListener("touchcancel", () => {
+                intercepting = false;
+            }, { passive: true });
+        }
+
         function syncShellToScreen(zoomP) {
             if (zoomP <= 0.01) {
                 root.style.setProperty("--shell-opacity", "0");
@@ -343,7 +394,7 @@
 
             const fadeStrength = mobileLike ? 1.8 : 1.4;
             deviceWrap.style.opacity = String(utils.clamp(1 - fadeP * fadeStrength, 0, 1));
-            
+
             const brightness = 0.18 + powerP * 0.82;
             const saturation = 0.15 + powerP * 1.1;
             const grayscale = 1 - powerP;
@@ -356,7 +407,7 @@
             }
 
             const deviceOpacity = utils.clamp(1 - fadeP * fadeStrength, 0, 1);
-            
+
             if (base) {
                 base.style.opacity = String(deviceOpacity);
             }
@@ -459,6 +510,7 @@
         });
 
         measure();
+        initMobileTouchIntercept();
         state.targetProgress = readScrollProgress();
         requestTick();
     }

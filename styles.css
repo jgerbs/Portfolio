@@ -43,6 +43,8 @@
 
 html {
     scroll-behavior: smooth;
+    /* Prevent elastic bounce scroll from fighting the hero lock on iOS */
+    overscroll-behavior-y: none;
 }
 
 body {
@@ -324,6 +326,8 @@ img {
     min-height: 100vh;
     overflow: hidden;
     isolation: isolate;
+    /* Allow JS touchmove preventDefault to work for scroll-locking */
+    touch-action: pan-y;
 }
 
 .hero-laptop__bg {
@@ -683,6 +687,7 @@ img {
 .hero-laptop:not(.hero-laptop--closed) .hero-laptop__sticky::before {
     content: none;
 }
+
 /* hero loader / final welcome */
 .hero-laptop__loader {
     position: absolute;
@@ -1937,7 +1942,7 @@ img {
    ========================================================= */
 @media (max-width: 980px) {
     .hero-laptop {
-        height: 220vh;
+        height: 280vh;
     }
 
     .hero-laptop__scene {
@@ -2227,7 +2232,7 @@ img {
    ========================================================= */
 @media (max-width: 640px) {
     .hero-laptop {
-        height: 205vh;
+        height: 270vh;
     }
 
     .hero-laptop__welcome h1 {
@@ -2461,4 +2466,3 @@ img {
         transition: none !important;
     }
 }
-

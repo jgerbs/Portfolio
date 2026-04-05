@@ -159,11 +159,7 @@
             targetMouseY: 0,
             progress: 0,
             targetProgress: 0,
-            ticking: false,
-
-            mobileOpenProgress: 0,
-            mobileOpenTarget: 0,
-            mobileOpenStartTime: 0
+            ticking: false
         };
 
         const metrics = {
@@ -229,36 +225,9 @@
 
             const mobileLike = isMobileLike();
 
-            if (dom.reducedMotion) {
-                state.progress = state.targetProgress;
-            } else if (mobileLike) {
-                // keep overall scene responsive, but not too twitchy
-                state.progress = utils.lerp(state.progress, state.targetProgress, 0.09);
-
-                // once user reaches the open trigger, run the lid animation at a fixed speed
-                const shouldBeOpen = state.targetProgress >= 0.08;
-
-                if (shouldBeOpen && state.mobileOpenTarget !== 1) {
-                    state.mobileOpenTarget = 1;
-                    state.mobileOpenStartTime = performance.now();
-                } else if (!shouldBeOpen && state.mobileOpenTarget !== 0) {
-                    state.mobileOpenTarget = 0;
-                    state.mobileOpenStartTime = performance.now();
-                }
-
-                const now = performance.now();
-                const duration = 420; // fixed open/close duration in ms
-                const t = utils.clamp((now - state.mobileOpenStartTime) / duration, 0, 1);
-                const eased = utils.easeInOut3(t);
-
-                if (state.mobileOpenTarget === 1) {
-                    state.mobileOpenProgress = utils.lerp(state.mobileOpenProgress, 1, eased);
-                } else {
-                    state.mobileOpenProgress = utils.lerp(state.mobileOpenProgress, 0, eased);
-                }
-            } else {
-                state.progress = utils.lerp(state.progress, state.targetProgress, 0.10);
-            }
+            // very smooth / more delayed
+            const progressLerp = dom.reducedMotion ? 1 : (mobileLike ? 0.06 : 0.10);
+            state.progress = utils.lerp(state.progress, state.targetProgress, progressLerp);
 
             state.mouseX = (dom.reducedMotion || mobileLike)
                 ? 0
@@ -270,11 +239,8 @@
 
             const p = state.progress;
 
-            const scrollOpenP = utils.easeInOut3(
-                utils.clamp(utils.mapRange(p, 0.05, 0.28, 0, 1), 0, 1)
-            );
-
-            const openP = mobileLike ? state.mobileOpenProgress : scrollOpenP;            const powerP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.16, 0.34, 0, 1), 0, 1));
+            const openP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.05, 0.28, 0, 1), 0, 1));
+            const powerP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.16, 0.34, 0, 1), 0, 1));
             const zoomP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.28, 0.70, 0, 1), 0, 1));
             const fadeP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.68, 0.82, 0, 1), 0, 1));
             const finalWelcomeP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.80, 0.92, 0, 1), 0, 1));
@@ -388,8 +354,7 @@
             if (
                 Math.abs(state.progress - state.targetProgress) > 0.0003 ||
                 Math.abs(state.mouseX - state.targetMouseX) > 0.0003 ||
-                Math.abs(state.mouseY - state.targetMouseY) > 0.0003 ||
-                Math.abs(state.mobileOpenProgress - state.mobileOpenTarget) > 0.001
+                Math.abs(state.mouseY - state.targetMouseY) > 0.0003
             ) {
                 requestTick();
             }

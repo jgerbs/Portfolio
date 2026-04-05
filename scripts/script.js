@@ -229,15 +229,8 @@
             if (dom.reducedMotion) {
                 state.progress = state.targetProgress;
             } else if (mobileLike) {
-                const delta = state.targetProgress - state.progress;
-
-                // Snap quickly when swipe momentum jumps far
-                if (Math.abs(delta) > 0.12) {
-                    state.progress = state.targetProgress;
-                } else {
-                    // Follow much faster on mobile
-                    state.progress = utils.lerp(state.progress, state.targetProgress, 0.32);
-                }
+                // Mobile should feel tied to the swipe, not delayed behind it
+                state.progress = state.targetProgress;
             } else {
                 state.progress = utils.lerp(state.progress, state.targetProgress, 0.10);
             }
@@ -252,12 +245,29 @@
 
             const p = state.progress;
 
-            const openP = utils.easeInOut3(utils.clamp(utils.mapRange(p, mobileLike ? 0.03 : 0.05, mobileLike ? 0.34 : 0.28, 0, 1), 0, 1));
-            const powerP = utils.easeInOut3(utils.clamp(utils.mapRange(p, mobileLike ? 0.10 : 0.16, mobileLike ? 0.40 : 0.34, 0, 1), 0, 1));
-            const zoomP = utils.easeInOut3(utils.clamp(utils.mapRange(p, mobileLike ? 0.22 : 0.28, mobileLike ? 0.78 : 0.70, 0, 1), 0, 1));
-            const fadeP = utils.easeInOut3(utils.clamp(utils.mapRange(p, mobileLike ? 0.72 : 0.68, mobileLike ? 0.88 : 0.82, 0, 1), 0, 1));
-            const finalWelcomeP = utils.easeInOut3(utils.clamp(utils.mapRange(p, mobileLike ? 0.84 : 0.80, mobileLike ? 0.96 : 0.92, 0, 1), 0, 1));
-            const workRevealP = utils.easeInOut3(utils.clamp(utils.mapRange(p, mobileLike ? 0.90 : 0.90, 1.00, 0, 1), 0, 1));
+            const openP = utils.easeInOut3(
+                utils.clamp(utils.mapRange(p, mobileLike ? 0.02 : 0.05, mobileLike ? 0.20 : 0.28, 0, 1), 0, 1)
+            );
+
+            const powerP = utils.easeInOut3(
+                utils.clamp(utils.mapRange(p, mobileLike ? 0.08 : 0.16, mobileLike ? 0.24 : 0.34, 0, 1), 0, 1)
+            );
+
+            const zoomP = utils.easeInOut3(
+                utils.clamp(utils.mapRange(p, mobileLike ? 0.18 : 0.28, mobileLike ? 0.52 : 0.70, 0, 1), 0, 1)
+            );
+
+            const fadeP = utils.easeInOut3(
+                utils.clamp(utils.mapRange(p, mobileLike ? 0.48 : 0.68, mobileLike ? 0.64 : 0.82, 0, 1), 0, 1)
+            );
+
+            const finalWelcomeP = utils.easeInOut3(
+                utils.clamp(utils.mapRange(p, mobileLike ? 0.58 : 0.80, mobileLike ? 0.76 : 0.92, 0, 1), 0, 1)
+            );
+
+            const workRevealP = utils.easeInOut3(
+                utils.clamp(utils.mapRange(p, mobileLike ? 0.68 : 0.90, 1.00, 0, 1), 0, 1)
+            );
             const bgShiftP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.10, 0.30, 0, 1), 0, 1));
             const heroFadeOutP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.84, 0.98, 0, 1), 0, 1));
 
@@ -284,7 +294,8 @@
             const tiltX = state.mouseY * -2.2 * tiltInfluence;
             const tiltY = state.mouseX * 3.2 * tiltInfluence;
 
-            const lidAngle = -95 + openP * 95;
+            const lidOpenVisual = mobileLike ? utils.easeOut3(openP) : openP;
+            const lidAngle = -95 + lidOpenVisual * 95;
             const restTilt = (1 - openP) * 2.5;
             lid.style.transform = `rotateX(${lidAngle + restTilt}deg)`;
 
@@ -309,14 +320,19 @@
             `;
             }
 
-            deviceWrap.style.opacity = String(utils.clamp(1 - fadeP * 1.4, 0, 1));
-
+            const fadeStrength = mobileLike ? 1.8 : 1.4;
+            deviceWrap.style.opacity = String(utils.clamp(1 - fadeP * fadeStrength, 0, 1));
+            
             const brightness = 0.18 + powerP * 0.82;
             const saturation = 0.15 + powerP * 1.1;
             const grayscale = 1 - powerP;
 
             screen.style.opacity = String(0.2 + powerP * 0.8);
-            screen.style.filter = `brightness(${brightness}) saturate(${saturation}) grayscale(${grayscale})`;
+            if (mobileLike) {
+                screen.style.filter = `brightness(${brightness})`;
+            } else {
+                screen.style.filter = `brightness(${brightness}) saturate(${saturation}) grayscale(${grayscale})`;
+            }
 
             const deviceOpacity = utils.clamp(1 - fadeP * 1.4, 0, 1);
 

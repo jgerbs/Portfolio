@@ -226,8 +226,21 @@
             const mobileLike = isMobileLike();
 
             // very smooth / more delayed
-            const progressLerp = dom.reducedMotion ? 1 : (mobileLike ? 0.06 : 0.10);
-            state.progress = utils.lerp(state.progress, state.targetProgress, progressLerp);
+            if (dom.reducedMotion) {
+                state.progress = state.targetProgress;
+            } else if (mobileLike) {
+                const delta = state.targetProgress - state.progress;
+
+                // Snap quickly when swipe momentum jumps far
+                if (Math.abs(delta) > 0.12) {
+                    state.progress = state.targetProgress;
+                } else {
+                    // Follow much faster on mobile
+                    state.progress = utils.lerp(state.progress, state.targetProgress, 0.32);
+                }
+            } else {
+                state.progress = utils.lerp(state.progress, state.targetProgress, 0.10);
+            }
 
             state.mouseX = (dom.reducedMotion || mobileLike)
                 ? 0
@@ -239,12 +252,12 @@
 
             const p = state.progress;
 
-            const openP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.05, 0.28, 0, 1), 0, 1));
-            const powerP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.16, 0.34, 0, 1), 0, 1));
-            const zoomP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.28, 0.70, 0, 1), 0, 1));
-            const fadeP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.68, 0.82, 0, 1), 0, 1));
-            const finalWelcomeP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.80, 0.92, 0, 1), 0, 1));
-            const workRevealP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.90, 1.00, 0, 1), 0, 1));
+            const openP = utils.easeInOut3(utils.clamp(utils.mapRange(p, mobileLike ? 0.03 : 0.05, mobileLike ? 0.34 : 0.28, 0, 1), 0, 1));
+            const powerP = utils.easeInOut3(utils.clamp(utils.mapRange(p, mobileLike ? 0.10 : 0.16, mobileLike ? 0.40 : 0.34, 0, 1), 0, 1));
+            const zoomP = utils.easeInOut3(utils.clamp(utils.mapRange(p, mobileLike ? 0.22 : 0.28, mobileLike ? 0.78 : 0.70, 0, 1), 0, 1));
+            const fadeP = utils.easeInOut3(utils.clamp(utils.mapRange(p, mobileLike ? 0.72 : 0.68, mobileLike ? 0.88 : 0.82, 0, 1), 0, 1));
+            const finalWelcomeP = utils.easeInOut3(utils.clamp(utils.mapRange(p, mobileLike ? 0.84 : 0.80, mobileLike ? 0.96 : 0.92, 0, 1), 0, 1));
+            const workRevealP = utils.easeInOut3(utils.clamp(utils.mapRange(p, mobileLike ? 0.90 : 0.90, 1.00, 0, 1), 0, 1));
             const bgShiftP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.10, 0.30, 0, 1), 0, 1));
             const heroFadeOutP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.84, 0.98, 0, 1), 0, 1));
 
@@ -275,10 +288,16 @@
             const restTilt = (1 - openP) * 2.5;
             lid.style.transform = `rotateX(${lidAngle + restTilt}deg)`;
 
-            const deviceScale = utils.lerp(1, mobileLike ? 2.2 : 3.2, zoomP);
-            const liftY = utils.lerp(0, mobileLike ? -10 : -18, openP);
+            const deviceScale = utils.lerp(1, mobileLike ? 1.55 : 3.2, zoomP);
+            const liftY = utils.lerp(0, mobileLike ? -6 : -18, openP);
 
-            deviceWrap.style.transform = `
+            if (mobileLike) {
+                deviceWrap.style.transform = `
+                translate3d(0, ${liftY}px, 0)
+                scale(${deviceScale})
+            `;
+            } else {
+                deviceWrap.style.transform = `
                 translate3d(
                     ${state.mouseX * 8 * tiltInfluence}px,
                     ${liftY + state.mouseY * 3 * tiltInfluence}px,
@@ -288,6 +307,7 @@
                 rotateY(${tiltY}deg)
                 scale(${deviceScale})
             `;
+            }
 
             deviceWrap.style.opacity = String(utils.clamp(1 - fadeP * 1.4, 0, 1));
 
@@ -312,7 +332,7 @@
                 const wFade = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.06, 0.20, 0, 1), 0, 1));
                 welcome.style.opacity = String(1 - wFade);
                 welcome.style.transform = `translate3d(0, ${wFade * -30}px, 0) scale(${1 - wFade * 0.04})`;
-                welcome.style.filter = mobileLike ? "none" : `blur(${wFade * 6}px)`;
+                welcome.style.filter = "none";
             }
 
             const loaderP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.16, 0.34, 0, 1), 0, 1));
@@ -321,7 +341,7 @@
 
             loader.style.opacity = String(loaderVisible);
             loader.style.transform = `scale(${utils.lerp(0.92, 1, loaderVisible)})`;
-            loader.style.filter = mobileLike ? "none" : `blur(${utils.lerp(8, 0, loaderVisible)}px)`;
+            loader.style.filter = "none";
 
             if (indicator) {
                 const hide = utils.clamp(utils.mapRange(p, 0.04, 0.14, 0, 1), 0, 1);
@@ -334,11 +354,11 @@
                 translate(-50%, calc(-50% + ${utils.lerp(28, 0, finalWelcomeP)}px))
                 scale(${utils.lerp(0.96, 1, finalWelcomeP)})
             `;
-            finalWelcome.style.filter = mobileLike ? "none" : `blur(${utils.lerp(12, 0, finalWelcomeP)}px)`;
+            finalWelcome.style.filter = "none";
 
             workSection.style.opacity = String(workRevealP);
             workSection.style.transform = `translate3d(0, ${utils.lerp(34, 0, workRevealP)}px, 0) scale(${utils.lerp(0.985, 1, workRevealP)})`;
-            workSection.style.filter = mobileLike ? "none" : `blur(${utils.lerp(18, 0, workRevealP)}px)`; workSection.classList.toggle("is-visible", workRevealP > 0.02);
+            workSection.style.filter = "none";
 
             const isEmbedded = zoomP > 0.02 && p < 0.90;
             const isFull = p >= 0.90;

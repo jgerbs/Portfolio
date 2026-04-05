@@ -50,7 +50,6 @@
         dom.winW = window.innerWidth;
         dom.winH = window.innerHeight;
         dom.reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
         resizeSubscribers.forEach((callback) => callback());
     }
 
@@ -65,10 +64,9 @@
 
     /* =========================================================
        HERO LAPTOP JOURNEY
-       Optimized:
-       - caches hero metrics
-       - avoids repeated DOM queries inside render
-       - keeps all style writes grouped in one frame
+       - Background color from version 1 (darker, cooler)
+       - Mobile hero improvements from version 2
+       - Work section reveal from version 1 (blur + transform)
        ========================================================= */
     function initHeroSection() {
         const hero = document.querySelector(".hero-laptop");
@@ -96,6 +94,9 @@
         const root = document.documentElement;
         const body = document.body;
 
+        /* ---------------------------------------------------------
+           BACKGROUND SYSTEM — colors from version 1
+        --------------------------------------------------------- */
         const CLOSED_BG = `
             radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.10), transparent 22%),
             radial-gradient(circle at 78% 24%, rgba(210, 210, 210, 0.08), transparent 18%),
@@ -105,21 +106,15 @@
         `;
 
         const INSIDE_BG = `
-    radial-gradient(circle at 18% 20%, rgba(86, 117, 255, 0.16), transparent 18%),
-    radial-gradient(circle at 78% 24%, rgba(158, 231, 255, 0.08), transparent 16%),
-    radial-gradient(circle at 24% 66%, rgba(62, 92, 210, 0.10), transparent 18%),
-    radial-gradient(circle at 82% 78%, rgba(90, 170, 255, 0.08), transparent 16%),
-    linear-gradient(
-        180deg,
-        #020814 0%,
-        #020a18 22%,
-        #030c1c 46%,
-        #16264c 72%,
-        #1b2b55 100%
-    )
-`;
+            radial-gradient(circle at 18% 20%, rgba(86, 117, 255, 0.18), transparent 18%),
+            radial-gradient(circle at 78% 24%, rgba(158, 231, 255, 0.10), transparent 16%),
+            radial-gradient(circle at 24% 66%, rgba(62, 92, 210, 0.12), transparent 16%),
+            radial-gradient(circle at 82% 78%, rgba(90, 170, 255, 0.10), transparent 14%),
+            linear-gradient(180deg, #030814 0%, #040a16 24%, #050d1a 56%, #030711 100%)
+        `;
 
         body.style.background = INSIDE_BG;
+        body.style.backgroundAttachment = "fixed";
         pageShell.style.background = INSIDE_BG;
 
         heroBg.style.background = "none";
@@ -209,12 +204,7 @@
         }
 
         /* ----------------------------------------------------------
-           MOBILE TOUCH INTERCEPT
-           On touch devices we intercept vertical swipes while the
-           hero animation is running and convert them into virtual
-           scroll progress instead of letting the browser scroll.
-           This prevents the jitter caused by window.scrollTo()
-           fighting against momentum scrolling.
+           MOBILE TOUCH INTERCEPT — from version 2
         ---------------------------------------------------------- */
         function initMobileTouchIntercept() {
             if (!isMobileLike()) return;
@@ -241,12 +231,9 @@
                 const targetScrollY = touchStartScrollY + dy;
                 const lockScrollY = getHeroLockScrollY();
 
-                // If we would scroll past the lock point, prevent it
                 if (targetScrollY > lockScrollY) {
                     e.preventDefault();
-                    // Clamp to lock point — visual rubber band capped
-                    const clamped = lockScrollY;
-                    window.scrollTo(0, clamped);
+                    window.scrollTo(0, lockScrollY);
                 }
             }, { passive: false });
 
@@ -297,11 +284,10 @@
 
             const mobileLike = isMobileLike();
 
-            // very smooth / more delayed
             if (dom.reducedMotion) {
                 state.progress = state.targetProgress;
             } else if (mobileLike) {
-                // Mobile should feel tied to the swipe, not delayed behind it
+                // Mobile: tied directly to swipe, not delayed
                 state.progress = state.targetProgress;
             } else {
                 state.progress = utils.lerp(state.progress, state.targetProgress, 0.10);
@@ -340,6 +326,7 @@
             const workRevealP = utils.easeInOut3(
                 utils.clamp(utils.mapRange(p, mobileLike ? 0.68 : 0.90, 1.00, 0, 1), 0, 1)
             );
+
             const bgShiftP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.10, 0.30, 0, 1), 0, 1));
             const heroFadeOutP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.84, 0.98, 0, 1), 0, 1));
 
@@ -360,8 +347,12 @@
                 glow2.style.transform = `scale(${utils.lerp(1, 0.88, bgShiftP)})`;
             }
 
-            heroBg.style.opacity = String(1 - heroFadeOutP);
+            // Version 1: softer hero fade (0.92 multiplier)
+            heroBg.style.opacity = String(1 - heroFadeOutP * 0.92);
 
+            /* ---------------------------------------------------------
+               DEVICE / MOTION — mobile branch from version 2
+            --------------------------------------------------------- */
             const tiltInfluence = (dom.reducedMotion || mobileLike) ? 0 : 1 - zoomP;
             const tiltX = state.mouseY * -2.2 * tiltInfluence;
             const tiltY = state.mouseX * 3.2 * tiltInfluence;
@@ -374,7 +365,6 @@
             const deviceScale = utils.lerp(1, mobileLike ? 1.55 : 3.2, zoomP);
             const liftY = utils.lerp(0, mobileLike ? -6 : -18, openP);
 
-            // Push the laptop lower on small screens so it stays visually centered
             const mobileBaseOffsetY = mobileLike
                 ? utils.clamp(dom.winH * 0.15, 26, 72)
                 : 0;
@@ -421,20 +411,26 @@
                 shadow.style.opacity = String(deviceOpacity * 0.82);
             }
 
+            /* ---------------------------------------------------------
+               HELLO TEXT
+            --------------------------------------------------------- */
             if (welcome) {
                 const wFade = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.06, 0.20, 0, 1), 0, 1));
                 welcome.style.opacity = String(1 - wFade);
                 welcome.style.transform = `translate3d(0, ${wFade * -30}px, 0) scale(${1 - wFade * 0.04})`;
-                welcome.style.filter = "none";
+                welcome.style.filter = `blur(${wFade * 6}px)`;
             }
 
+            /* ---------------------------------------------------------
+               LOADER IN SCREEN
+            --------------------------------------------------------- */
             const loaderP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.16, 0.34, 0, 1), 0, 1));
-            const loaderOutP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.68, 0.82, 0, 1), 0, 1));
+            const loaderOutP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.34, 0.48, 0, 1), 0, 1));
             const loaderVisible = loaderP * (1 - loaderOutP);
 
             loader.style.opacity = String(loaderVisible);
             loader.style.transform = `scale(${utils.lerp(0.92, 1, loaderVisible)})`;
-            loader.style.filter = "none";
+            loader.style.filter = `blur(${utils.lerp(8, 0, loaderVisible)}px)`;
 
             if (indicator) {
                 const hide = utils.clamp(utils.mapRange(p, 0.04, 0.14, 0, 1), 0, 1);
@@ -442,20 +438,31 @@
                 indicator.style.transform = `translateX(-50%) translateY(${hide * 10}px)`;
             }
 
+            /* ---------------------------------------------------------
+               FINAL WELCOME
+            --------------------------------------------------------- */
             finalWelcome.style.opacity = String(finalWelcomeP);
             finalWelcome.style.transform = `
                 translate(-50%, calc(-50% + ${utils.lerp(28, 0, finalWelcomeP)}px))
                 scale(${utils.lerp(0.96, 1, finalWelcomeP)})
             `;
-            finalWelcome.style.filter = "none";
+            finalWelcome.style.filter = `blur(${utils.lerp(12, 0, finalWelcomeP)}px)`;
+
             if (!state.heroUnlocked && finalWelcomeP >= 0.72) {
                 state.heroUnlocked = true;
             }
 
+            /* ---------------------------------------------------------
+               WORK SECTION REVEAL — version 1 (blur + transform)
+            --------------------------------------------------------- */
             workSection.style.opacity = String(workRevealP);
             workSection.style.transform = `translate3d(0, ${utils.lerp(34, 0, workRevealP)}px, 0) scale(${utils.lerp(0.985, 1, workRevealP)})`;
-            workSection.style.filter = "none";
+            workSection.style.filter = `blur(${utils.lerp(18, 0, workRevealP)}px)`;
+            workSection.classList.toggle("is-visible", workRevealP > 0.02);
 
+            /* ---------------------------------------------------------
+               SHELL HANDOFF
+            --------------------------------------------------------- */
             const isEmbedded = zoomP > 0.02 && p < 0.90;
             const isFull = p >= 0.90;
 
@@ -565,10 +572,9 @@
 
     /* =========================================================
        WORK RAIL
-       Optimized:
-       - caches stage metrics
-       - avoids repeated getBoundingClientRect in card loop
-       - pauses animation work when offscreen
+       - Metrics caching from version 2
+       - tick() from specified version: always-running RAF loop
+         with isInView early-return guard for proper responsiveness
        ========================================================= */
     function initWorkRail() {
         const stage = document.getElementById("workRailStage");
@@ -751,18 +757,15 @@
             }
         }
 
-        let rafId = 0;
-
-        function needsAnimation() {
-            return (
-                state.isDragging ||
-                Math.abs(state.railVelocity) > 0.002 ||
-                state.isInView
-            );
-        }
-
+        /* ---------------------------------------------------------
+           TICK — specified version: always-running RAF with
+           isInView early-return guard for card responsiveness
+        --------------------------------------------------------- */
         function tick() {
-            rafId = 0;
+            if (!state.isInView && !state.isDragging && Math.abs(state.railVelocity) < 0.002) {
+                requestAnimationFrame(tick);
+                return;
+            }
 
             if (!state.isDragging) {
                 state.railOffset += state.railVelocity;
@@ -790,18 +793,13 @@
             }
 
             render();
-
-            if (needsAnimation()) {
-                rafId = requestAnimationFrame(tick);
-            }
-        }
-
-        function requestTick() {
-            if (rafId) return;
-            rafId = requestAnimationFrame(tick);
+            requestAnimationFrame(tick);
         }
 
         function handleWheel(event) {
+            const rect = stage.getBoundingClientRect();
+            state.isInView = rect.top < dom.winH && rect.bottom > 0;
+
             if (!state.isInView || state.isDragging) return;
 
             const dominantDelta =
@@ -811,7 +809,6 @@
 
             state.railVelocity += dominantDelta * state.wheelForce * 0.01;
             applyNeighborImpulse(Math.floor(cards.length / 2), dominantDelta * 0.01);
-            requestTick();
         }
 
         function handlePointerDown(event) {
@@ -857,7 +854,6 @@
 
             state.lastPointerX = event.clientX;
             state.lastTime = now;
-            requestTick();
         }
 
         function endDrag(event) {
@@ -876,8 +872,6 @@
                 card.style.zIndex = "";
                 card.classList.remove("is-grabbed");
             });
-
-            requestTick();
         }
 
         window.addEventListener("wheel", handleWheel, { passive: true });
@@ -896,9 +890,10 @@
         stage.addEventListener("pointerup", endDrag);
         stage.addEventListener("pointercancel", endDrag);
 
-        measure();
-        render();
-        requestTick();
+        requestAnimationFrame(() => {
+            measure();
+            tick();
+        });
     }
 
     /* =========================================================
@@ -947,10 +942,6 @@
 
     /* =========================================================
        EDUCATION PATH
-       Optimized:
-       - one section measurement cache
-       - less layout work per frame
-       - card lookup cached
        ========================================================= */
     function initEducationPath() {
         const section = document.getElementById("education");

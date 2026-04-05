@@ -1396,11 +1396,7 @@ img {
     margin-top: 28px;
 }
 
-.skills-lane {
-    position: relative;
-    overflow: hidden;
-    mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 1) 10%, rgba(0, 0, 0, 1) 90%, transparent 100%);
-}
+
 
 .skills-lane__track {
     display: flex;

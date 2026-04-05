@@ -374,22 +374,27 @@
             const deviceScale = utils.lerp(1, mobileLike ? 1.55 : 3.2, zoomP);
             const liftY = utils.lerp(0, mobileLike ? -6 : -18, openP);
 
+            // Push the laptop lower on small screens so it stays visually centered
+            const mobileBaseOffsetY = mobileLike
+                ? utils.clamp(dom.winH * 0.15, 26, 72)
+                : 0;
+
             if (mobileLike) {
                 deviceWrap.style.transform = `
-                translate3d(0, ${liftY}px, 0)
-                scale(${deviceScale})
-            `;
+                    translate3d(0, ${mobileBaseOffsetY + liftY}px, 0)
+                    scale(${deviceScale})
+                `;
             } else {
                 deviceWrap.style.transform = `
-                translate3d(
-                    ${state.mouseX * 8 * tiltInfluence}px,
-                    ${liftY + state.mouseY * 3 * tiltInfluence}px,
-                    0
-                )
-                rotateX(${tiltX}deg)
-                rotateY(${tiltY}deg)
-                scale(${deviceScale})
-            `;
+                    translate3d(
+                        ${state.mouseX * 8 * tiltInfluence}px,
+                        ${liftY + state.mouseY * 3 * tiltInfluence}px,
+                        0
+                    )
+                    rotateX(${tiltX}deg)
+                    rotateY(${tiltY}deg)
+                    scale(${deviceScale})
+                `;
             }
 
             const fadeStrength = mobileLike ? 1.8 : 1.4;

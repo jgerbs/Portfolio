@@ -159,7 +159,11 @@
             targetMouseY: 0,
             progress: 0,
             targetProgress: 0,
-            ticking: false
+            ticking: false,
+            heroUnlockProgress: 0.74,
+            heroUnlocked: false,
+            lockScrollY: 0,
+            isScrollLocking: false
         };
 
         const metrics = {
@@ -185,6 +189,23 @@
         function readScrollProgress() {
             const heroTopInViewport = metrics.heroTop - window.scrollY;
             return utils.clamp(-heroTopInViewport / metrics.heroScrollable, 0, 1);
+        }
+
+        function getHeroLockScrollY() {
+            return metrics.heroTop + metrics.heroScrollable * state.heroUnlockProgress;
+        }
+
+        function enforceHeroScrollLock() {
+            if (state.heroUnlocked || state.isScrollLocking) return;
+
+            const maxScrollY = getHeroLockScrollY();
+
+            if (window.scrollY > maxScrollY) {
+                state.isScrollLocking = true;
+                window.scrollTo(0, maxScrollY);
+                state.lockScrollY = maxScrollY;
+                state.isScrollLocking = false;
+            }
         }
 
         function syncShellToScreen(zoomP) {
@@ -334,8 +355,8 @@
                 screen.style.filter = `brightness(${brightness}) saturate(${saturation}) grayscale(${grayscale})`;
             }
 
-            const deviceOpacity = utils.clamp(1 - fadeP * 1.4, 0, 1);
-
+            const deviceOpacity = utils.clamp(1 - fadeP * fadeStrength, 0, 1);
+            
             if (base) {
                 base.style.opacity = String(deviceOpacity);
             }
@@ -371,6 +392,9 @@
                 scale(${utils.lerp(0.96, 1, finalWelcomeP)})
             `;
             finalWelcome.style.filter = "none";
+            if (!state.heroUnlocked && finalWelcomeP >= 0.72) {
+                state.heroUnlocked = true;
+            }
 
             workSection.style.opacity = String(workRevealP);
             workSection.style.transform = `translate3d(0, ${utils.lerp(34, 0, workRevealP)}px, 0) scale(${utils.lerp(0.985, 1, workRevealP)})`;
@@ -404,6 +428,11 @@
 
         function updateProgress() {
             metrics.workTopViewport = workSection.getBoundingClientRect().top;
+
+            if (!state.heroUnlocked) {
+                enforceHeroScrollLock();
+            }
+
             state.targetProgress = readScrollProgress();
             requestTick();
         }
@@ -420,6 +449,12 @@
 
         onResize(() => {
             measure();
+
+            if (!state.heroUnlocked) {
+                state.lockScrollY = getHeroLockScrollY();
+                enforceHeroScrollLock();
+            }
+
             updateProgress();
         });
 

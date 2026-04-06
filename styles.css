@@ -1150,7 +1150,7 @@ img {
 
 .theme-web {
     --card-accent: #ead33f;
-    --card-panel: #d8c5e4;
+    --card-panel: #e3e4c5;
 }
 
 .theme-fullstack {
@@ -2306,13 +2306,6 @@ img {
 
     .rail-card__head {
         height: 165px;
-    }
-
-    .rail-card__mini {
-        top: 14px;
-        width: 72px;
-        height: 72px;
-        font-size: 0.62rem;
     }
 
     .rail-card p {

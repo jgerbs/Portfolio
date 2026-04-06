@@ -116,7 +116,7 @@
         root.style.setProperty("--page-bg", INSIDE_BG);
 
         body.style.background = INSIDE_BG;
-        body.style.backgroundAttachment = "scroll";
+        body.style.backgroundAttachment = "fixed";
 
         /* pageShell is empty right now, so this is not actually affecting your sections */
         pageShell.style.background = "transparent";
@@ -316,19 +316,19 @@
             );
 
             const zoomP = utils.easeInOut3(
-                utils.clamp(utils.mapRange(p, mobileLike ? 0.18 : 0.28, mobileLike ? 0.52 : 0.70, 0, 1), 0, 1)
+                utils.clamp(utils.mapRange(p, mobileLike ? 0.18 : 0.28, mobileLike ? 0.60 : 0.70, 0, 1), 0, 1)
             );
 
             const fadeP = utils.easeInOut3(
-                utils.clamp(utils.mapRange(p, mobileLike ? 0.48 : 0.68, mobileLike ? 0.64 : 0.82, 0, 1), 0, 1)
+                utils.clamp(utils.mapRange(p, mobileLike ? 0.58 : 0.68, mobileLike ? 0.72 : 0.82, 0, 1), 0, 1)
             );
 
             const finalWelcomeP = utils.easeInOut3(
-                utils.clamp(utils.mapRange(p, mobileLike ? 0.58 : 0.80, mobileLike ? 0.76 : 0.92, 0, 1), 0, 1)
+                utils.clamp(utils.mapRange(p, mobileLike ? 0.62 : 0.80, mobileLike ? 0.80 : 0.92, 0, 1), 0, 1)
             );
 
             const workRevealP = utils.easeInOut3(
-                utils.clamp(utils.mapRange(p, mobileLike ? 0.68 : 0.90, 1.00, 0, 1), 0, 1)
+                utils.clamp(utils.mapRange(p, mobileLike ? 0.72 : 0.90, 1.00, 0, 1), 0, 1)
             );
 
             const bgShiftP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.10, 0.30, 0, 1), 0, 1));
@@ -366,16 +366,18 @@
             const restTilt = (1 - openP) * 2.5;
             lid.style.transform = `rotateX(${lidAngle + restTilt}deg)`;
 
-            const deviceScale = utils.lerp(1, mobileLike ? 1.55 : 3.2, zoomP);
-            const liftY = utils.lerp(0, mobileLike ? -6 : -18, openP);
+            const deviceScale = utils.lerp(1, mobileLike ? 5.5 : 3.2, zoomP);
+            const liftY = utils.lerp(0, mobileLike ? -12 : -18, openP);
 
             const mobileBaseOffsetY = mobileLike
-                ? utils.clamp(dom.winH * 0.15, 26, 72)
+                ? utils.clamp(dom.winH * 0.10, 16, 48)
                 : 0;
 
             if (mobileLike) {
+                // During zoom, shift the device upward so the screen fills the viewport
+                const zoomOffsetY = utils.lerp(0, -dom.winH * 0.08, zoomP);
                 deviceWrap.style.transform = `
-                    translate3d(0, ${mobileBaseOffsetY + liftY}px, 0)
+                    translate3d(0, ${mobileBaseOffsetY + liftY + zoomOffsetY}px, 0)
                     scale(${deviceScale})
                 `;
             } else {
@@ -391,7 +393,7 @@
                 `;
             }
 
-            const fadeStrength = mobileLike ? 1.8 : 1.4;
+            const fadeStrength = mobileLike ? 2.2 : 1.4;
             deviceWrap.style.opacity = String(utils.clamp(1 - fadeP * fadeStrength, 0, 1));
 
             const brightness = 0.18 + powerP * 0.82;

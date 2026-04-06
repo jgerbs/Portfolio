@@ -33,12 +33,13 @@
 
     --hero-closed-opacity: 1;
 
+    /* Starts black — JS transitions this to INSIDE_BG once laptop opens */
     --page-bg:
-        radial-gradient(circle at 18% 20%, rgba(86, 117, 255, 0.18), transparent 18%),
-        radial-gradient(circle at 78% 24%, rgba(158, 231, 255, 0.10), transparent 16%),
-        radial-gradient(circle at 24% 66%, rgba(62, 92, 210, 0.12), transparent 16%),
-        radial-gradient(circle at 82% 78%, rgba(90, 170, 255, 0.10), transparent 14%),
-        linear-gradient(180deg, #030814 0%, #040a16 24%, #050d1a 56%, #030711 100%);
+        radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.10), transparent 22%),
+        radial-gradient(circle at 78% 24%, rgba(210, 210, 210, 0.08), transparent 18%),
+        radial-gradient(circle at 24% 70%, rgba(170, 170, 170, 0.06), transparent 18%),
+        radial-gradient(circle at 82% 78%, rgba(235, 235, 235, 0.05), transparent 16%),
+        linear-gradient(180deg, #020202 0%, #070707 30%, #0d0d0d 65%, #141414 100%);
 }
 
 /* =========================================================
@@ -60,7 +61,7 @@ body {
     font-family: Inter, system-ui, sans-serif;
     overflow-x: hidden;
     background: var(--page-bg);
-    background-attachment: scroll;
+    background-attachment: fixed;
 }
 
 a {
@@ -77,7 +78,7 @@ img {
 .edu-path,
 .skills-orbit,
 .about-journey {
-    background: var(--page-bg);
+    background: transparent;
 }
 
 /* =========================================================

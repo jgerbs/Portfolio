@@ -32,6 +32,13 @@
     --shell-opacity: 0;
 
     --hero-closed-opacity: 1;
+
+    --page-bg:
+        radial-gradient(circle at 18% 20%, rgba(86, 117, 255, 0.18), transparent 18%),
+        radial-gradient(circle at 78% 24%, rgba(158, 231, 255, 0.10), transparent 16%),
+        radial-gradient(circle at 24% 66%, rgba(62, 92, 210, 0.12), transparent 16%),
+        radial-gradient(circle at 82% 78%, rgba(90, 170, 255, 0.10), transparent 14%),
+        linear-gradient(180deg, #030814 0%, #040a16 24%, #050d1a 56%, #030711 100%);
 }
 
 /* =========================================================
@@ -52,6 +59,7 @@ body {
     color: var(--text);
     font-family: Inter, system-ui, sans-serif;
     overflow-x: hidden;
+    background: var(--page-bg);
     background-attachment: scroll;
 }
 
@@ -63,6 +71,13 @@ a {
 img {
     display: block;
     max-width: 100%;
+}
+
+.work-rail,
+.edu-path,
+.skills-orbit,
+.about-journey {
+    background: var(--page-bg);
 }
 
 /* =========================================================

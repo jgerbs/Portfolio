@@ -113,9 +113,13 @@
             linear-gradient(180deg, #030814 0%, #040a16 24%, #050d1a 56%, #030711 100%)
         `;
 
+        root.style.setProperty("--page-bg", INSIDE_BG);
+
         body.style.background = INSIDE_BG;
-        body.style.backgroundAttachment = "fixed";
-        pageShell.style.background = INSIDE_BG;
+        body.style.backgroundAttachment = "scroll";
+
+        /* pageShell is empty right now, so this is not actually affecting your sections */
+        pageShell.style.background = "transparent";
 
         heroBg.style.background = "none";
         heroBg.style.overflow = "hidden";
@@ -347,8 +351,8 @@
                 glow2.style.transform = `scale(${utils.lerp(1, 0.88, bgShiftP)})`;
             }
 
-            // Version 1: softer hero fade (0.92 multiplier)
-            heroBg.style.opacity = String(1 - heroFadeOutP * 0.92);
+            /* Keep the base hero background solid so the handoff into Work stays seamless */
+            heroBg.style.opacity = "1";
 
             /* ---------------------------------------------------------
                DEVICE / MOTION — mobile branch from version 2

@@ -60,8 +60,16 @@ body {
     color: var(--text);
     font-family: Inter, system-ui, sans-serif;
     overflow-x: hidden;
+    background: #020202;
+}
+
+/* Single true-fixed background — sits behind everything, immune to overflow/isolation clipping */
+.page-bg-fixed {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
     background: var(--page-bg);
-    background-attachment: fixed;
 }
 
 a {

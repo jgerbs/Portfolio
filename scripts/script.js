@@ -113,10 +113,13 @@
             linear-gradient(180deg, #030814 0%, #040a16 24%, #050d1a 56%, #030711 100%)
         `;
 
-        root.style.setProperty("--page-bg", INSIDE_BG);
+        root.style.setProperty("--page-bg", CLOSED_BG);
 
-        body.style.background = INSIDE_BG;
-        body.style.backgroundAttachment = "fixed";
+        /* Target the fixed bg div, not body — avoids overflow/isolation clipping seams */
+        const pageBgFixed = document.getElementById("pageBgFixed");
+        if (pageBgFixed) {
+            pageBgFixed.style.background = CLOSED_BG;
+        }
 
         /* pageShell is empty right now, so this is not actually affecting your sections */
         pageShell.style.background = "transparent";
@@ -336,6 +339,11 @@
 
             closedLayer.style.opacity = String(1 - bgShiftP);
             insideLayer.style.opacity = String(bgShiftP);
+
+            /* Swap the fixed page bg once the colour shift completes — no seam between any sections */
+            if (pageBgFixed) {
+                pageBgFixed.style.background = bgShiftP >= 1 ? INSIDE_BG : CLOSED_BG;
+            }
 
             if (heroGrid) {
                 heroGrid.style.opacity = String(utils.lerp(0.065, 0.045, bgShiftP));

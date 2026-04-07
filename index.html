@@ -77,6 +77,7 @@
 </head>
 
 <body>
+    <div class="page-bg-fixed" id="pageBgFixed" aria-hidden="true"></div>
     <div class="page-noise" aria-hidden="true"></div>
 
     <header class="site-header">
@@ -203,7 +204,7 @@
                 <div class="work-rail__stage" id="workRailStage" aria-label="Project showcase">
                     <div class="work-rail__pole"></div>
 
-                    <div class="work-rail__cards" id="workRailCards">
+                    <div class="work-rail__cards  reveal-on-scroll" id="workRailCards">
 
                         <!-- =========================================================
                             PROJECT 1 — SIMPLE PLATFORMER GAME
@@ -212,15 +213,16 @@
                         <article class="rail-card theme-other" data-swing-factor="0.98">
                             <div class="rail-card__strap"></div>
                             <div class="rail-card__hole"></div>
-                        
+
                             <div class="rail-card__surface">
                                 <div class="rail-card__head">
-                                    <img src="images/game.webp" alt="Simple platformer game preview" class="rail-card__preview" loading="lazy"
-                                        decoding="async" width="800" height="520" />
+                                    <img src="images/game.webp" alt="Simple platformer game preview"
+                                        class="rail-card__preview" loading="lazy" decoding="async" width="800"
+                                        height="520" />
                                     <div class="rail-card__head-overlay"></div>
                                     <span class="rail-card__mini">GAME</span>
                                 </div>
-                        
+
                                 <div class="rail-card__body">
                                     <span class="rail-card__label">OTHER</span>
                                     <h3>Simple Platformer Game</h3>
@@ -229,7 +231,7 @@
                                         design, and
                                         core gameplay systems, released on Itch.io.
                                     </p>
-                        
+
                                     <div class="rail-card__meta">
                                         <span>
                                             <img src="images/languages/godot.svg" alt="Godot icon">
@@ -241,7 +243,7 @@
                                             <img src="images/languages/itch-io.svg" alt="Itch.io icon">
                                         </span>
                                     </div>
-                        
+
                                     <a href="https://gamesbygerber.itch.io/first-game" target="_blank" rel="noopener">
                                         View Project
                                     </a>
@@ -1026,7 +1028,8 @@
 
                     <div class="contact-footer-block">
                         <div class="contact-socials">
-                            <a href="mailto:your@email.com" title="Email" aria-label="Email">
+                            <a href="/cdn-cgi/l/email-protection#add4c2d8dfedc8c0ccc4c183cec2c0" title="Email"
+                                aria-label="Email">
                                 <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/gmail.svg"
                                     alt="Email" />
                             </a>
@@ -1084,6 +1087,7 @@
         </div>
     </main>
 
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const yearEl = document.getElementById("currentYear");

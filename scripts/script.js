@@ -162,7 +162,7 @@
             progress: 0,
             targetProgress: 0,
             ticking: false,
-            heroUnlockProgress: 0.74,
+            heroUnlockProgress: 0.80,
             heroUnlocked: false,
             lockScrollY: 0,
             isScrollLocking: false
@@ -291,14 +291,11 @@
 
             const mobileLike = isMobileLike();
 
-            if (dom.reducedMotion) {
-                state.progress = state.targetProgress;
-            } else if (mobileLike) {
-                // Mobile: tied directly to swipe, not delayed
-                state.progress = state.targetProgress;
-            } else {
-                state.progress = utils.lerp(state.progress, state.targetProgress, 0.10);
-            }
+            // FIXED: Use targetProgress directly for scroll-driven animation.
+            // Lerp on scroll progress was the root cause of the "stuck frame" bug —
+            // the loop would stop (threshold not met) while p was still mid-transition.
+            // Mouse parallax keeps its own lerp since it's cursor-driven, not scroll-driven.
+            state.progress = state.targetProgress;
 
             state.mouseX = (dom.reducedMotion || mobileLike)
                 ? 0
@@ -322,16 +319,21 @@
                 utils.clamp(utils.mapRange(p, mobileLike ? 0.18 : 0.28, mobileLike ? 0.60 : 0.70, 0, 1), 0, 1)
             );
 
+            // FIXED: Widen the fadeP band so the laptop fade-out completes well before
+            // finalWelcome starts. Previously both overlapped in a narrow ~0.10 window
+            // which created a visible "nothing visible" frame when lerp stalled there.
             const fadeP = utils.easeInOut3(
-                utils.clamp(utils.mapRange(p, mobileLike ? 0.58 : 0.68, mobileLike ? 0.72 : 0.82, 0, 1), 0, 1)
+                utils.clamp(utils.mapRange(p, mobileLike ? 0.54 : 0.64, mobileLike ? 0.68 : 0.76, 0, 1), 0, 1)
             );
 
+            // FIXED: finalWelcome now starts earlier (0.72 desktop, 0.60 mobile) so there's
+            // meaningful overlap — the welcome fades in as the laptop fades out, never a gap.
             const finalWelcomeP = utils.easeInOut3(
-                utils.clamp(utils.mapRange(p, mobileLike ? 0.62 : 0.80, mobileLike ? 0.80 : 0.92, 0, 1), 0, 1)
+                utils.clamp(utils.mapRange(p, mobileLike ? 0.58 : 0.72, mobileLike ? 0.76 : 0.88, 0, 1), 0, 1)
             );
 
             const workRevealP = utils.easeInOut3(
-                utils.clamp(utils.mapRange(p, mobileLike ? 0.72 : 0.90, 1.00, 0, 1), 0, 1)
+                utils.clamp(utils.mapRange(p, mobileLike ? 0.72 : 0.88, 1.00, 0, 1), 0, 1)
             );
 
             const bgShiftP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.10, 0.30, 0, 1), 0, 1));
@@ -474,7 +476,7 @@
             `;
             finalWelcome.style.filter = `blur(${utils.lerp(12, 0, finalWelcomeP)}px)`;
 
-            if (!state.heroUnlocked && finalWelcomeP >= 0.72) {
+            if (!state.heroUnlocked && finalWelcomeP >= 0.55) {
                 state.heroUnlocked = true;
             }
 
@@ -501,9 +503,8 @@
             hero.classList.toggle("hero-laptop--done", fadeP > 0.9);
 
             if (
-                Math.abs(state.progress - state.targetProgress) > 0.0003 ||
-                Math.abs(state.mouseX - state.targetMouseX) > 0.0003 ||
-                Math.abs(state.mouseY - state.targetMouseY) > 0.0003
+                Math.abs(state.mouseX - state.targetMouseX) > 0.0005 ||
+                Math.abs(state.mouseY - state.targetMouseY) > 0.0005
             ) {
                 requestTick();
             }

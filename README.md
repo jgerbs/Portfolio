@@ -1,140 +1,143 @@
-# Jack Gerber — Software Developer & Cybersecurity Analyst
+<h1 align="center">Jack Gerber</h1>
+<p align="center">
+Software Developer · Full-Stack · Cybersecurity
+</p>
 
-Full-stack developer and cybersecurity analyst building web applications, security tools, and interactive experiences. Currently completing the Computer Systems Technology (CST) Diploma at BCIT.
-
-&nbsp;
+<p align="center">
+I build web applications, security demos, and tools that make complex systems easier to understand.
+</p>
 
 ---
 
 ## About Me
 
-I'm a developer based in British Columbia with a background spanning software development, cybersecurity, and systems. My work at BCIT across four programs — ACIS, ASD, Computer Systems, and CST — has given me a broad technical foundation, complemented by the Google Cybersecurity Professional Certificate.
+I'm a developer based in British Columbia with a background in software development, cybersecurity, and systems.
 
-I enjoy building things that have real structure to them: authenticated web apps, interactive security demos, tools that make abstract concepts concrete. I'm equally comfortable on the backend wiring up an API as I am thinking through how an attacker might approach a system.
+Through BCIT (ACIS, ASD, Computer Systems, CST), I’ve built a strong technical foundation, along with completing the Google Cybersecurity Professional Certificate.
 
-&nbsp;
+I like building things that have real structure. Authenticated apps, security demos, and tools that turn abstract ideas into something interactive. I enjoy working across the stack, whether that’s wiring up an API or thinking through how a system might be attacked.
 
 ---
 
 ## Projects
 
-### 🔐 MVC Blog Application
-A full-stack blog platform built to demonstrate production-style authentication and content management.
+### Blog Application
+Full-stack blog platform focused on authentication, user management, and realistic application structure.
 
-- Email confirmation required before first login, password reset via tokenized email links
-- Role-based access (Admin / Contributor), admin dashboard for user management
-- Cover image uploads, article CRUD with ownership enforcement, date-range filtering
-- **Stack:** C#, ASP.NET Core 9 MVC, Entity Framework Core, PostgreSQL, Resend API
-- [Live Demo](https://blog.jackgerber.ca) · [View Code](https://github.com/jgerbs/Portfolio/tree/main/BlogApp)
+- Email confirmation before login, password reset with secure tokens  
+- Role-based access with admin dashboard  
+- Article CRUD, image uploads, filtering  
 
-> The live demo may take 15–30 seconds to load — the server spins down on free-tier hosting.
+**Stack:** C#, ASP.NET Core, Entity Framework, PostgreSQL  
 
-&nbsp;
+[Live Demo](https://blog.jackgerber.ca) · [View Code](https://github.com/jgerbs/Portfolio/tree/main/BlogApp)
 
-### 🗨️ Node.js Reddit Clone
-A server-rendered Reddit-style app covering the full MVC architecture with auth, voting, and communities.
+> First load may take ~15–30 seconds (free-tier hosting)
 
-- Session-based auth via Passport.js, post and comment CRUD with ownership checks
-- Up/downvote system with per-user vote state (upsert pattern), cascading deletes
-- Subgroups created implicitly on post creation, alphabetical subgroup index
-- **Stack:** Node.js, TypeScript, Express.js, EJS, Prisma ORM, PostgreSQL
-- [Live Demo](https://reddit.jackgerber.ca) · [View Code](https://github.com/jgerbs/Portfolio/tree/main/redditClone)
+---
 
-> The live demo may take 15–30 seconds to load — the server spins down on free-tier hosting.
+### Reddit Clone
+Server-rendered Reddit-style app built to explore full-stack architecture and data relationships.
 
-&nbsp;
+- Session-based authentication  
+- Posts, comments, and voting system  
+- Community-style grouping  
 
-### 🛡️ Cybersecurity Algorithm Demonstrations
-A browser-based educational lab with seven interactive demos covering attack mechanics and defensive concepts.
+**Stack:** Node.js, TypeScript, Express, Prisma, PostgreSQL  
 
-- Keylogger simulation (consent-gated, browser-only), brute force, dictionary, and heuristic PIN attacks
-- Parallel heuristic search across 4 Web Workers with live thread-coloured logs
-- Full ransomware simulation: fake download site → execution → file encryption → Splunk-style SOC log viewer
-- NIST-aligned incident report with MITRE ATT&CK mapping, IOC table, and evidence carousel
-- **Stack:** Vanilla JavaScript, HTML5, CSS3, Web Workers API
-- [Live Demo](https://jgerbs.github.io/Portfolio/cybersecurityDemos/index.html) · [View Code](https://github.com/jgerbs/Portfolio/tree/main/cybersecurityDemos)
+[Live Demo](https://reddit.jackgerber.ca) · [View Code](https://github.com/jgerbs/Portfolio/tree/main/redditClone)
 
-&nbsp;
+> First load may take ~15–30 seconds (free-tier hosting)
 
-### 🔑 Password Strength Checker
-A real-time password evaluator that scores strength across five tiers and explains exactly what to improve.
+---
 
-- Checks length, character variety (uppercase, lowercase, digits, special chars), and Shannon entropy
-- Entropy-based strength tiers from Very Weak to Very Strong with actionable per-criterion feedback
-- **Stack:** Python, Streamlit
-- [Live Demo](https://password-feedback.streamlit.app) · [View Code](https://github.com/jgerbs/Portfolio/tree/main/passwordStrength)
+### Cybersecurity Demos
+Interactive browser-based lab for exploring security concepts in a controlled environment.
 
-&nbsp;
+- Brute force, dictionary, and keylogging simulations  
+- Parallel search using Web Workers  
+- Ransomware simulation with mock SOC-style logs  
 
-### 🌐 Springbok Medical Website
-A custom client website built through stakeholder collaboration and agile iteration.
+**Stack:** JavaScript, HTML, CSS  
 
-- **Stack:** HTML5, CSS3, JavaScript
-- [Live Demo](https://jgerbs.github.io/Springbok/Spa.html) · [View Code](https://github.com/jgerbs/Springbok)
+[Live Demo](https://jgerbs.github.io/Portfolio/cybersecurityDemos/index.html) · [View Code](https://github.com/jgerbs/Portfolio/tree/main/cybersecurityDemos)
 
-&nbsp;
+---
 
-### 🎮 Simple Platformer Game
-A 2D platformer — one of my earliest projects and the build that got me hooked on software development.
+### Password Strength Checker
+Real-time password evaluator that explains how and why a password is strong or weak.
 
-- Player state machine (floor, air, wall, ladder), wall-jumping, fireball projectile, enemy stomping and cliff-aware AI, coin collection win condition
-- **Stack:** Godot Engine, GDScript
-- [Play on itch.io](https://gamesbygerber.itch.io/first-game) · [View Code](https://github.com/jgerbs/Portfolio/tree/main/First%20Game%202.0)
+- Checks length, character variety, and entropy  
+- Gives actionable feedback  
 
-&nbsp;
+**Stack:** Python, Streamlit  
+
+[Live Demo](https://password-feedback.streamlit.app) · [View Code](https://github.com/jgerbs/Portfolio/tree/main/passwordStrength)
+
+---
+
+### Springbok Medical Website
+Client website built through real collaboration and iterative design.
+
+**Stack:** HTML, CSS, JavaScript  
+
+[Live Demo](https://jgerbs.github.io/Springbok/Spa.html) · [View Code](https://github.com/jgerbs/Springbok)
+
+---
+
+### First Game (2.0)
+Simple 2D platformer and one of my earliest projects.
+
+- Movement system, enemies, collectibles  
+- The project where everything started to click  
+
+**Stack:** Godot, GDScript  
+
+[Play](https://gamesbygerber.itch.io/first-game) · [View Code](https://github.com/jgerbs/Portfolio/tree/main/First%20Game%202.0)
 
 ---
 
 ## Skills
 
-**Languages**
-`C#` `JavaScript` `TypeScript` `Python` `C++` `Java` `PHP`
+**Languages**  
+C# · JavaScript · TypeScript · Python · C++ · Java · PHP  
 
-**Frameworks & Runtimes**
-`ASP.NET Core` `.NET` `Node.js` `Express.js` `Streamlit` `Godot / GDScript`
+**Frameworks & Tools**  
+ASP.NET Core · Node.js · Express · Prisma · Entity Framework · Streamlit  
 
-**Databases & ORM**
-`PostgreSQL` `Prisma ORM` `Entity Framework Core`
+**Databases**  
+PostgreSQL  
 
-**Cybersecurity Tools**
-`Wireshark` `Nmap` `Splunk` `Suricata` `VirusTotal`
+**Cybersecurity**  
+Wireshark · Nmap · Splunk · Suricata · VirusTotal  
 
-**Systems & Platforms**
-`Linux` `PowerShell` `Git` `GitHub Pages` `Render` `Streamlit Cloud`
-
-&nbsp;
+**Systems**  
+Linux · Git · GitHub · Render  
 
 ---
 
-## Live Deployments
+## Live Projects
 
-| Project | URL | Platform |
-|---|---|---|
-| Portfolio Site | [jackgerber.ca](https://jackgerber.ca) | GitHub Pages |
-| Blog App | [blog.jackgerber.ca](https://blog.jackgerber.ca) | Render |
-| Reddit Clone | [reddit.jackgerber.ca](https://reddit.jackgerber.ca) | Render |
-| Cybersecurity Demos | [jgerbs.github.io/Portfolio/cybersecurityDemos](https://jgerbs.github.io/Portfolio/cybersecurityDemos/index.html) | GitHub Pages |
-| Password Strength Checker | [password-feedback.streamlit.app](https://password-feedback.streamlit.app) | Streamlit Cloud |
-| Platformer Game | [gamesbygerber.itch.io/first-game](https://gamesbygerber.itch.io/first-game) | itch.io |
+Portfolio: https://jackgerber.ca  
+Blog: https://blog.jackgerber.ca  
+Reddit Clone: https://reddit.jackgerber.ca  
+Cybersecurity Lab: https://jgerbs.github.io/Portfolio/cybersecurityDemos  
+Password Tool: https://password-feedback.streamlit.app  
 
-> Render-hosted apps (Blog, Reddit Clone) may take 15–30 seconds on first load — free-tier servers spin down when idle.
-
-&nbsp;
+> Some apps may take a few seconds to load on first visit due to free-tier hosting.
 
 ---
 
 ## Currently Working On
 
-- Completing the BCIT Computer Systems Technology (CST) Diploma (expected 2026)
-- Deepening practical cybersecurity skills and expanding knowledge of threat analysis, SIEM, and incident response
-- Building more full-stack projects with a focus on security and clean architecture
-
-&nbsp;
+- Finishing the BCIT CST Diploma (2026)  
+- Going deeper into cybersecurity and threat analysis  
+- Building more full-stack apps with a focus on structure and security  
 
 ---
 
 ## Contact
 
-- **Portfolio:** [jackgerber.ca](https://jackgerber.ca)
-- **GitHub:** [github.com/jgerbs](https://github.com/jgerbs)
-- **LinkedIn:** [linkedin.com/in/jack-gerber-4840ab1b1](https://www.linkedin.com/in/jack-gerber-4840ab1b1/)
+Portfolio: https://jackgerber.ca  
+GitHub: https://github.com/jgerbs  
+LinkedIn: https://linkedin.com/in/jack-gerber-4840ab1b1  

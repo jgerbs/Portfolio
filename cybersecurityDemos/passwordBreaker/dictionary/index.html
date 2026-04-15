@@ -1,3 +1,13 @@
+<!-- ============================================================
+     dictionary/index.html
+     Dictionary PIN attack demo — checks the 50 most common PINs first.
+
+     Responsibilities:
+     - Renders the header, status LED, and navigation home link
+     - Provides PIN input controls, random generator, and start/stop buttons
+     - Displays live attempt log and statistics (count, elapsed time, status)
+     - Includes educational copy on dictionary-based attack efficiency
+     ============================================================ -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,7 +20,9 @@
 
 <body>
 
-    <!-- HEADER -->
+    <!-- ============================================================
+         1) HEADER + STATUS LED
+         ============================================================ -->
     <header class="cs-nav">
         <div class="cs-left">
             <a href="../../index.html" class="cs-home-btn">
@@ -30,7 +42,9 @@
 
     <main class="split">
 
-        <!-- LEFT PANEL -->
+        <!-- ============================================================
+             2) LEFT PANEL — PIN INPUT + CONTROLS + STATISTICS
+             ============================================================ -->
         <section class="panel left">
             <h2>Dictionary Attack Using Common PINs</h2>
             <p class="muted">
@@ -64,13 +78,14 @@
             </div>
         </section>
 
-        <!-- RIGHT PANEL -->
+        <!-- ============================================================
+             3) RIGHT PANEL — DICTIONARY LOG + EDUCATIONAL COPY
+             ============================================================ -->
         <section class="panel right">
             <h2>Dictionary Log</h2>
             <div class="log" id="log-box"></div>
 
             <div class="education">
-
                 <h3>Are These PINs Safe?</h3>
                 <p class="muted">
                     The PINs used in this demo come from real cybersecurity reports and actual breach data.

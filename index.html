@@ -1,3 +1,27 @@
+<!-- ============================================================
+     index.html
+     Main entry point for the Jack Gerber portfolio site.
+
+     Responsibilities:
+     - Provides SEO metadata, Open Graph tags, and structured data (JSON-LD)
+     - Renders the animated hero laptop section and scroll-driven journey
+     - Displays project cards (work rail), education timeline, and skills lanes
+     - Presents the about/misogi narrative and inline contact form
+     - Loads EmailJS, the contact form handler, and the main scroll script
+
+     Sections:
+     1) HEAD — META, SEO, FONTS, STRUCTURED DATA
+     2) FIXED BACKGROUND + NOISE OVERLAY
+     3) SITE HEADER + NAVIGATION
+     4) SECTION DOTS (SCROLL PROGRESS INDICATOR)
+     5) HERO LAPTOP JOURNEY
+     6) WORK RAIL — PROJECT CARDS
+     7) EDUCATION PATH TIMELINE
+     8) SKILLS ORBIT LANES
+     9) ABOUT JOURNEY + MISOGI PANELS
+     10) CONTACT SECTION + FORM
+     11) SCRIPTS
+     ============================================================ -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -47,6 +71,9 @@
 
     <link rel="stylesheet" href="styles.css" />
 
+    <!-- ============================================================
+         1) HEAD — META, SEO, FONTS, STRUCTURED DATA
+         ============================================================ -->
     <!-- Structured Data -->
     <script type="application/ld+json">
     {
@@ -77,9 +104,16 @@
 </head>
 
 <body>
+
+    <!-- ============================================================
+         2) FIXED BACKGROUND + NOISE OVERLAY
+         ============================================================ -->
     <div class="page-bg-fixed" id="pageBgFixed" aria-hidden="true"></div>
     <div class="page-noise" aria-hidden="true"></div>
 
+    <!-- ============================================================
+         3) SITE HEADER + NAVIGATION
+         ============================================================ -->
     <header class="site-header">
 
         <a href="#top" class="brand">JG</a>
@@ -95,6 +129,9 @@
         <div class="header-line"></div>
     </header>
 
+    <!-- ============================================================
+         4) SECTION DOTS (SCROLL PROGRESS INDICATOR)
+         ============================================================ -->
     <aside class="section-dots" aria-label="Section progress">
         <a href="#hero" class="dot is-active"><span>JG</span></a>
         <a href="#work" class="dot"><span>Work</span></a>
@@ -105,6 +142,10 @@
     </aside>
 
     <main id="top">
+
+        <!-- ============================================================
+             5) HERO LAPTOP JOURNEY
+             ============================================================ -->
         <section class="hero-laptop" id="hero">
             <div class="hero-laptop__sticky">
                 <div class="hero-laptop__bg" aria-hidden="true">
@@ -122,7 +163,8 @@
                         </h1>
 
                         <p class="reveal-on-scroll is-visible">
-                            I build security-focused software and create interactive digital experiences.
+                            I design and build secure, scalable applications while solving complex technical problems
+                            across software, systems, and cybersecurity.
                         </p>
                     </div>
 
@@ -191,6 +233,9 @@
         </section>
 
 
+        <!-- ============================================================
+             6) WORK RAIL — PROJECT CARDS
+             ============================================================ -->
         <section class="work-rail" id="work">
             <div class="work-rail__inner">
                 <div class="work-rail__heading">
@@ -227,9 +272,10 @@
                                     <span class="rail-card__label">OTHER</span>
                                     <h3>Simple Platformer Game</h3>
                                     <p>
-                                        A small 2D platformer built in Godot exploring movement, collision, level
-                                        design, and
-                                        core gameplay systems, released on Itch.io.
+                                        A 2D platformer showcasing smooth player controls, collision handling, and level
+                                        design with a complete playable
+                                        experience.
+
                                     </p>
 
                                     <div class="rail-card__meta">
@@ -244,9 +290,17 @@
                                         </span>
                                     </div>
 
-                                    <a href="https://gamesbygerber.itch.io/first-game" target="_blank" rel="noopener">
-                                        View Project
-                                    </a>
+                                    <div class="rail-card__actions">
+                                        <a href="https://gamesbygerber.itch.io/first-game" target="_blank"
+                                            rel="noopener">
+                                            View Demo
+                                        </a>
+                                        <a href="https://github.com/jgerbs/Portfolio/tree/main/First%20Game%202.0"
+                                            target="_blank" rel="noopener"
+                                            class="rail-card__action rail-card__action--secondary">
+                                            View Code
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </article>
@@ -272,8 +326,9 @@
                                     <span class="rail-card__label">FULLSTACK</span>
                                     <h3>MVC Blog Application</h3>
                                     <p>
-                                        An ASP.NET Core MVC blogging app with authentication, user roles, publishing
-                                        workflows, and a PostgreSQL-backed content system deployed to Render.
+                                        A full-stack blog platform with email authentication, full CRUD operations,
+                                        role-based access, and real published
+                                        content demonstrating a complete content workflow.
                                     </p>
 
                                     <div class="rail-card__meta">
@@ -288,9 +343,15 @@
                                         </span>
                                     </div>
 
-                                    <a href="https://blog.jackgerber.ca" target="_blank" rel="noopener">
-                                        View Project
-                                    </a>
+                                    <div class="rail-card__actions">
+                                        <a href="https://blog.jackgerber.ca" target="_blank" rel="noopener">
+                                            View Demo
+                                        </a>
+                                        <a href="https://github.com/jgerbs/Portfolio/tree/main/BlogApp" target="_blank"
+                                            rel="noopener" class="rail-card__action rail-card__action--secondary">
+                                            View Code
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </article>
@@ -316,10 +377,10 @@
                                     <span class="rail-card__label">SECURITY</span>
                                     <h3>Cybersecurity Demos</h3>
                                     <p>
-                                        A set of interactive browser demos designed to visualize concepts like
-                                        brute-force
-                                        attacks, keylogging, ransomware flow, and browser-based security
-                                        interaction.
+                                        Interactive demos that break down real-world attacks like brute-force,
+                                        keylogging, and ransomware into visual, hands-on
+                                        experiences.
+
                                     </p>
 
                                     <div class="rail-card__meta">
@@ -334,10 +395,17 @@
                                         </span>
                                     </div>
 
-                                    <a href="https://jgerbs.github.io/Portfolio/cybersecurityDemos/index.html"
-                                        target="_blank" rel="noopener">
-                                        View Project
-                                    </a>
+                                    <div class="rail-card__actions">
+                                        <a href="https://jgerbs.github.io/Portfolio/cybersecurityDemos/index.html"
+                                            target="_blank" rel="noopener">
+                                            View Demo
+                                        </a>
+                                        <a href="https://github.com/jgerbs/Portfolio/tree/main/cybersecurityDemos"
+                                            target="_blank" rel="noopener"
+                                            class="rail-card__action rail-card__action--secondary">
+                                            View Code
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </article>
@@ -363,9 +431,9 @@
                                     <span class="rail-card__label">FULLSTACK</span>
                                     <h3>Node.js Reddit Clone</h3>
                                     <p>
-                                        A Reddit-style community platform with authentication, voting, comments,
-                                        subgroup
-                                        pages, and a backend-first architecture using TypeScript and PostgreSQL.
+                                        A Reddit-style platform with authentication, voting, comments, and communities,
+                                        using preloaded users and data to
+                                        showcase full functionality.
                                     </p>
 
                                     <div class="rail-card__meta">
@@ -380,9 +448,16 @@
                                         </span>
                                     </div>
 
-                                    <a href="https://reddit.jackgerber.ca" target="_blank" rel="noopener">
-                                        View Project
-                                    </a>
+                                    <div class="rail-card__actions">
+                                        <a href="https://reddit.jackgerber.ca" target="_blank" rel="noopener">
+                                            View Demo
+                                        </a>
+                                        <a href="https://github.com/jgerbs/Portfolio/tree/main/redditClone"
+                                            target="_blank" rel="noopener"
+                                            class="rail-card__action rail-card__action--secondary">
+                                            View Code
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </article>
@@ -408,10 +483,9 @@
                                     <span class="rail-card__label">WEBSITES</span>
                                     <h3>Springbok Medical Website</h3>
                                     <p>
-                                        A luxury medical spa website built with a custom design system, responsive
-                                        layouts,
-                                        animated storytelling, booking integrations, and a polished premium brand
-                                        feel.
+                                        A custom medical website delivered through close collaboration with
+                                        stakeholders, using agile iterations to refine
+                                        requirements, enhance UX, and support scalable growth.
                                     </p>
 
                                     <div class="rail-card__meta">
@@ -426,10 +500,16 @@
                                         </span>
                                     </div>
 
-                                    <a href="https://jgerbs.github.io/Springbok/Spa.html" target="_blank"
-                                        rel="noopener">
-                                        View Project
-                                    </a>
+                                    <div class="rail-card__actions">
+                                        <a href="https://jgerbs.github.io/Springbok/Spa.html" target="_blank"
+                                            rel="noopener">
+                                            View Demo
+                                        </a>
+                                        <a href="https://github.com/jgerbs/Springbok" target="_blank" rel="noopener"
+                                            class="rail-card__action rail-card__action--secondary">
+                                            View Code
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </article>
@@ -456,9 +536,10 @@
                                     <span class="rail-card__label">SECURITY</span>
                                     <h3>Password Strength Checker</h3>
                                     <p>
-                                        A Streamlit-based Python app that analyzes passwords in real time and gives
-                                        clear,
-                                        practical feedback to help users create stronger credentials.
+                                        A real-time password analysis tool that gives clear, actionable feedback to help
+                                        users create stronger, more secure
+                                        credentials.
+
                                     </p>
 
                                     <div class="rail-card__meta">
@@ -470,9 +551,17 @@
                                         </span>
                                     </div>
 
-                                    <a href="https://password-feedback.streamlit.app/" target="_blank" rel="noopener">
-                                        View Project
-                                    </a>
+                                    <div class="rail-card__actions">
+                                        <a href="https://password-feedback.streamlit.app/" target="_blank"
+                                            rel="noopener">
+                                            View Demo
+                                        </a>
+                                        <a href="https://github.com/jgerbs/Portfolio/tree/main/passwordStrength"
+                                            target="_blank" rel="noopener"
+                                            class="rail-card__action rail-card__action--secondary">
+                                            View Code
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </article>
@@ -481,6 +570,9 @@
             </div>
         </section>
 
+        <!-- ============================================================
+             7) EDUCATION PATH TIMELINE
+             ============================================================ -->
         <section id="education" class="edu-path" aria-labelledby="education-title">
             <div class="edu-path__pin">
                 <div class="edu-path__viewport">
@@ -607,6 +699,9 @@
             </div>
         </section>
 
+        <!-- ============================================================
+             8) SKILLS ORBIT LANES
+             ============================================================ -->
         <section id="skills" class="skills-orbit" aria-labelledby="skills-title">
             <div class="skills-orbit__bg" aria-hidden="true">
                 <div class="skills-orbit__glow skills-orbit__glow--1"></div>
@@ -843,6 +938,9 @@
             </div>
         </section>
 
+        <!-- ============================================================
+             9) ABOUT JOURNEY + MISOGI PANELS
+             ============================================================ -->
         <section id="about" class="about-journey" aria-labelledby="about-title">
             <div class="about-journey__bg" aria-hidden="true">
                 <div class="about-journey__glow about-journey__glow--1"></div>
@@ -1014,16 +1112,20 @@
             </div>
         </section>
 
-        <!-- CONTACT -->
+        <!-- ============================================================
+             10) CONTACT SECTION + FORM
+             ============================================================ -->
         <section id="contact" class="section contact-section fade-in">
             <div class="contact-shell">
                 <div class="contact-copy fade-left">
                     <span class="contact-kicker">Contact</span>
                     <h2>Let’s build something meaningful.</h2>
                     <p>
-                        I’m always open to discussing opportunities in cybersecurity, software development,
-                        and technical problem solving. Whether you have a role, project, collaboration, or
-                        just want to connect, feel free to send me a message.
+                        I’m looking for opportunities in tech where I can contribute by building, analyzing, and solving
+                        real problems.
+                        Whether it’s creating new systems, improving existing ones, or enhancing your online presence,
+                        I’d be
+                        happy to connect.
                     </p>
 
                     <div class="contact-footer-block">
@@ -1087,6 +1189,9 @@
         </div>
     </main>
 
+    <!-- ============================================================
+         11) SCRIPTS
+         ============================================================ -->
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {

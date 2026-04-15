@@ -1,66 +1,80 @@
-@* Jack Gerber - A01266976
-   Date: Nov 05, 2025 *@
- 
+@* ============================================================
+   File:    Views/Article/Index.cshtml
+   Purpose: Article listing view — renders a responsive card grid
+            for all published articles with owner/admin edit controls
+            and a "Create New Article" button for authorized users.
+
+   Sections:
+   1) PAGE SETUP + CURRENT USER RESOLUTION
+   2) EMPTY STATE
+   3) ARTICLE CARD GRID (cover image, metadata, action buttons)
+   4) CREATE ARTICLE BUTTON (Contributors + Admins only)
+   ============================================================ *@
 @using Microsoft.AspNetCore.Identity
 @inject UserManager<ApplicationUser> UserManager
 
 @model IEnumerable<BlogApp.Models.Article>
 
+@* ============================================================
+   1) PAGE SETUP + CURRENT USER RESOLUTION
+   ============================================================ *@
 @{
     ViewData["Title"] = "Home";
 
-    // Safely get the current logged-in user if authenticated
     ApplicationUser? currentUser = null;
     if (User?.Identity?.IsAuthenticated == true)
-    {
         currentUser = await UserManager.GetUserAsync(User);
-    }
 
     var articles = Model ?? Enumerable.Empty<BlogApp.Models.Article>();
 }
 
 <h2 class="mb-4 text-accent">Latest Articles</h2>
 
+@* ============================================================
+   2) EMPTY STATE
+   ============================================================ *@
 @if (!articles.Any())
 {
     <p class="text-muted">No articles available at the moment.</p>
 }
 else
 {
+    @* ============================================================
+       3) ARTICLE CARD GRID (cover image, metadata, action buttons)
+       isOwner and isAdmin drive Edit/Delete button visibility.
+       ============================================================ *@
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         @foreach (var article in articles.OrderByDescending(a => a?.DatePosted))
         {
-            if (article == null)
-            {
-                continue; // skip null entries safely
-            }
+            if (article == null) { continue; }
 
-            bool isOwner = currentUser != null && article?.ContributorUsername == currentUser?.UserName;
+            bool isOwner = currentUser != null && article.ContributorUsername == currentUser.UserName;
             bool isAdmin = User?.IsInRole("Admin") ?? false;
 
             <div class="col">
                 <div class="card bg-dark text-light shadow-glow h-100">
-                    @if (!string.IsNullOrEmpty(article?.CoverImageUrl))
+
+                    @if (!string.IsNullOrEmpty(article.CoverImageUrl))
                     {
                         <img src="@article.CoverImageUrl"
                              class="card-img-top"
-                             alt="@(article?.Title ?? "Article Image")"
-                             style="object-fit: cover; height: 200px; border-top-left-radius: .5rem; border-top-right-radius: .5rem;">
+                             alt="@(article.Title ?? "Article Image")"
+                             style="object-fit: cover; height: 200px; border-top-left-radius: .5rem; border-top-right-radius: .5rem;" />
                     }
 
                     <div class="card-body d-flex flex-column">
-                        <h4 class="card-title text-accent">@((article?.Title ?? "Untitled Article"))</h4>
+                        <h4 class="card-title text-accent">@(article.Title ?? "Untitled Article")</h4>
                         <p class="text-muted small">
-                            @(article?.DatePosted != null
+                            @(article.DatePosted != default
                                 ? article.DatePosted.ToLocalTime().ToString("MMM dd, yyyy")
                                 : "Unknown Date")
                         </p>
-                        <p class="card-text flex-grow-1">@((article?.ShortDescription ?? "No description provided."))</p>
+                        <p class="card-text flex-grow-1">@(article.ShortDescription ?? "No description provided.")</p>
 
                         <div class="mt-auto d-flex justify-content-between">
                             <a asp-action="Details"
                                asp-controller="Article"
-                               asp-route-id="@(article?.ArticleId ?? 0)"
+                               asp-route-id="@article.ArticleId"
                                class="btn btn-outline-info">
                                 Read More
                             </a>
@@ -69,25 +83,31 @@ else
                             {
                                 <div>
                                     <a asp-action="Edit"
-                                       asp-route-id="@(article?.ArticleId ?? 0)"
+                                       asp-route-id="@article.ArticleId"
                                        class="btn btn-warning me-2">Edit</a>
+
                                     <form asp-action="DeleteConfirmed"
-                                          asp-route-id="@(article?.ArticleId ?? 0)"
+                                          asp-route-id="@article.ArticleId"
                                           method="post"
-                                          style="display:inline;">
+                                          style="display: inline;">
                                         <button type="submit" class="btn btn-danger">Delete</button>
                                     </form>
                                 </div>
                             }
                         </div>
                     </div>
+
                 </div>
             </div>
         }
     </div>
 }
 
-@if (User?.Identity?.IsAuthenticated == true && (User?.IsInRole("Contributor") == true || User?.IsInRole("Admin") == true))
+@* ============================================================
+   4) CREATE ARTICLE BUTTON (Contributors + Admins only)
+   ============================================================ *@
+@if (User?.Identity?.IsAuthenticated == true &&
+     (User.IsInRole("Contributor") || User.IsInRole("Admin")))
 {
     <a asp-action="Create" class="btn btn-success mt-4">Create New Article</a>
 }

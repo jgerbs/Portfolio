@@ -1,5 +1,28 @@
-// emailModal.js — inline contact form with custom validation + button states
+/* ============================================================
+   emailModal.js
+   Inline contact form with real-time field validation and
+   multi-state submit button feedback via EmailJS.
+
+   Responsibilities:
+   - Smooth-scrolls to the contact section when the email CTA is clicked
+   - Validates name, email, and message fields on input and blur
+   - Submits the form through EmailJS and handles success / error states
+   - Manages five distinct button states: idle, sending, success, error, invalid
+   - Clears all field errors and resets to idle after each outcome
+
+   Section index:
+   1. DOM references
+   2. CTA scroll handler
+   3. Real-time field validation
+   4. Form submit handler
+   5. Validation helpers
+   6. Button state machine
+   ============================================================ */
+
 document.addEventListener("DOMContentLoaded", () => {
+    /* ============================================================
+       1. DOM REFERENCES
+       ============================================================ */
     const openBtn = document.getElementById("emailButton");
     const contactSection = document.getElementById("contact");
     const form = document.getElementById("emailForm");
@@ -14,6 +37,9 @@ document.addEventListener("DOMContentLoaded", () => {
         message: form.querySelector("#message")
     };
 
+    /* ============================================================
+       2. CTA SCROLL HANDLER
+       ============================================================ */
     if (openBtn && contactSection) {
         openBtn.addEventListener("click", (e) => {
             e.preventDefault();
@@ -28,18 +54,26 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    /* ============================================================
+       3. REAL-TIME FIELD VALIDATION
+       ============================================================ */
     Object.values(fields).forEach((field) => {
         if (!field) return;
 
+        /* Soft validation on input: only clears errors, never adds them */
         field.addEventListener("input", () => {
             validateField(field, true);
         });
 
+        /* Strict validation on blur: shows errors on empty/invalid */
         field.addEventListener("blur", () => {
             validateField(field);
         });
     });
 
+    /* ============================================================
+       4. FORM SUBMIT HANDLER
+       ============================================================ */
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
@@ -99,10 +133,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    /* ============================================================
+       5. VALIDATION HELPERS
+       ============================================================ */
     function isValidEmail(value) {
         return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value);
     }
 
+    /* soft=true: clear errors only (used on "input"); soft=false: set errors too (used on "blur") */
     function validateField(field, soft = false) {
         const value = field.value.trim();
 
@@ -138,6 +176,9 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    /* ============================================================
+       6. BUTTON STATE MACHINE
+       ============================================================ */
     function setButtonState(state) {
         if (!submitBtn) return;
 
@@ -174,7 +215,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }, 1800);
                 break;
 
-            default:
+            default: // "idle"
                 submitBtn.disabled = false;
                 submitBtn.textContent = "Send Message";
                 break;

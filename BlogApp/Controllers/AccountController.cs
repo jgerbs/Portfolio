@@ -1,46 +1,75 @@
-// Jack Gerber - A01266976
-// Production AccountController with Email Confirmation (Render & Resend integrated)
+/* ============================================================
+   File:    Controllers/AccountController.cs
+   Purpose: Handles all user account actions — registration,
+            login, email confirmation, password reset, and
+            admin-level user management.
 
+   Responsibilities:
+   - Register new users and send HTML email confirmation links
+   - Resend confirmation emails on user request
+   - Confirm email addresses via tokenized URL
+   - Authenticate users with lockout and confirmation checks
+   - Support forgot-password / reset-password flows via email
+   - Allow admins to suspend, unsuspend, delete, promote, and demote users
+
+   Sections:
+   1) USING DIRECTIVES + NAMESPACE
+   2) CONSTRUCTOR + DEPENDENCY INJECTION
+   3) REGISTRATION + EMAIL CONFIRMATION DISPATCH
+   4) RESEND CONFIRMATION EMAIL
+   5) CONFIRM EMAIL (token validation)
+   6) LOGIN + LOGOUT
+   7) FORGOT PASSWORD + RESET PASSWORD
+   8) ADMIN — USER MANAGEMENT (list, suspend, delete)
+   9) ADMIN — ROLE MANAGEMENT (make/remove admin)
+   10) PRIVATE HELPER
+============================================================ */
+
+/* ============================================================
+   1) USING DIRECTIVES + NAMESPACE
+   ============================================================ */
 using BlogApp.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using BlogApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BlogApp.Controllers
 {
+    /* ============================================================
+       2) CONSTRUCTOR + DEPENDENCY INJECTION
+       ============================================================ */
     public class AccountController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<ApplicationUser>   _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly IEmailSender _emailSender;
-        private readonly IConfiguration _config; // Added to access APP_BASE_URL
+        private readonly RoleManager<IdentityRole>      _roleManager;
+        private readonly IEmailSender                   _emailSender;
+        private readonly IConfiguration                 _config;
 
         public AccountController(
-            UserManager<ApplicationUser> userManager,
+            UserManager<ApplicationUser>   userManager,
             SignInManager<ApplicationUser> signInManager,
-            RoleManager<IdentityRole> roleManager,
-            IEmailSender emailSender,
-            IConfiguration config)
+            RoleManager<IdentityRole>      roleManager,
+            IEmailSender                   emailSender,
+            IConfiguration                 config)
         {
-            _userManager = userManager;
+            _userManager   = userManager;
             _signInManager = signInManager;
-            _roleManager = roleManager;
-            _emailSender = emailSender;
-            _config = config;
+            _roleManager   = roleManager;
+            _emailSender   = emailSender;
+            _config        = config;
         }
 
-        // ---------------- REGISTER (GET) ----------------
+        /* ============================================================
+           3) REGISTRATION + EMAIL CONFIRMATION DISPATCH
+           ============================================================ */
+
         [HttpGet]
-        public IActionResult Register()
-        {
-            return View(new RegisterViewModel());
-        }
+        public IActionResult Register() => View(new RegisterViewModel());
 
-        // ---------------- REGISTER (POST) ----------------
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
@@ -49,10 +78,10 @@ namespace BlogApp.Controllers
 
             var user = new ApplicationUser
             {
-                UserName = model.Email,
-                Email = model.Email,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
+                UserName   = model.Email,
+                Email      = model.Email,
+                FirstName  = model.FirstName,
+                LastName   = model.LastName,
                 IsApproved = true
             };
 
@@ -60,9 +89,10 @@ namespace BlogApp.Controllers
 
             if (!result.Succeeded)
             {
-                bool duplicate = result.Errors.Any(e => e.Code == "DuplicateUserName" || e.Code == "DuplicateEmail");
+                bool isDuplicate = result.Errors.Any(e =>
+                    e.Code == "DuplicateUserName" || e.Code == "DuplicateEmail");
 
-                if (duplicate)
+                if (isDuplicate)
                     ViewBag.DuplicateEmail = true;
 
                 foreach (var error in result.Errors)
@@ -73,87 +103,56 @@ namespace BlogApp.Controllers
 
             await _userManager.AddToRoleAsync(user, "Contributor");
 
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-
-            // ✅ Use APP_BASE_URL if available (for Render/Production)
-            var baseUrl = _config["APP_BASE_URL"] ?? $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
-            var confirmUrl = $"{baseUrl}/Account/ConfirmEmail?userId={user.Id}&token={Uri.EscapeDataString(token)}";
-
-            // Load email template
-            var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "email", "confirm.html");
-            var html = await System.IO.File.ReadAllTextAsync(templatePath);
-            html = html.Replace("{{confirm_link}}", confirmUrl);
-
-            await _emailSender.SendEmailAsync(user.Email, "Confirm your BlogApp account", html);
+            await SendConfirmationEmailAsync(user);
 
             TempData["RegisterSuccess"] = user.Email;
-
             return RedirectToAction("Register");
         }
 
+        /* ============================================================
+           4) RESEND CONFIRMATION EMAIL
+           ============================================================ */
 
-        // ---------------- RESEND CONFIRMATION EMAIL ----------------
         [HttpPost]
         public async Task<IActionResult> ResendConfirmationEmail(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
-            {
                 return RedirectToAction("CheckEmail", new { email = "", error = "Invalid email." });
-            }
 
             var user = await _userManager.FindByEmailAsync(email);
 
             if (user == null)
-            {
-                return RedirectToAction("CheckEmail", new { email = email, error = "No account found with that email." });
-            }
+                return RedirectToAction("CheckEmail", new { email, error = "No account found with that email." });
 
             if (user.EmailConfirmed)
-            {
                 return RedirectToAction("Login");
-            }
 
-            // Generate token
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-
-            // Use environment-aware base URL
-            var baseUrl = _config["APP_BASE_URL"] ?? $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
-            var confirmUrl = $"{baseUrl}/Account/ConfirmEmail?userId={user.Id}&token={Uri.EscapeDataString(token)}";
-
-            var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "email", "confirm.html");
-            var html = await System.IO.File.ReadAllTextAsync(templatePath);
-            html = html.Replace("{{confirm_link}}", confirmUrl);
-
-            if (user?.Email == null)
+            if (user.Email == null)
                 return ErrorView("Email address is missing. Please try again.");
 
-            await _emailSender.SendEmailAsync(user.Email, "Confirm your BlogApp account", html);
+            await SendConfirmationEmailAsync(user);
 
-            // Redirect BACK to CheckEmail with success flag
-            return RedirectToAction("CheckEmail", new { email = email, resent = true });
+            return RedirectToAction("CheckEmail", new { email, resent = true });
         }
 
-
-
-        // ---------------- CHECK EMAIL PAGE ----------------
         public IActionResult CheckEmail(string email, bool? resent, string error)
         {
-            ViewBag.Email = email;
-            ViewBag.Error = error;
+            ViewBag.Email  = email;
+            ViewBag.Error  = error;
             ViewBag.Resent = resent ?? false;
-
             return View();
         }
 
+        /* ============================================================
+           5) CONFIRM EMAIL (token validation)
+           ============================================================ */
 
-        // ---------------- CONFIRM EMAIL ----------------
         public async Task<IActionResult> ConfirmEmail(string userId, string token)
         {
             if (userId == null || token == null)
                 return BadRequest("Invalid confirmation link.");
 
             var user = await _userManager.FindByIdAsync(userId);
-
             if (user == null)
                 return NotFound("User not found.");
 
@@ -163,17 +162,19 @@ namespace BlogApp.Controllers
             {
                 user.IsApproved = true;
                 await _userManager.UpdateAsync(user);
-
                 return View("ConfirmSuccess");
             }
 
             return View("ConfirmFailed");
         }
 
-        // ---------------- LOGIN (GET) ----------------
+        /* ============================================================
+           6) LOGIN + LOGOUT
+           ============================================================ */
+
+        [HttpGet]
         public IActionResult Login() => View(new LoginViewModel());
 
-        // ---------------- LOGIN (POST) ----------------
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
@@ -194,21 +195,18 @@ namespace BlogApp.Controllers
                 return View(model);
             }
 
+            // Block suspended users (LockoutEnd set far in the future)
             if (user.LockoutEnd.HasValue && user.LockoutEnd.Value > DateTimeOffset.UtcNow)
             {
                 ModelState.AddModelError("", "Your account has been suspended. Contact the administrator.");
                 return View(model);
             }
 
-            if (string.IsNullOrEmpty(user?.UserName))
+            if (string.IsNullOrEmpty(user.UserName))
                 return ErrorView("User account information is missing.");
-    
+
             var result = await _signInManager.PasswordSignInAsync(
-                user.UserName,
-                model.Password,
-                model.RememberMe,
-                false
-            );
+                user.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
 
             if (result.Succeeded)
                 return RedirectToAction("Index", "Home");
@@ -217,145 +215,19 @@ namespace BlogApp.Controllers
             return View(model);
         }
 
-        // ---------------- LOGOUT ----------------
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
 
-        // ---------------- MANAGE USERS (Admin Only) ----------------
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> ManageUsers()
-        {
-            var users = await _userManager.Users.ToListAsync();
-            return View(users);
-        }
+        /* ============================================================
+           7) FORGOT PASSWORD + RESET PASSWORD
+           ============================================================ */
 
-        // ---------------- SUSPEND USER ----------------
-        [Authorize(Roles = "Admin")]
-        [HttpPost]
-        public async Task<IActionResult> SuspendUser(string id)
-        {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null)
-                return NotFound();
-
-            user.LockoutEnd = DateTimeOffset.UtcNow.AddYears(100);
-            await _userManager.UpdateAsync(user);
-
-            TempData["Success"] = "User suspended.";
-            return RedirectToAction("ManageUsers");
-        }
-
-        // ---------------- UNSUSPEND USER ----------------
-        [Authorize(Roles = "Admin")]
-        [HttpPost]
-        public async Task<IActionResult> UnsuspendUser(string id)
-        {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null)
-                return NotFound();
-
-            user.LockoutEnd = null;
-            await _userManager.UpdateAsync(user);
-
-            TempData["Success"] = "User unsuspended.";
-            return RedirectToAction("ManageUsers");
-        }
-
-        // ---------------- DELETE USER ----------------
-        [Authorize(Roles = "Admin")]
-        [HttpPost]
-        public async Task<IActionResult> DeleteUser(string id)
-        {
-            var user = await _userManager.FindByIdAsync(id);
-
-            if (user == null)
-            {
-                TempData["Success"] = "User not found.";
-                return RedirectToAction("ManageUsers");
-            }
-
-            var result = await _userManager.DeleteAsync(user);
-
-            if (result.Succeeded)
-            {
-                TempData["Success"] = "User deleted successfully.";
-                return RedirectToAction("ManageUsers");
-            }
-
-            TempData["Success"] = "Could not delete user.";
-            return RedirectToAction("ManageUsers");
-        }
-
-        // ------------------ MAKE ADMIN ------------------
-        [Authorize(Roles = "Admin")]
-        [HttpPost]
-        public async Task<IActionResult> MakeAdmin(string id)
-        {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null)
-                return NotFound();
-
-            // Ensure "Admin" role exists
-            if (!await _roleManager.RoleExistsAsync("Admin"))
-                await _roleManager.CreateAsync(new IdentityRole("Admin"));
-
-            // Remove "Contributor" if currently assigned
-            if (await _userManager.IsInRoleAsync(user, "Contributor"))
-                await _userManager.RemoveFromRoleAsync(user, "Contributor");
-
-            // Add "Admin"
-            await _userManager.AddToRoleAsync(user, "Admin");
-
-            TempData["Success"] = $"{user.Email} has been granted Admin privileges.";
-            return RedirectToAction("ManageUsers");
-        }
-
-
-
-        // ------------------ REMOVE ADMIN ------------------
-        [Authorize(Roles = "Admin")]
-        [HttpPost]
-        public async Task<IActionResult> RemoveAdmin(string id)
-        {
-            var user = await _userManager.FindByIdAsync(id);
-            if (string.IsNullOrEmpty(user?.Email))
-                return ErrorView("Unable to reset password. Email not found.");
-
-            // Prevent removing the primary admin
-            var primaryAdmin = Environment.GetEnvironmentVariable("ADMIN_EMAIL");
-            if (!string.IsNullOrEmpty(primaryAdmin) &&
-                user.Email.Equals(primaryAdmin, StringComparison.OrdinalIgnoreCase))
-            {
-                TempData["Success"] = "The primary admin cannot be demoted.";
-                return RedirectToAction("ManageUsers");
-            }
-
-            // Remove "Admin" role
-            if (await _userManager.IsInRoleAsync(user, "Admin"))
-                await _userManager.RemoveFromRoleAsync(user, "Admin");
-
-            // Ensure "Contributor" exists and reassign it
-            if (!await _roleManager.RoleExistsAsync("Contributor"))
-                await _roleManager.CreateAsync(new IdentityRole("Contributor"));
-
-            if (!await _userManager.IsInRoleAsync(user, "Contributor"))
-                await _userManager.AddToRoleAsync(user, "Contributor");
-
-            TempData["Success"] = $"{user.Email} is no longer an Admin and has been reassigned as a Contributor.";
-            return RedirectToAction("ManageUsers");
-        }
-
-        // ---------------- FORGOT PASSWORD GET ----------------
         [HttpGet]
-        public IActionResult ForgotPassword()
-        {
-            return View();
-        }
+        public IActionResult ForgotPassword() => View();
 
-        // ---------------- FORGOT PASSWORD POST ----------------
         [HttpPost]
         public async Task<IActionResult> ForgotPassword(string email)
         {
@@ -379,36 +251,26 @@ namespace BlogApp.Controllers
                 return View();
             }
 
-            // Generate reset token
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-            // Handle missing token or email safely
-            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(user?.Email))
+            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(user.Email))
                 return ErrorView("Password reset token or email is missing. Please try again.");
 
-            // Use environment-aware base URL
-            var baseUrl = _config["APP_BASE_URL"] ?? $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
-            var resetLink = $"{baseUrl}/Account/ResetPassword?email={Uri.EscapeDataString(user.Email ?? string.Empty)}&token={Uri.EscapeDataString(token ?? string.Empty)}";
+            var baseUrl   = _config["APP_BASE_URL"] ?? $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
+            var resetLink = $"{baseUrl}/Account/ResetPassword" +
+                            $"?email={Uri.EscapeDataString(user.Email)}" +
+                            $"&token={Uri.EscapeDataString(token)}";
 
-            // Load template
             var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "email", "resetpassword.html");
             var html = await System.IO.File.ReadAllTextAsync(path);
             html = html.Replace("{{reset_link}}", resetLink);
 
-            if (string.IsNullOrEmpty(user?.Email))
-                return ErrorView("Unable to send the reset email because the user’s email address is missing.");
-    
-            await _emailSender.SendEmailAsync(
-                user.Email,
-                "Reset your password",
-                html
-            );
+            await _emailSender.SendEmailAsync(user.Email, "Reset your password", html);
 
             TempData["ResetSuccess"] = "Password reset instructions have been sent to your email.";
             return RedirectToAction("Login");
         }
 
-        // ---------------- RESET PASSWORD GET ----------------
         [HttpGet]
         public IActionResult ResetPassword(string email, string token)
         {
@@ -417,11 +279,9 @@ namespace BlogApp.Controllers
 
             ViewBag.Email = email;
             ViewBag.Token = token;
-
             return View();
         }
 
-        // ---------------- RESET PASSWORD POST ----------------
         [HttpPost]
         public async Task<IActionResult> ResetPassword(string email, string token, string password)
         {
@@ -452,15 +312,151 @@ namespace BlogApp.Controllers
 
             ViewBag.Email = email;
             ViewBag.Token = token;
-
             return View();
         }
 
+        /* ============================================================
+           8) ADMIN — USER MANAGEMENT (list, suspend, unsuspend, delete)
+           ============================================================ */
+
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ManageUsers()
+        {
+            var users = await _userManager.Users.ToListAsync();
+            return View(users);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<IActionResult> SuspendUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
+
+            // Set LockoutEnd 100 years ahead to effectively ban the user
+            user.LockoutEnd = DateTimeOffset.UtcNow.AddYears(100);
+            await _userManager.UpdateAsync(user);
+
+            TempData["Success"] = "User suspended.";
+            return RedirectToAction("ManageUsers");
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<IActionResult> UnsuspendUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
+
+            user.LockoutEnd = null;
+            await _userManager.UpdateAsync(user);
+
+            TempData["Success"] = "User unsuspended.";
+            return RedirectToAction("ManageUsers");
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+
+            if (user == null)
+            {
+                TempData["Success"] = "User not found.";
+                return RedirectToAction("ManageUsers");
+            }
+
+            var result = await _userManager.DeleteAsync(user);
+
+            TempData["Success"] = result.Succeeded
+                ? "User deleted successfully."
+                : "Could not delete user.";
+
+            return RedirectToAction("ManageUsers");
+        }
+
+        /* ============================================================
+           9) ADMIN — ROLE MANAGEMENT (promote to admin, demote to contributor)
+           ============================================================ */
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<IActionResult> MakeAdmin(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
+
+            if (!await _roleManager.RoleExistsAsync("Admin"))
+                await _roleManager.CreateAsync(new IdentityRole("Admin"));
+
+            if (await _userManager.IsInRoleAsync(user, "Contributor"))
+                await _userManager.RemoveFromRoleAsync(user, "Contributor");
+
+            await _userManager.AddToRoleAsync(user, "Admin");
+
+            TempData["Success"] = $"{user.Email} has been granted Admin privileges.";
+            return RedirectToAction("ManageUsers");
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<IActionResult> RemoveAdmin(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (string.IsNullOrEmpty(user?.Email))
+                return ErrorView("Unable to update role. Email not found.");
+
+            // Prevent demoting the primary admin account
+            var primaryAdmin = Environment.GetEnvironmentVariable("ADMIN_EMAIL");
+            if (!string.IsNullOrEmpty(primaryAdmin) &&
+                user.Email.Equals(primaryAdmin, StringComparison.OrdinalIgnoreCase))
+            {
+                TempData["Success"] = "The primary admin cannot be demoted.";
+                return RedirectToAction("ManageUsers");
+            }
+
+            if (await _userManager.IsInRoleAsync(user, "Admin"))
+                await _userManager.RemoveFromRoleAsync(user, "Admin");
+
+            if (!await _roleManager.RoleExistsAsync("Contributor"))
+                await _roleManager.CreateAsync(new IdentityRole("Contributor"));
+
+            if (!await _userManager.IsInRoleAsync(user, "Contributor"))
+                await _userManager.AddToRoleAsync(user, "Contributor");
+
+            TempData["Success"] = $"{user.Email} is no longer an Admin and has been reassigned as a Contributor.";
+            return RedirectToAction("ManageUsers");
+        }
+
+        /* ============================================================
+           10) PRIVATE HELPER
+           ============================================================ */
+
+        /// <summary>
+        /// Generates and sends an email confirmation link to the given user.
+        /// Resolves the base URL from config (APP_BASE_URL) or the current request.
+        /// </summary>
+        private async Task SendConfirmationEmailAsync(ApplicationUser user)
+        {
+            var token      = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var baseUrl    = _config["APP_BASE_URL"] ?? $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
+            var confirmUrl = $"{baseUrl}/Account/ConfirmEmail?userId={user.Id}&token={Uri.EscapeDataString(token)}";
+
+            var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "email", "confirm.html");
+            var html         = await System.IO.File.ReadAllTextAsync(templatePath);
+            html = html.Replace("{{confirm_link}}", confirmUrl);
+
+            await _emailSender.SendEmailAsync(user.Email!, "Confirm your BlogApp account", html);
+        }
+
+        /// <summary>
+        /// Renders the shared Error view with a custom message via ViewBag.
+        /// </summary>
         private IActionResult ErrorView(string message)
         {
             ViewBag.ErrorMessage = message;
             return View("~/Views/Shared/Error.cshtml");
         }
-
     }
 }

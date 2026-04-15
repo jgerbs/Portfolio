@@ -1,4 +1,12 @@
-[*.cs]
+# ==============================================================
+# File:    .editorconfig
+# Purpose: Enforces code-quality diagnostics for C# source files.
+#
+# Rules:
+# - CS8604 (Possible null reference argument) is escalated from
+#   a warning to a build error to enforce null safety across the
+#   project, consistent with <Nullable>enable</Nullable> in the csproj.
+# ==============================================================
 
-# CS8604: Possible null reference argument.
+[*.cs]
 dotnet_diagnostic.CS8604.severity = error

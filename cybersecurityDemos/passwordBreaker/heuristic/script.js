@@ -1,3 +1,25 @@
+/* ============================================================
+   heuristic/script.js
+   Heuristic PIN attack — smart queue of likely PINs with brute force fallback.
+
+   Responsibilities:
+   - Builds a priority queue: common PINs → repetition patterns → sequences →
+     keypad shapes → birth years → full brute force fallback (deduped)
+   - Consumes the queue one item per interval tick, logging type and value
+   - Updates the attempt counter, timer, current attempt, and status label
+   - Handles start/stop button state and random PIN generation
+
+   Sections:
+   1) STATE + DOM REFERENCES
+   2) LOG HELPER + RANDOM PIN
+   3) HEURISTIC QUEUE BUILDER
+   4) MAIN LOOP
+   5) START / STOP HANDLERS
+   ============================================================ */
+
+/* ============================================================
+   1) STATE + DOM REFERENCES
+   ============================================================ */
 let running = false;
 let correctPIN = "0000";
 let attempts = 0;
@@ -5,20 +27,21 @@ let startTime = 0;
 let queue = [];
 let interval = null;
 
-const startBtn = document.getElementById("start-btn");
-const stopBtn = document.getElementById("stop-btn");
-const pinInput = document.getElementById("pin-input");
-const randomBtn = document.getElementById("random-pin");
+const startBtn       = document.getElementById("start-btn");
+const stopBtn        = document.getElementById("stop-btn");
+const pinInput       = document.getElementById("pin-input");
+const randomBtn      = document.getElementById("random-pin");
 
-const attemptsLabel = document.getElementById("attempts");
-const timeLabel = document.getElementById("time");
-const statusLabel = document.getElementById("status-label");
-const logBox = document.getElementById("log-box");
-
-const indicator = document.getElementById("indicator");
+const attemptsLabel  = document.getElementById("attempts");
+const timeLabel      = document.getElementById("time");
+const statusLabel    = document.getElementById("status-label");
+const logBox         = document.getElementById("log-box");
+const indicator      = document.getElementById("indicator");
 const indicatorLabel = document.getElementById("indicator-label");
 
-// LOGGING
+/* ============================================================
+   2) LOG HELPER + RANDOM PIN
+   ============================================================ */
 function log(type, pin) {
     const el = document.createElement("div");
     el.className = "log-line";
@@ -27,21 +50,21 @@ function log(type, pin) {
     logBox.scrollTop = logBox.scrollHeight;
 }
 
-// RANDOM PIN BUTTON
 function randomPIN() {
-    const pin = Math.floor(Math.random() * 10000)
-        .toString().padStart(4, "0");
-    pinInput.value = pin;
+    pinInput.value = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
 }
+
 randomBtn.addEventListener("click", randomPIN);
 
-// -------------------------------------------------------------
-//  BUILD ADVANCED HEURISTIC QUEUE
-// -------------------------------------------------------------
+/* ============================================================
+   3) HEURISTIC QUEUE BUILDER
+   Priority: COMMON → AAAA → PATTERNS → SEQUENCE → KEYPAD → BIRTH-YEAR → FALLBACK
+   Duplicate PINs are removed so each candidate is only checked once.
+   ============================================================ */
 function buildQueue() {
     const q = [];
 
-    // 1. Top COMMON PINs (highest probability)
+    /* Phase 1 — Top 50 most common PINs (real breach data) */
     const common = [
         "1234", "1111", "0000", "1342", "1212", "2222", "4444", "1122", "1986", "2020",
         "7777", "5555", "1989", "9999", "6969", "2004", "1010", "4321", "6666", "1984",
@@ -51,13 +74,12 @@ function buildQueue() {
     ];
     common.forEach(pin => q.push({ type: "COMMON", pin }));
 
-    // 2. Repetition patterns (AAAA, ABAB, ABBA, etc.)
-    // AAAA
+    /* Phase 2 — AAAA (all same digit) */
     for (let d = 0; d <= 9; d++) {
         q.push({ type: "AAAA", pin: `${d}${d}${d}${d}` });
     }
 
-    // AAAB, AABA, ABAA, BAAA + reversed
+    /* Phase 3 — Repetition patterns: AAAB/AABA/ABAA/BAAA + AABB/ABBA/ABAB */
     for (let a = 0; a <= 9; a++) {
         for (let b = 0; b <= 9; b++) {
             if (a === b) continue;
@@ -65,18 +87,10 @@ function buildQueue() {
             q.push({ type: "PATTERNS", pin: `${a}${a}${b}${a}` });
             q.push({ type: "PATTERNS", pin: `${a}${b}${a}${a}` });
             q.push({ type: "PATTERNS", pin: `${b}${a}${a}${a}` });
-
             q.push({ type: "PATTERNS", pin: `${b}${b}${b}${a}` });
             q.push({ type: "PATTERNS", pin: `${b}${b}${a}${b}` });
             q.push({ type: "PATTERNS", pin: `${b}${a}${b}${b}` });
             q.push({ type: "PATTERNS", pin: `${a}${b}${b}${b}` });
-        }
-    }
-
-    // AABB, ABBA, BAAB, BBAA, ABAB, BABA
-    for (let a = 0; a <= 9; a++) {
-        for (let b = 0; b <= 9; b++) {
-            if (a === b) continue;
             q.push({ type: "PATTERNS", pin: `${a}${a}${b}${b}` });
             q.push({ type: "PATTERNS", pin: `${b}${b}${a}${a}` });
             q.push({ type: "PATTERNS", pin: `${a}${b}${b}${a}` });
@@ -86,69 +100,44 @@ function buildQueue() {
         }
     }
 
-    // 3. Sequential (0123, 1234, ..., 9876)
-    const seqUp = [];
-    const seqDown = [];
-
-    // UP
+    /* Phase 4 — Sequential ascending and descending */
     for (let i = 0; i < 7; i++) {
-        const a = i, b = i + 1, c = i + 2, d = i + 3;
-        seqUp.push(`${a}${b}${c}${d}`);
+        q.push({ type: "SEQUENCE-UP",   pin: `${i}${i+1}${i+2}${i+3}` });
     }
-    // DOWN
     for (let i = 9; i > 2; i--) {
-        const a = i, b = i - 1, c = i - 2, d = i - 3;
-        seqDown.push(`${a}${b}${c}${d}`);
+        q.push({ type: "SEQUENCE-DOWN", pin: `${i}${i-1}${i-2}${i-3}` });
     }
 
-    seqUp.forEach(p => q.push({ type: "SEQUENCE-UP", pin: p }));
-    seqDown.forEach(p => q.push({ type: "SEQUENCE-DOWN", pin: p }));
-
-    // 4. Keyboard patterns (numeric keypad + QWERTY adjacent)
-    const keypad = [
-        "8520", // keyboard vertical
-        "0258", // keyboard vertical
-        "7530", // keyboard diagonal
-        "0357", // keyboard diagonal reverse
-        "1590", // phone keypad diagonal
-        "9510", // phone keypad diagonal reverse
-        "2580", // phone keypad vertical
-        "0852", // phone keypad vertical reverse
-    ];
+    /* Phase 5 — Numeric keypad / phone keypad shapes */
+    const keypad = ["8520", "0258", "7530", "0357", "1590", "9510", "2580", "0852"];
     keypad.forEach(p => q.push({ type: "KEYPAD", pin: p }));
 
-    // 5. Birth years 1950–2025
+    /* Phase 6 — Birth years 1950–2025 */
     for (let y = 1950; y <= 2025; y++) {
         q.push({ type: "BIRTH-YEAR", pin: y.toString() });
     }
 
-    // 6. Final brute force fallback
+    /* Phase 7 — Full brute force fallback 0000–9999 */
     for (let i = 0; i <= 9999; i++) {
         q.push({ type: "FALLBACK", pin: i.toString().padStart(4, "0") });
     }
 
-    // REMOVE DUPLICATES
+    /* Deduplicate — keep first occurrence of each PIN */
     const seen = new Set();
-    const finalQueue = [];
-
-    for (const item of q) {
-        if (!seen.has(item.pin)) {
-            seen.add(item.pin);
-            finalQueue.push(item);
-        }
-    }
-
-    return finalQueue;
+    return q.filter(item => {
+        if (seen.has(item.pin)) return false;
+        seen.add(item.pin);
+        return true;
+    });
 }
 
-// -------------------------------------------------------------
-// MAIN LOOP
-// -------------------------------------------------------------
+/* ============================================================
+   4) MAIN LOOP
+   ============================================================ */
 function loop() {
     if (!running) return;
 
-    const elapsed = (performance.now() - startTime) / 1000;
-    timeLabel.textContent = elapsed.toFixed(3) + "s";
+    timeLabel.textContent = ((performance.now() - startTime) / 1000).toFixed(3) + "s";
 
     if (queue.length === 0) {
         statusLabel.textContent = "Exhausted queue";
@@ -162,16 +151,13 @@ function loop() {
     }
 
     const item = queue.shift();
-    const attempt = item.pin;
-
-    document.getElementById("current-attempt").textContent = `${attempt} (${item.type})`;
-
-    log(item.type, attempt);
+    document.getElementById("current-attempt").textContent = `${item.pin} (${item.type})`;
+    log(item.type, item.pin);
 
     attempts++;
     attemptsLabel.textContent = attempts;
 
-    if (attempt === correctPIN) {
+    if (item.pin === correctPIN) {
         statusLabel.textContent = "PIN Found!";
         indicator.classList.remove("active");
         indicatorLabel.textContent = "Done";
@@ -179,13 +165,12 @@ function loop() {
         clearInterval(interval);
         startBtn.disabled = false;
         stopBtn.disabled = true;
-        return;
     }
 }
 
-// -------------------------------------------------------------
-// START / STOP HANDLERS
-// -------------------------------------------------------------
+/* ============================================================
+   5) START / STOP HANDLERS
+   ============================================================ */
 startBtn.addEventListener("click", () => {
     correctPIN = pinInput.value.trim();
 
@@ -199,17 +184,14 @@ startBtn.addEventListener("click", () => {
     logBox.innerHTML = "";
     attemptsLabel.textContent = "0";
     timeLabel.textContent = "0.000s";
-
     queue = buildQueue();
-
     statusLabel.textContent = "Running...";
     indicator.classList.add("active");
     indicatorLabel.textContent = "Running";
-
     startBtn.disabled = true;
     stopBtn.disabled = false;
-
     startTime = performance.now();
+
     interval = setInterval(loop, 10);
 });
 

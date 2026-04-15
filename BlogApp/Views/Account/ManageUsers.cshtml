@@ -1,20 +1,42 @@
+@* ============================================================
+   File:    Views/Account/ManageUsers.cshtml
+   Purpose: Admin-only user management table — lists all accounts
+            with status indicators and action buttons for suspend,
+            promote/demote, and delete.
+
+   Sections:
+   1) MODEL + DIRECTIVES + PAGE SETUP
+   2) SUCCESS BANNER
+   3) USER TABLE (header)
+   4) USER TABLE ROWS (roles, status, per-user action buttons)
+   ============================================================ *@
+
+@* ============================================================
+   1) MODEL + DIRECTIVES + PAGE SETUP
+   ============================================================ *@
 @model IEnumerable<BlogApp.Models.ApplicationUser>
 @using Microsoft.AspNetCore.Identity
 @inject UserManager<ApplicationUser> UserManager
-@inject RoleManager<IdentityRole> RoleManager
+@inject RoleManager<IdentityRole>   RoleManager
 
 @{
-    ViewData["Title"] = "Manage User Accounts";
+    ViewData["Title"]      = "Manage User Accounts";
     var originalAdminEmail = Environment.GetEnvironmentVariable("ADMIN_EMAIL") ?? "admin@example.com";
 }
 
 <h2 class="mb-4">Manage User Accounts</h2>
 
+@* ============================================================
+   2) SUCCESS BANNER
+   ============================================================ *@
 @if (TempData["Success"] != null)
 {
     <div class="alert alert-success">@TempData["Success"]</div>
 }
 
+@* ============================================================
+   3) USER TABLE (header)
+   ============================================================ *@
 <table class="table table-dark table-striped table-bordered shadow-lg">
     <thead>
         <tr class="text-accent">
@@ -27,28 +49,29 @@
         </tr>
     </thead>
 
+    @* ============================================================
+       4) USER TABLE ROWS (roles, status, per-user action buttons)
+       The primary admin account is locked — no actions are shown.
+       ============================================================ *@
     <tbody>
         @foreach (var user in Model)
         {
-            if (user == null)
-            {
-                continue; // skip null entries just in case
-            }
+            if (user == null) { continue; }
 
-            var roles = await UserManager.GetRolesAsync(user);
-            var role = roles.Contains("Admin") ? "Admin"
-                : roles.Contains("Contributor") ? "Contributor"
-                : "User";
+            var roles  = await UserManager.GetRolesAsync(user);
+            var role   = roles.Contains("Admin")       ? "Admin"
+                       : roles.Contains("Contributor") ? "Contributor"
+                       : "User";
 
-            bool isSuspended = user.LockoutEnd.HasValue && user.LockoutEnd > DateTimeOffset.UtcNow;
-            bool isOriginalAdmin = string.Equals(user?.Email, originalAdminEmail, StringComparison.OrdinalIgnoreCase);
+            bool isSuspended     = user.LockoutEnd.HasValue && user.LockoutEnd > DateTimeOffset.UtcNow;
+            bool isOriginalAdmin = string.Equals(user.Email, originalAdminEmail, StringComparison.OrdinalIgnoreCase);
 
             <tr>
-                <td>@(user?.FirstName ?? "Unknown") @(user?.LastName ?? "User")</td>
-                <td>@(user?.Email ?? "unknown@email.com")</td>
+                <td>@(user.FirstName ?? "Unknown") @(user.LastName ?? "User")</td>
+                <td>@(user.Email ?? "unknown@email.com")</td>
 
                 <td>
-                    @if (user?.EmailConfirmed == true)
+                    @if (user.EmailConfirmed)
                     {
                         <span class="badge bg-success">Yes</span>
                     }
@@ -74,42 +97,42 @@
                 <td class="text-end">
                     @if (!isOriginalAdmin)
                     {
-                        @* Suspend / Unsuspend *@
-                        if (!isSuspended)
+                        @* Suspend / Unsuspend toggle *@
+                        @if (!isSuspended)
                         {
                             <form method="post" asp-action="SuspendUser" class="d-inline">
-                                <input type="hidden" name="id" value="@(user?.Id ?? string.Empty)" />
+                                <input type="hidden" name="id" value="@user.Id" />
                                 <button class="btn btn-warning btn-sm">Suspend</button>
                             </form>
                         }
                         else
                         {
                             <form method="post" asp-action="UnsuspendUser" class="d-inline">
-                                <input type="hidden" name="id" value="@(user?.Id ?? string.Empty)" />
+                                <input type="hidden" name="id" value="@user.Id" />
                                 <button class="btn btn-success btn-sm">Unsuspend</button>
                             </form>
                         }
 
-                        @* Role management *@
+                        @* Role promotion / demotion *@
                         @if (role != "Admin")
                         {
                             <form method="post" asp-action="MakeAdmin" class="d-inline">
-                                <input type="hidden" name="id" value="@(user?.Id ?? string.Empty)" />
+                                <input type="hidden" name="id" value="@user.Id" />
                                 <button class="btn btn-info btn-sm">Make Admin</button>
                             </form>
                         }
                         else
                         {
                             <form method="post" asp-action="RemoveAdmin" class="d-inline">
-                                <input type="hidden" name="id" value="@(user?.Id ?? string.Empty)" />
+                                <input type="hidden" name="id" value="@user.Id" />
                                 <button class="btn btn-secondary btn-sm">Remove Admin</button>
                             </form>
                         }
 
-                        @* Delete user *@
+                        @* Permanent deletion with confirmation dialog *@
                         <form method="post" asp-action="DeleteUser" class="d-inline"
                               onsubmit="return confirm('Are you sure you want to permanently delete this user? This cannot be undone.');">
-                            <input type="hidden" name="id" value="@(user?.Id ?? string.Empty)" />
+                            <input type="hidden" name="id" value="@user.Id" />
                             <button class="btn btn-danger btn-sm">Delete</button>
                         </form>
                     }

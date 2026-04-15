@@ -1,3 +1,8 @@
+@* ============================================================
+   File:    Views/Account/ConfirmFailed.cshtml
+   Purpose: Shown when an email confirmation token is invalid
+            or has expired — prompts the user to request a new one.
+   ============================================================ *@
 @{
     ViewData["Title"] = "Confirmation Failed";
 }
@@ -5,6 +10,5 @@
 <div class="alert alert-danger mt-4">
     <h4>Invalid or expired confirmation link.</h4>
     <p>Please request a new confirmation email.</p>
-
     <a asp-action="CheckEmail" class="btn btn-outline-dark mt-3">Resend Confirmation Email</a>
 </div>

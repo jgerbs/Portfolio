@@ -1,9 +1,20 @@
-﻿.border-top {
-  border-top: 1px solid #e5e5e5;
-}
-.border-bottom {
-  border-bottom: 1px solid #e5e5e5;
-}
-.box-shadow {
-  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
-}
+/* ============================================================
+   File:    Views/Shared/_Layout.cshtml.css
+   Purpose: Scoped utility classes for the layout partial —
+            border helpers and a light box-shadow definition.
+
+   Sections:
+   1) BORDER UTILITIES
+   2) BOX SHADOW
+============================================================ */
+
+/* ============================================================
+   1) BORDER UTILITIES
+   ============================================================ */
+.border-top    { border-top:    1px solid #e5e5e5; }
+.border-bottom { border-bottom: 1px solid #e5e5e5; }
+
+/* ============================================================
+   2) BOX SHADOW
+   ============================================================ */
+.box-shadow { box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05); }

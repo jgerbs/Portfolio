@@ -1,1 +1,5 @@
+# requirements.txt
+# Python dependencies for the Password Strength Checker Streamlit app.
+# Install with: pip install -r requirements.txt
+
 streamlit

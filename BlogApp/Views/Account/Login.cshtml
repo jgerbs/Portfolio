@@ -1,4 +1,20 @@
+@* ============================================================
+   File:    Views/Account/Login.cshtml
+   Purpose: Login form with contextual success banners (post-reset,
+            post-confirmation) and an inline resend option for users
+            who haven't confirmed their email yet.
+
+   Sections:
+   1) PAGE SETUP
+   2) POST-ACTION SUCCESS BANNERS
+   3) VALIDATION ERROR BLOCK + RESEND SHORTCUT
+   4) LOGIN FORM
+   ============================================================ *@
 @model BlogApp.ViewModels.LoginViewModel
+
+@* ============================================================
+   1) PAGE SETUP
+   ============================================================ *@
 @{
     ViewData["Title"] = "Login";
 }
@@ -6,31 +22,31 @@
 <h2>@ViewData["Title"]</h2>
 <br />
 
-@* Show success from Forgot Password *@
+@* ============================================================
+   2) POST-ACTION SUCCESS BANNERS
+   Shown after: password reset email sent, email confirmed, or
+   password successfully reset.
+   ============================================================ *@
 @if (TempData["ResetEmailSent"] != null)
 {
-    <div class="alert alert-success mt-3">
-        @TempData["ResetEmailSent"]
-    </div>
+    <div class="alert alert-success mt-3">@TempData["ResetEmailSent"]</div>
 }
 
-@* Show success after confirming email *@
 @if (TempData["EmailConfirmed"] != null)
 {
-    <div class="alert alert-success mt-3">
-        @TempData["EmailConfirmed"]
-    </div>
+    <div class="alert alert-success mt-3">@TempData["EmailConfirmed"]</div>
 }
 
-@* Show success after password reset *@
 @if (TempData["ResetSuccess"] != null)
 {
-    <div class="alert alert-success mt-3">
-        @TempData["ResetSuccess"]
-    </div>
+    <div class="alert alert-success mt-3">@TempData["ResetSuccess"]</div>
 }
 
-@* Display login-related errors *@
+@* ============================================================
+   3) VALIDATION ERROR BLOCK + RESEND SHORTCUT
+   If the error mentions an unconfirmed email, display an inline
+   resend button so the user can recover without navigating away.
+   ============================================================ *@
 @if (!ViewData.ModelState.IsValid && ViewData.ModelState.Values.Any(v => v.Errors.Count > 0))
 {
     <div class="alert alert-danger mt-3">
@@ -39,26 +55,25 @@
             <div>@error.ErrorMessage</div>
         }
 
-        @* If the issue is unconfirmed email, show resend button *@
         @if (ViewData.ModelState.Values.SelectMany(v => v.Errors)
             .Any(e => e.ErrorMessage.Contains("confirm your email")))
         {
             <hr />
-
             <form asp-action="ResendConfirmationEmail" method="post" class="d-inline">
                 <input type="hidden" name="email" value="@Model.Email" />
-                <button class="btn btn-sm btn-outline-primary">
-                    Resend Confirmation Email
-                </button>
+                <button class="btn btn-sm btn-outline-primary">Resend Confirmation Email</button>
             </form>
         }
     </div>
 }
 
+@* ============================================================
+   4) LOGIN FORM
+   ============================================================ *@
 <form asp-action="Login" method="post">
     <div class="form-group">
         <label for="Email">Email</label>
-        <input type="email" class="form-control" id="Email" name="Email" 
+        <input type="email" class="form-control" id="Email" name="Email"
                value="@Model.Email" required />
     </div>
 

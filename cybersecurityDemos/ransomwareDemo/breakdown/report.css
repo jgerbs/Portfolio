@@ -1,6 +1,33 @@
-/* ----------------------------------------------
-   GENERAL LAYOUT
----------------------------------------------- */
+/* ============================================================
+   ransomwareDemo/breakdown/report.css
+   Styles for the ransomware incident report page.
+
+   Responsibilities:
+   - Defines layout for the full-width report container and section headings
+   - Styles the timeline, IOC, and MITRE ATT&CK data tables
+   - Styles screenshot image wrappers, captions, and grid layout
+   - Styles the Figma embed wrapper
+   - Styles the evidence image carousel (viewer, buttons, caption)
+   - Provides responsive overrides for narrow viewports
+
+   Sections:
+   1) GENERAL LAYOUT
+   2) REPORT TABLES
+   3) LISTS + INLINE CODE
+   4) SCREENSHOT IMAGE WRAPPERS
+   5) FIGMA EMBED WRAPPER
+   6) EVIDENCE IMAGE CAROUSEL
+   7) RESPONSIVE OVERRIDES
+
+   Cleanup notes:
+   - Removed unused .screenshot-placeholder rule (replaced by the evidence carousel)
+   - Consolidated three separate @media (max-width: 700px) blocks into one
+   - Standardized section dividers from mixed /* ---- */ and /* ==== */ to uniform style
+   ============================================================ */
+
+/* ============================================================
+   1) GENERAL LAYOUT
+   ============================================================ */
 main {
     max-width: 1100px;
     margin: 0 auto;
@@ -20,9 +47,9 @@ main {
     line-height: 1.6;
 }
 
-/* ----------------------------------------------
-   TABLES — MITRE, IOCs, TIMELINES
----------------------------------------------- */
+/* ============================================================
+   2) REPORT TABLES
+   ============================================================ */
 .report-table {
     width: 100%;
     border-collapse: collapse;
@@ -54,28 +81,9 @@ main {
     transition: 0.2s;
 }
 
-/* ----------------------------------------------
-   SCREENSHOT PLACEHOLDERS
----------------------------------------------- */
-.screenshot-placeholder {
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px dashed var(--accent-dark);
-    border-radius: 10px;
-    height: 260px;
-    margin: 1.5rem 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--accent);
-    font-size: 1.1rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    opacity: 0.65;
-}
-
-/* ----------------------------------------------
-   LISTS
----------------------------------------------- */
+/* ============================================================
+   3) LISTS + INLINE CODE
+   ============================================================ */
 ul {
     margin-top: 0.5rem;
     padding-left: 1.2rem;
@@ -85,9 +93,6 @@ ul li {
     margin-bottom: 0.4rem;
 }
 
-/* ----------------------------------------------
-   INLINE CODE
----------------------------------------------- */
 code {
     background: #0e1a24;
     color: #8fceff;
@@ -96,56 +101,35 @@ code {
     font-family: "JetBrains Mono", monospace;
 }
 
-/* ----------------------------------------------
-   RESPONSIVE
----------------------------------------------- */
-@media (max-width: 700px) {
-    main {
-        padding: 1.2rem;
-    }
-    .section {
-        padding: 1.4rem;
-    }
-    .section h2 {
-        font-size: 1.5rem;
-    }
-}
-
-
 /* ============================================================
-   SCREENSHOT GRID + IMAGE STYLING (MATCHES PORTFOLIO THEME)
+   4) SCREENSHOT IMAGE WRAPPERS
    ============================================================ */
-
-/* Wrapper around each screenshot */
 .report-image {
     background: rgba(12, 16, 20, 0.85);
     border: 1px solid var(--border);
     border-radius: 14px;
     padding: 1rem;
     margin: 2rem 0;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
     backdrop-filter: blur(8px);
 }
 
-/* Actual screenshot image */
 .report-image img {
     width: 100%;
     height: auto;
     border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.08);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.35);
     display: block;
     margin-bottom: 0.75rem;
     transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* Hover effect */
 .report-image img:hover {
     transform: scale(1.015);
     box-shadow: 0 0 22px rgba(30, 182, 217, 0.35);
 }
 
-/* Caption under image */
 .report-caption {
     text-align: center;
     color: var(--muted);
@@ -154,7 +138,6 @@ code {
     letter-spacing: 0.3px;
 }
 
-/* Layout for multiple images */
 .report-image-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -162,9 +145,7 @@ code {
     margin-top: 1.5rem;
 }
 
-/* ============================================================
-   FULL-WIDTH LARGE IMAGE OPTION (for key screenshots)
-   ============================================================ */
+/* Full-width variant for key screenshots */
 .report-image.full {
     width: 100%;
 }
@@ -174,25 +155,9 @@ code {
     object-fit: contain;
 }
 
-
 /* ============================================================
-   MOBILE RESPONSIVE
+   5) FIGMA EMBED WRAPPER
    ============================================================ */
-@media (max-width: 700px) {
-
-    .report-image {
-        padding: 0.7rem;
-    }
-
-    .report-image img {
-        border-radius: 8px;
-    }
-
-    .report-caption {
-        font-size: 0.85rem;
-    }
-}
-
 .embed-wrapper {
     width: 100%;
     height: 600px;
@@ -210,17 +175,9 @@ code {
     border: none;
 }
 
-/* Mobile */
-@media (max-width: 700px) {
-    .embed-wrapper {
-        height: 420px;
-    }
-}
-
 /* ============================================================
-   EVIDENCE VIEWER (Carousel)
-============================================================ */
-
+   6) EVIDENCE IMAGE CAROUSEL
+   ============================================================ */
 .evidence-viewer {
     display: flex;
     align-items: center;
@@ -273,7 +230,9 @@ code {
     margin-top: 0.5rem;
 }
 
-/* Mobile */
+/* ============================================================
+   7) RESPONSIVE OVERRIDES
+   ============================================================ */
 @media (max-width: 750px) {
     .ev-btn {
         font-size: 1.6rem;
@@ -281,3 +240,32 @@ code {
     }
 }
 
+@media (max-width: 700px) {
+    main {
+        padding: 1.2rem;
+    }
+
+    .section {
+        padding: 1.4rem;
+    }
+
+    .section h2 {
+        font-size: 1.5rem;
+    }
+
+    .report-image {
+        padding: 0.7rem;
+    }
+
+    .report-image img {
+        border-radius: 8px;
+    }
+
+    .report-caption {
+        font-size: 0.85rem;
+    }
+
+    .embed-wrapper {
+        height: 420px;
+    }
+}

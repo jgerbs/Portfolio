@@ -1,3 +1,24 @@
+/* ============================================================
+   dictionary/script.js
+   Dictionary attack demo — checks the 50 most common PINs in order.
+
+   Responsibilities:
+   - Holds the dictionary of the 50 most common real-world PINs (CNBC/breach data)
+   - Iterates the list via setInterval, logging each attempt until found or exhausted
+   - Updates the attempt counter, timer, and status label each tick
+   - Handles start/stop button state and random PIN generation
+
+   Sections:
+   1) STATE + DOM REFERENCES
+   2) COMMON PIN DICTIONARY
+   3) LOG HELPER + RANDOM PIN
+   4) MAIN DICTIONARY LOOP
+   5) START / STOP HANDLERS
+   ============================================================ */
+
+/* ============================================================
+   1) STATE + DOM REFERENCES
+   ============================================================ */
 let running = false;
 let correctPIN = "0000";
 let attempts = 0;
@@ -5,8 +26,22 @@ let startTime = 0;
 let index = 0;
 let interval = null;
 
-// This list comes from CNBC's Tom Huddleston Jr.'s research on the most common 4-digit PINs
-// "These are the 50 most common four-digit PINs leaked on the dark web—make sure none of them are yours"
+const startBtn       = document.getElementById("start-btn");
+const stopBtn        = document.getElementById("stop-btn");
+const pinInput       = document.getElementById("pin-input");
+const randomBtn      = document.getElementById("random-pin");
+
+const attemptsLabel  = document.getElementById("attempts");
+const timeLabel      = document.getElementById("time");
+const statusLabel    = document.getElementById("status-label");
+const logBox         = document.getElementById("log-box");
+const indicator      = document.getElementById("indicator");
+const indicatorLabel = document.getElementById("indicator-label");
+
+/* ============================================================
+   2) COMMON PIN DICTIONARY
+   Source: CNBC — "These are the 50 most common four-digit PINs leaked on the dark web"
+   ============================================================ */
 const dictionary = [
     "1234", "1111", "0000", "1342", "1212", "2222", "4444", "1122", "1986", "2020",
     "7777", "5555", "1989", "9999", "6969", "2004", "1010", "4321", "6666", "1984",
@@ -15,20 +50,9 @@ const dictionary = [
     "1975", "2005", "1993", "1976", "1996", "2002", "1973", "2468", "1998", "1974"
 ];
 
-
-const startBtn = document.getElementById("start-btn");
-const stopBtn = document.getElementById("stop-btn");
-const pinInput = document.getElementById("pin-input");
-const randomBtn = document.getElementById("random-pin");
-
-const attemptsLabel = document.getElementById("attempts");
-const timeLabel = document.getElementById("time");
-const statusLabel = document.getElementById("status-label");
-const logBox = document.getElementById("log-box");
-
-const indicator = document.getElementById("indicator");
-const indicatorLabel = document.getElementById("indicator-label");
-
+/* ============================================================
+   3) LOG HELPER + RANDOM PIN
+   ============================================================ */
 function log(text) {
     const el = document.createElement("div");
     el.className = "log-line";
@@ -38,19 +62,18 @@ function log(text) {
 }
 
 function randomPIN() {
-    const pin = Math.floor(Math.random() * 10000)
-        .toString().padStart(4, "0");
-    pinInput.value = pin;
+    pinInput.value = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
 }
 
 randomBtn.addEventListener("click", randomPIN);
 
-// MAIN LOOP
+/* ============================================================
+   4) MAIN DICTIONARY LOOP
+   ============================================================ */
 function dictionaryLoop() {
     if (!running) return;
 
-    const elapsed = (performance.now() - startTime) / 1000;
-    timeLabel.textContent = elapsed.toFixed(3) + "s";
+    timeLabel.textContent = ((performance.now() - startTime) / 1000).toFixed(3) + "s";
 
     if (index >= dictionary.length) {
         statusLabel.textContent = "Not found in dictionary";
@@ -83,9 +106,12 @@ function dictionaryLoop() {
     index++;
 }
 
+/* ============================================================
+   5) START / STOP HANDLERS
+   ============================================================ */
 startBtn.addEventListener("click", () => {
-
     correctPIN = pinInput.value.trim();
+
     if (!/^\d{4}$/.test(correctPIN)) {
         alert("Enter a valid 4-digit PIN");
         return;
@@ -94,19 +120,16 @@ startBtn.addEventListener("click", () => {
     running = true;
     attempts = 0;
     index = 0;
-
     logBox.innerHTML = "";
     attemptsLabel.textContent = "0";
     timeLabel.textContent = "0.000s";
-
     statusLabel.textContent = "Running...";
     indicator.classList.add("active");
     indicatorLabel.textContent = "Running";
-
     startBtn.disabled = true;
     stopBtn.disabled = false;
-
     startTime = performance.now();
+
     interval = setInterval(dictionaryLoop, 50);
 });
 
@@ -116,7 +139,6 @@ stopBtn.addEventListener("click", () => {
     indicator.classList.remove("active");
     indicatorLabel.textContent = "Stopped";
     statusLabel.textContent = "Stopped";
-
     startBtn.disabled = false;
     stopBtn.disabled = true;
 });

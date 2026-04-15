@@ -1,6 +1,27 @@
 /* ============================================================
-   GLOBAL / BASE
-============================================================ */
+   File:    wwwroot/css/site.css
+   Purpose: Global application stylesheet — defines base resets,
+            the cyber-teal navbar theme, article card layouts,
+            modals, home-page featured/older article sections,
+            admin icon buttons, and the site footer.
+
+   Sections:
+   1) GLOBAL BASE (resets, fonts, flex-column body)
+   2) TITLES
+   3) CYBER TEAL NAVBAR THEME
+   4) NAVBAR ACTION BUTTONS
+   5) ARTICLE CARD (dark variant)
+   6) ARTICLE BUTTONS (shared)
+   7) MODALS (cyber variant)
+   8) FEATURED ARTICLES (top grid of 3)
+   9) LOWER ARTICLE LIST (horizontal rows)
+   10) SMALL ADMIN ICON BUTTONS
+   11) FOOTER
+   ============================================================ */
+
+/* ============================================================
+   1) GLOBAL BASE (resets, fonts, flex-column body)
+   ============================================================ */
 html {
   font-size: 14px;
   position: relative;
@@ -49,8 +70,8 @@ body {
 main { flex: 1 0 auto; } /* So footer sits flush without white gap */
 
 /* ============================================================
-   TITLES
-============================================================ */
+   2) TITLES
+   ============================================================ */
 .section-title {
   font-weight: 700;
   color: #000;
@@ -58,8 +79,8 @@ main { flex: 1 0 auto; } /* So footer sits flush without white gap */
 }
 
 /* ============================================================
-   CYBER TEAL NAVBAR THEME
-============================================================ */
+   3) CYBER TEAL NAVBAR THEME
+   ============================================================ */
 .cyber-nav {
   background: linear-gradient(90deg, #03121a, #062633 90%);
   border-bottom: 2px solid #1eb6d9;
@@ -85,9 +106,9 @@ main { flex: 1 0 auto; } /* So footer sits flush without white gap */
   text-shadow: 0 0 4px #1eb6d9;
 }
 
-/* -----------------------------------------------------------
-   NAVBAR ACTION BUTTONS
------------------------------------------------------------- */
+/* ============================================================
+   4) NAVBAR ACTION BUTTONS
+   ============================================================ */
 .nav-btn {
   padding: 6px 18px;
   font-size: 0.95rem;
@@ -108,8 +129,8 @@ main { flex: 1 0 auto; } /* So footer sits flush without white gap */
 
 
 /* ============================================================
-   ARTICLE CARD (dark card variant used elsewhere)
-============================================================ */
+   5) ARTICLE CARD (dark card variant used elsewhere)
+   ============================================================ */
 .article-card {
   background: #0a0f1a;
   border-radius: 14px;
@@ -149,8 +170,8 @@ main { flex: 1 0 auto; } /* So footer sits flush without white gap */
 }
 
 /* ============================================================
-   ARTICLE BUTTONS (shared)
-============================================================ */
+   6) ARTICLE BUTTONS (shared)
+   ============================================================ */
 .article-buttons {
   display: flex;
   justify-content: flex-end;
@@ -177,8 +198,8 @@ main { flex: 1 0 auto; } /* So footer sits flush without white gap */
 .btn-delete:hover { background: #bd2130; transform: translateY(-3px); }
 
 /* ============================================================
-   MODALS (cyber variant)
-============================================================ */
+   7) MODALS (cyber variant)
+   ============================================================ */
 .custom-modal .modal-dialog { max-width: 500px; }
 .modal-theme {
   background: #0a0f1a;
@@ -219,8 +240,8 @@ main { flex: 1 0 auto; } /* So footer sits flush without white gap */
 .btn-close-white { filter: invert(1); }
 
 /* ============================================================
-   FEATURED ARTICLES (top grid of 3)
-============================================================ */
+   8) FEATURED ARTICLES (top grid of 3)
+   ============================================================ */
 .featured-article-card {
   background: #fff;
   border: 1px solid #eee;
@@ -262,8 +283,8 @@ main { flex: 1 0 auto; } /* So footer sits flush without white gap */
 }
 
 /* ============================================================
-   LOWER ARTICLE LIST (horizontal rows)
-============================================================ */
+   9) LOWER ARTICLE LIST (horizontal rows)
+   ============================================================ */
 /* Section container (lighter divider for white theme) */
 .older-articles {
   display: flex;
@@ -323,8 +344,8 @@ main { flex: 1 0 auto; } /* So footer sits flush without white gap */
 }
 
 /* ============================================================
-   SMALL ADMIN ICON BUTTONS (used in multiple sections)
-============================================================ */
+   10) SMALL ADMIN ICON BUTTONS (used in multiple sections)
+   ============================================================ */
 .admin-btns {
   display: flex;
   flex-direction: row;
@@ -347,8 +368,8 @@ main { flex: 1 0 auto; } /* So footer sits flush without white gap */
 .modal-content { border-radius: 10px; }
 
 /* ============================================================
-   FOOTER (matches navbar theme) + no white gap
-============================================================ */
+   11) FOOTER (matches navbar theme)
+   ============================================================ */
 .footer {
   background: linear-gradient(90deg, #03121a, #062633 90%);
   color: #bfefff;

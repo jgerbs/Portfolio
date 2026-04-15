@@ -1,3 +1,24 @@
+<!-- ============================================================
+     ransomwareDemo/demo/index.html
+     Ransomware attack simulation — interactive three-pane demo.
+
+     Responsibilities:
+     - Renders a three-pane layout: simulated browser, file system, and SOC log viewer
+     - Displays an intro modal explaining the simulation before it begins
+     - Hosts an execution warning modal when the user attempts to run the malicious app
+     - Hosts a ransom modal with encrypted file preview and simulated payment button
+     - Hosts a file preview modal for viewing simulated document contents
+
+     Sections:
+     1) HEAD
+     2) HEADER + STATUS LED
+     3) INTRO MODAL
+     4) THREE-PANE LAYOUT
+     5) EXECUTION WARNING MODAL
+     6) RANSOM MODAL
+     7) FILE PREVIEW MODAL
+     8) SCRIPTS
+     ============================================================ -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,14 +26,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Ransomware Simulation Demo</title>
-
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="demo.css">
 </head>
 
 <body>
 
-    <!-- NAV -->
+    <!-- ============================================================
+         2) HEADER + STATUS LED
+         ============================================================ -->
     <header class="cs-nav">
         <div class="cs-left">
             <a href="../../index.html" class="cs-home-btn">
@@ -32,9 +54,9 @@
         </div>
     </header>
 
-
-
-    <!-- INTRO MODAL -->
+    <!-- ============================================================
+         3) INTRO MODAL
+         ============================================================ -->
     <div id="introModal">
         <div class="modal-box">
             <h2>Welcome to the Ransomware Demo</h2>
@@ -46,27 +68,24 @@
         </div>
     </div>
 
-
-    <!-- ======================================================
-         THREE PANE LAYOUT
-         ====================================================== -->
+    <!-- ============================================================
+         4) THREE-PANE LAYOUT
+         ============================================================ -->
     <main id="threePane">
 
-        <!-- PANE 1: Simulated Foogle Search / Fake Website -->
+        <!-- Pane 1: Simulated browser — Foogle search / fake download site -->
         <section class="panel pane-left">
             <div class="pane-title">Simulated Download</div>
             <div id="leftContent"></div>
         </section>
 
-
-        <!-- PANE 2: Simulated File System -->
+        <!-- Pane 2: Simulated file system -->
         <section class="panel pane-center">
             <div class="pane-title">Simulated File System</div>
             <div id="fileExplorer"></div>
         </section>
 
-
-        <!-- PANE 3: Simulated Logs -->
+        <!-- Pane 3: Simulated SOC log viewer (Splunk-style) -->
         <section class="panel pane-right">
             <div class="pane-title">Simulated Logs (SOC View)</div>
 
@@ -85,9 +104,12 @@
 
             <div id="splunkEvents"></div>
         </section>
+
     </main>
 
-    <!-- EXECUTION WARNING MODAL -->
+    <!-- ============================================================
+         5) EXECUTION WARNING MODAL
+         ============================================================ -->
     <div id="executeModal">
         <div class="modal-box">
             <h2>Run UnapprovedApp.exe?</h2>
@@ -100,7 +122,9 @@
         </div>
     </div>
 
-    <!-- RANSOM MODAL -->
+    <!-- ============================================================
+         6) RANSOM MODAL
+         ============================================================ -->
     <div id="ransomModal">
         <div class="ransom-box">
 
@@ -117,8 +141,9 @@
         </div>
     </div>
 
-
-    <!-- FILE PREVIEW MODAL -->
+    <!-- ============================================================
+         7) FILE PREVIEW MODAL
+         ============================================================ -->
     <div id="fileModal">
         <div class="file-modal-box">
             <span id="fileModalClose">&times;</span>
@@ -126,7 +151,10 @@
             <div id="fileModalContent"></div>
         </div>
     </div>
-    
+
+    <!-- ============================================================
+         8) SCRIPTS
+         ============================================================ -->
     <script src="script.js"></script>
 
 </body>

@@ -1,11 +1,29 @@
+@* ============================================================
+   File:    Views/Account/CheckEmail.cshtml
+   Purpose: Confirmation-pending landing page shown after
+            registration or a resend request.
+
+   Sections:
+   1) PAGE DATA SETUP
+   2) ERROR + RESENT STATUS ALERTS
+   3) CONFIRMATION INSTRUCTIONS
+   4) RESEND FORM + BACK LINK
+   ============================================================ *@
+
+@* ============================================================
+   1) PAGE DATA SETUP
+   ============================================================ *@
 @{
-    var email = ViewBag.Email ?? "";
-    var error = ViewBag.Error as string;
+    var email  = ViewBag.Email ?? "";
+    var error  = ViewBag.Error as string;
     var resent = ViewBag.Resent as bool? ?? false;
 }
 
 <h2>Verification Required</h2>
 
+@* ============================================================
+   2) ERROR + RESENT STATUS ALERTS
+   ============================================================ *@
 @if (!string.IsNullOrEmpty(error))
 {
     <div class="alert alert-danger">@error</div>
@@ -16,11 +34,17 @@
     <div class="alert alert-success">Confirmation email resent!</div>
 }
 
+@* ============================================================
+   3) CONFIRMATION INSTRUCTIONS
+   ============================================================ *@
 <div class="alert alert-secondary p-4">
     <p>A confirmation email has been sent to: <strong>@email</strong></p>
     <p>Please check your inbox and confirm your account before signing in.</p>
 </div>
 
+@* ============================================================
+   4) RESEND FORM + BACK LINK
+   ============================================================ *@
 <h4>Didn't receive the email?</h4>
 
 <form asp-action="ResendConfirmationEmail" method="post" class="mb-3">

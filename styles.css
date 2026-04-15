@@ -1,6 +1,41 @@
-/* =========================================================
+/* ============================================================
+   styles.css
+   Main stylesheet for the Jack Gerber portfolio site.
+
+   Responsibilities:
+   - Defines global design tokens (colors, shadows, layout widths)
+   - Styles the animated hero laptop sequence and scroll-driven transitions
+   - Manages the work rail project cards, education timeline, and skills lanes
+   - Handles the about section, contact form, and all form validation states
+   - Includes keyframe animations and reduced-motion accessibility overrides
+
+   Sections:
+   01) ROOT / DESIGN TOKENS
+   02) RESET / GLOBAL
+   03) GLOBAL PAGE EFFECTS / SHELL
+   04) HEADER / NAVIGATION
+   05) SECTION DOTS
+   06) SHARED SECTION TYPOGRAPHY / SHARED GLASS PANELS
+   07) HERO LAPTOP JOURNEY
+   08) WORK RAIL
+   09) EDUCATION PATH
+   10) SKILLS ORBIT
+   11) ABOUT JOURNEY
+   12) CONTACT SECTION
+   13) CONTACT FORM
+   14) SCROLL REVEAL
+   15) ANIMATIONS
+   16) RESPONSIVE — 1200PX
+   17) RESPONSIVE — 980PX
+   18) RESPONSIVE — 760PX
+   19) RESPONSIVE — 640PX
+   20) RESPONSIVE — 480PX
+   21) REDUCED MOTION
+   ============================================================ */
+
+/* ============================================================
    01. ROOT / DESIGN TOKENS
-   ========================================================= */
+   ============================================================ */
 :root {
     --bg: #040916;
     --bg-deep: #020713;
@@ -42,9 +77,9 @@
         linear-gradient(180deg, #020202 0%, #070707 30%, #0d0d0d 65%, #141414 100%);
 }
 
-/* =========================================================
+/* ============================================================
    02. RESET / GLOBAL
-   ========================================================= */
+   ============================================================ */
 * {
     box-sizing: border-box;
 }
@@ -89,9 +124,9 @@ img {
     background: transparent;
 }
 
-/* =========================================================
+/* ============================================================
    03. GLOBAL PAGE EFFECTS / SHELL
-   ========================================================= */
+   ============================================================ */
 .page-noise {
     position: fixed;
     inset: 0;
@@ -122,9 +157,9 @@ img {
     position: relative;
 }
 
-/* =========================================================
+/* ============================================================
    04. HEADER / NAVIGATION
-   ========================================================= */
+   ============================================================ */
 .site-header {
     position: fixed;
     top: 0;
@@ -186,9 +221,9 @@ img {
     transform: translateY(-1px);
 }
 
-/* =========================================================
+/* ============================================================
    05. SECTION DOTS
-   ========================================================= */
+   ============================================================ */
 .section-dots {
     position: fixed;
     top: 50%;
@@ -237,9 +272,9 @@ img {
     transform: scale(1.15);
 }
 
-/* =========================================================
+/* ============================================================
    06. SHARED SECTION TYPOGRAPHY / SHARED GLASS PANELS
-   ========================================================= */
+   ============================================================ */
 .edu-path__eyebrow,
 .skills-orbit__eyebrow,
 .about-journey__eyebrow,
@@ -335,9 +370,9 @@ img {
     background: radial-gradient(circle, rgba(158, 231, 255, 0.18), transparent 70%);
 }
 
-/* =========================================================
+/* ============================================================
    07. HERO LAPTOP JOURNEY
-   ========================================================= */
+   ============================================================ */
 .hero-laptop {
     position: relative;
     z-index: 40;
@@ -809,9 +844,9 @@ img {
     color: rgba(245, 247, 255, 0.76);
 }
 
-/* =========================================================
+/* ============================================================
    08. WORK RAIL
-   ========================================================= */
+   ============================================================ */
 .work-rail {
     position: relative;
     z-index: 10;
@@ -1154,21 +1189,38 @@ img {
     object-fit: contain;
 }
 
-.rail-card a {
-    position: relative;
-    z-index: 2;
+.rail-card__actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    width: 100%;
+}
+
+.rail-card__actions a {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: fit-content;
-    min-width: 150px;
-    padding: 13px 18px;
+    width: 100%;
+    min-width: 0;
+    min-height: 48px;
+    padding: 0 14px;
     border-radius: 999px;
     background: var(--card-accent);
     color: #0b1020;
+    font-size: clamp(0.84rem, 0.75rem + 0.2vw, 0.95rem);
     font-weight: 800;
-    letter-spacing: 0.03em;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.rail-card__action--secondary {
+    background: rgba(11, 16, 32, 0.08);
+    box-shadow: inset 0 0 0 1px rgba(11, 16, 32, 0.14);
 }
 
 .rail-card a:hover {
@@ -1196,9 +1248,9 @@ img {
     --card-panel: #e0d4d8;
 }
 
-/* =========================================================
+/* ============================================================
    09. EDUCATION PATH
-   ========================================================= */
+   ============================================================ */
 .edu-path {
     position: relative;
     height: 500vh;
@@ -1383,9 +1435,9 @@ img {
     will-change: transform, opacity;
 }
 
-/* =========================================================
+/* ============================================================
    10. SKILLS ORBIT
-   ========================================================= */
+   ============================================================ */
 .skills-orbit {
     position: relative;
     padding: clamp(110px, 10vw, 160px) 0;
@@ -1424,14 +1476,32 @@ img {
     margin-top: 28px;
 }
 
-
+.skills-lane {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    padding: 6px 0;
+    -webkit-mask-image: linear-gradient(to right,
+            transparent 0%,
+            rgba(0, 0, 0, 1) 8%,
+            rgba(0, 0, 0, 1) 92%,
+            transparent 100%);
+    mask-image: linear-gradient(to right,
+            transparent 0%,
+            rgba(0, 0, 0, 1) 8%,
+            rgba(0, 0, 0, 1) 92%,
+            transparent 100%);
+}
 
 .skills-lane__track {
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    flex-wrap: nowrap;
     gap: 18px;
     width: max-content;
+    min-width: max-content;
     will-change: transform;
+    transform: translate3d(0, 0, 0);
 }
 
 .skills-lane--left .skills-lane__track {
@@ -1451,6 +1521,7 @@ img {
 }
 
 .skill-orb {
+    flex: 0 0 auto;
     display: flex;
     align-items: center;
     gap: 14px;
@@ -1463,7 +1534,9 @@ img {
 .skill-orb:hover {
     transform: translateY(-4px) scale(1.03);
     border-color: rgba(158, 231, 255, 0.34);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.07));
+    background: linear-gradient(180deg,
+            rgba(255, 255, 255, 0.16),
+            rgba(255, 255, 255, 0.07));
 }
 
 .skill-orb img {
@@ -1480,9 +1553,9 @@ img {
     white-space: nowrap;
 }
 
-/* =========================================================
+/* ============================================================
    11. ABOUT JOURNEY
-   ========================================================= */
+   ============================================================ */
 .about-journey {
     position: relative;
     padding: clamp(110px, 10vw, 160px) 0;
@@ -1611,9 +1684,9 @@ img {
     margin-bottom: 0;
 }
 
-/* =========================================================
+/* ============================================================
    12. CONTACT SECTION
-   ========================================================= */
+   ============================================================ */
 .contact-section {
     position: relative;
     padding: clamp(5rem, 10vw, 8rem) clamp(1.25rem, 4vw, 3rem);
@@ -1718,9 +1791,9 @@ img {
     line-height: 1.6;
 }
 
-/* =========================================================
+/* ============================================================
    13. CONTACT FORM
-   ========================================================= */
+   ============================================================ */
 .contact-form {
     display: flex;
     flex-direction: column;
@@ -1877,9 +1950,9 @@ img {
     color: #2a0909;
 }
 
-/* =========================================================
+/* ============================================================
    14. SCROLL REVEAL
-   ========================================================= */
+   ============================================================ */
 .reveal-on-scroll {
     opacity: 0;
     transform: translate3d(0, 30px, 0);
@@ -1894,9 +1967,9 @@ img {
     filter: blur(0);
 }
 
-/* =========================================================
+/* ============================================================
    15. ANIMATIONS
-   ========================================================= */
+   ============================================================ */
 @keyframes skillsMarqueeLeft {
     from {
         transform: translate3d(0, 0, 0);
@@ -1946,9 +2019,9 @@ img {
     }
 }
 
-/* =========================================================
+/* ============================================================
    16. RESPONSIVE - 1200PX
-   ========================================================= */
+   ============================================================ */
 @media (max-width: 1200px) {
     .work-rail__inner {
         width: min(100% - 32px, 1800px);
@@ -1961,9 +2034,9 @@ img {
     }
 }
 
-/* =========================================================
+/* ============================================================
    17. RESPONSIVE - 980PX
-   ========================================================= */
+   ============================================================ */
 @media (max-width: 980px) {
     .hero-laptop {
         height: 280vh;
@@ -2147,9 +2220,9 @@ img {
     }
 }
 
-/* =========================================================
+/* ============================================================
    18. RESPONSIVE - 760PX
-   ========================================================= */
+   ============================================================ */
 @media (max-width: 760px) {
     .brand {
         top: 10px;
@@ -2244,16 +2317,19 @@ img {
         flex-basis: 16px;
     }
 
+    .rail-card__actions {
+        gap: 8px;
+    }
+
     .rail-card a {
-        min-width: 132px;
         padding: 11px 14px;
         font-size: 0.82rem;
     }
 }
 
-/* =========================================================
+/* ============================================================
    19. RESPONSIVE - 640PX
-   ========================================================= */
+   ============================================================ */
 @media (max-width: 640px) {
     .hero-laptop {
         height: 270vh;
@@ -2319,8 +2395,8 @@ img {
 
     .work-rail__stage,
     .work-rail__cards {
-        min-height: 610px;
-        height: 610px;
+        min-height: 740px;
+        height: 740px;
     }
 
     .rail-card {
@@ -2419,9 +2495,9 @@ img {
     }
 }
 
-/* =========================================================
+/* ============================================================
    20. RESPONSIVE - 480PX
-   ========================================================= */
+   ============================================================ */
 @media (max-width: 480px) {
     .contact-shell {
         grid-template-columns: 1fr 1fr;
@@ -2455,9 +2531,9 @@ img {
     }
 }
 
-/* =========================================================
+/* ============================================================
    21. REDUCED MOTION
-   ========================================================= */
+   ============================================================ */
 @media (prefers-reduced-motion: reduce) {
     html {
         scroll-behavior: auto;

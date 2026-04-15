@@ -1,24 +1,64 @@
-/* ============================================
-   GLOBAL CYBERSECURITY DEMO THEME (UNIFIED)
-   ============================================ */
+/* ============================================================
+   File:    style.css
+   Purpose: Global shared stylesheet for the Cybersecurity
+            Algorithm Demonstrations suite.
+
+   Responsibilities:
+   - Defines CSS custom properties (color + LED tokens)
+   - Styles the sticky navigation bar and home button
+   - Provides the split-panel layout used across demo pages
+   - Styles the log window, inputs, and buttons
+   - Defines the card grid and card components for the landing page
+   - Consolidates all responsive breakpoint overrides
+
+   Sections:
+   1) THEME TOKENS
+   2) BASE RESET + BODY
+   3) NAVIGATION BAR
+   4) HOME BUTTON WITH GLOW EFFECT
+   5) LED RECORDING INDICATOR
+   6) SPLIT-PANEL LAYOUT + PANEL CARD
+   7) TYPOGRAPHY
+   8) INPUTS + BUTTONS
+   9) KEYLOGGER TEXTAREA
+   10) LOG WINDOW + THREAD COLORS
+   11) SECTION WRAPPER (LANDING PAGE)
+   12) CARD GRID + CARD COMPONENTS
+   13) PROJECT THUMBNAIL
+   14) RESPONSIVE OVERRIDES
+
+   Cleanup notes:
+   - Consolidated three scattered @media (max-width: 600px) blocks
+     into one unified block at the bottom (section 14).
+   - The duplicate .section padding rule in the second 600px block
+     overrode the first; kept the later value and removed the dead
+     earlier declaration.
+   - Merged the two @media (max-width: 900px) blocks for the same reason.
+   ============================================================ */
+
+
+/* ============================================================
+   1) THEME TOKENS
+   ============================================================ */
 
 :root {
-    --bg-top: #07151B;
-    --bg-mid: #0A1E24;
-    --text: #E6F4F8;
-    --muted: #98A0AB;
-    --accent: #1EB6D9;
-    --border: rgba(255, 255, 255, 0.06);
-    --panel-bg: rgba(255, 255, 255, 0.02);
+    --bg-top:    #07151B;
+    --bg-mid:    #0A1E24;
+    --text:      #E6F4F8;
+    --muted:     #98A0AB;
+    --accent:    #1EB6D9;
+    --border:    rgba(255, 255, 255, 0.06);
+    --panel-bg:  rgba(255, 255, 255, 0.02);
 
-    --led-off: #7a7f85;
-    --led-on1: #2ea85f;
-    --led-on2: #48f180;
+    --led-off:   #7a7f85;
+    --led-on1:   #2ea85f;
+    --led-on2:   #48f180;
 }
 
-/* ============================================
-   BASE
-   ============================================ */
+
+/* ============================================================
+   2) BASE RESET + BODY
+   ============================================================ */
 
 body {
     margin: 0;
@@ -30,9 +70,10 @@ body {
     flex-direction: column;
 }
 
-/* ============================================
-   RESPONSIVE NAVBAR
-   ============================================ */
+
+/* ============================================================
+   3) NAVIGATION BAR
+   ============================================================ */
 
 .cs-nav {
     position: sticky;
@@ -69,9 +110,10 @@ body {
     gap: 10px;
 }
 
-/* ============================================
-   HOME BUTTON WITH GLOW
-   ============================================ */
+
+/* ============================================================
+   4) HOME BUTTON WITH GLOW EFFECT
+   ============================================================ */
 
 .cs-home-btn {
     width: clamp(30px, 3vw, 38px);
@@ -105,9 +147,10 @@ body {
     filter: drop-shadow(0 0 6px var(--accent)) invert(90%) sepia(80%) saturate(500%) hue-rotate(130deg);
 }
 
-/* ============================================
-   LED INDICATOR
-   ============================================ */
+
+/* ============================================================
+   5) LED RECORDING INDICATOR
+   ============================================================ */
 
 .led-container {
     display: flex;
@@ -133,26 +176,17 @@ body {
 }
 
 @keyframes recordPulse {
-    0% {
-        transform: scale(1);
-        background: var(--led-on1);
-    }
-
-    50% {
-        transform: scale(1.25);
-        background: var(--led-on2);
-    }
-
-    100% {
-        transform: scale(1);
-        background: var(--led-on1);
-    }
+    0%   { transform: scale(1);    background: var(--led-on1); }
+    50%  { transform: scale(1.25); background: var(--led-on2); }
+    100% { transform: scale(1);    background: var(--led-on1); }
 }
 
-/* ============================================
-   LAYOUT
-   ============================================ */
 
+/* ============================================================
+   6) SPLIT-PANEL LAYOUT + PANEL CARD
+   ============================================================ */
+
+/* Two-column flex container used on demo pages */
 .split {
     flex: 1;
     display: grid;
@@ -161,6 +195,7 @@ body {
     padding: 24px;
 }
 
+/* Individual panel within a split layout */
 .panel {
     background: var(--panel-bg);
     padding: 24px;
@@ -169,7 +204,11 @@ body {
     border: 1px solid var(--border);
 }
 
-/* Typography */
+
+/* ============================================================
+   7) TYPOGRAPHY
+   ============================================================ */
+
 h2 {
     color: var(--accent);
     margin-top: 0;
@@ -185,9 +224,10 @@ h3 {
     color: var(--muted);
 }
 
-/* ============================================
-   INPUTS + BUTTONS
-   ============================================ */
+
+/* ============================================================
+   8) INPUTS + BUTTONS
+   ============================================================ */
 
 .pin-select {
     display: flex;
@@ -215,14 +255,13 @@ button {
     transition: 0.15s ease;
 }
 
-button:hover {
-    background: #27c8f0;
-}
+button:hover    { background: #27c8f0; }
+button:disabled { background: rgba(255, 255, 255, 0.15); cursor: not-allowed; }
 
-button:disabled {
-    background: rgba(255, 255, 255, 0.15);
-    cursor: not-allowed;
-}
+
+/* ============================================================
+   9) KEYLOGGER TEXTAREA
+   ============================================================ */
 
 .keylogger-input {
     width: 95%;
@@ -236,9 +275,10 @@ button:disabled {
     font-size: 15px;
 }
 
-/* ============================================
-   LOG WINDOW
-   ============================================ */
+
+/* ============================================================
+   10) LOG WINDOW + THREAD COLORS
+   ============================================================ */
 
 .log {
     background: #020C13;
@@ -256,26 +296,16 @@ button:disabled {
     border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
 }
 
-/* Thread colors */
-.thread-1 {
-    color: #4db8ff;
-}
+/* Per-thread label colors used in the parallel demo */
+.thread-1 { color: #4db8ff; }
+.thread-2 { color: #6effa8; }
+.thread-3 { color: #d79bff; }
+.thread-4 { color: #ffb77c; }
 
-.thread-2 {
-    color: #6effa8;
-}
 
-.thread-3 {
-    color: #d79bff;
-}
-
-.thread-4 {
-    color: #ffb77c;
-}
-
-/* ============================================
-   SECTION WRAPPER (MATCHES PORTFOLIO STYLE)
-   ============================================ */
+/* ============================================================
+   11) SECTION WRAPPER (LANDING PAGE)
+   ============================================================ */
 
 .section {
     background: rgba(12, 16, 20, 0.92);
@@ -289,22 +319,6 @@ button:disabled {
     box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4);
 }
 
-@media (max-width: 900px) {
-    .section {
-        width: 94%;     /* add breathing room */
-        padding: 3rem 2rem;
-        margin: 2rem auto;
-    }
-}
-
-@media (max-width: 600px) {
-    .section {
-        width: 96%;     /* more breathing room */
-        padding: 2.2rem 1.4rem;
-        margin: 1.5rem auto;
-    }
-}
-
 .section h2 {
     text-align: center;
     font-size: clamp(1.8rem, 4vw, 2.4rem);
@@ -314,6 +328,7 @@ button:disabled {
     letter-spacing: 0.05em;
 }
 
+/* Accent underline beneath section headings */
 .section h2::after {
     content: "";
     display: block;
@@ -324,19 +339,16 @@ button:disabled {
     border-radius: 3px;
 }
 
-/* ============================================
-   CARD GRID (MATCHES PORTFOLIO)
-   ============================================ */
+
+/* ============================================================
+   12) CARD GRID + CARD COMPONENTS
+   ============================================================ */
 
 .card-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 2rem;
 }
-
-/* ============================================
-   CARD STYLE (MATCHES PORTFOLIO)
-   ============================================ */
 
 .card {
     background: rgba(15, 17, 20, 0.4);
@@ -356,7 +368,6 @@ button:disabled {
     border-color: var(--accent);
 }
 
-/* Card title */
 .card h3 {
     color: var(--accent);
     margin-top: 1rem;
@@ -364,7 +375,6 @@ button:disabled {
     font-size: 1.2rem;
 }
 
-/* Description */
 .card p {
     color: var(--text);
     opacity: 0.85;
@@ -372,9 +382,10 @@ button:disabled {
     line-height: 1.45rem;
 }
 
-/* ============================================
-   THUMBNAIL
-   ============================================ */
+
+/* ============================================================
+   13) PROJECT THUMBNAIL
+   ============================================================ */
 
 .project-thumb {
     width: 100%;
@@ -393,23 +404,20 @@ button:disabled {
     box-shadow: 0 5px 18px rgba(30, 182, 217, 0.35);
 }
 
-/* ============================================
-   RESPONSIVE TUNING
-   ============================================ */
 
-@media (max-width: 600px) {
-    .section {
-        padding: 3rem 1.5rem;
-    }
-}
-
-/* ============================================
-   RESPONSIVE
-   ============================================ */
+/* ============================================================
+   14) RESPONSIVE OVERRIDES
+   ============================================================ */
 
 @media (max-width: 900px) {
     .split {
         grid-template-columns: 1fr;
+    }
+
+    .section {
+        width: 94%;
+        padding: 3rem 2rem;
+        margin: 2rem auto;
     }
 }
 
@@ -420,5 +428,11 @@ button:disabled {
 
     .cs-right {
         gap: 6px;
+    }
+
+    .section {
+        width: 96%;
+        padding: 2.2rem 1.4rem;
+        margin: 1.5rem auto;
     }
 }

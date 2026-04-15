@@ -1,109 +1,148 @@
 <!DOCTYPE html>
+<!--
+  ============================================================
+  File:    keyLogger/index.html
+  Purpose: Educational keylogger demonstration page showing
+           real-time keystroke capture in a sandboxed context.
+
+  Responsibilities:
+  - Renders the sticky navigation bar with an LED recording indicator
+  - Explains what keyloggers are and how they work (left panel)
+  - Provides a consent-gated textarea for live keystroke capture
+  - Displays captured keystrokes in a live log (right panel)
+  - Lists protective measures against real-world keyloggers
+
+  Sections:
+  1) HEAD — metadata and stylesheet
+  2) NAVIGATION BAR — home button, title, LED status indicator
+  3) LEFT PANEL — explanation, consent notice, and demo textarea
+  4) RIGHT PANEL — live log display and educational guidance
+  5) SCRIPT
+  ============================================================
+-->
 <html lang="en">
 
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Educational Keylogger Demo</title>
-  <link rel="stylesheet" href="../style.css" />
+    <!-- ============================================================
+         1) HEAD
+         ============================================================ -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Educational Keylogger Demo</title>
+    <link rel="stylesheet" href="../style.css" />
 </head>
 
 <body>
 
-  <!-- HEADER -->
-  <header class="cs-nav">
-    <div class="cs-left">
-      <a href="../index.html" class="cs-home-btn">
-        <img src="../../images/home.svg" alt="Home" class="cs-home-icon">
-      </a>
-    </div>
+    <!-- ============================================================
+         2) NAVIGATION BAR
+         ============================================================ -->
+    <header class="cs-nav">
+        <div class="cs-left">
+            <a href="../index.html" class="cs-home-btn">
+                <img src="../../images/home.svg" alt="Home" class="cs-home-icon">
+            </a>
+        </div>
 
-    <div class="cs-center">
-      <h1>Educational Keylogger Demonstration</h1>
-    </div>
+        <div class="cs-center">
+            <h1>Educational Keylogger Demonstration</h1>
+        </div>
 
-    <div class="cs-right">
-      <div id="indicator" class="record-light"></div>
-      <span id="indicator-label" class="led-text">Idle</span>
-    </div>
-  </header>
+        <div class="cs-right">
+            <div id="indicator" class="record-light"></div>
+            <span id="indicator-label" class="led-text">Idle</span>
+        </div>
+    </header>
 
-  <main class="split">
 
-    <!-- LEFT SIDE -->
-    <section class="panel left">
-      <h2>What Is a Keylogger?</h2>
-      <p class="muted">
-        A <strong>keylogger</strong>, short for keystroke logger, is a tool that records what you type on a keyboard.
-        While they can be used for things like authorized monitoring or usability testing, malicious keyloggers
-        can secretly capture everything you type, including passwords, messages, or financial information,
-        without you knowing.
-      </p>
+    <main class="split">
 
-      <h3>How It Works</h3>
-      <p class="muted">
-        Keyloggers can exist as either hardware devices or software programs.
-        Software keyloggers usually attach themselves to keyboard input events, log each key press, and then store
-        or transmit that data somewhere else.
-        This demo shows the concept in a safe way by recording keystrokes only inside the text box below, and
-        only after you choose to start the demo.
-      </p>
+        <!-- ============================================================
+             3) LEFT PANEL — Explanation, consent notice, demo textarea
+             ============================================================ -->
+        <section class="panel left">
+            <h2>What Is a Keylogger?</h2>
+            <p class="muted">
+                A <strong>keylogger</strong>, short for keystroke logger, is a tool that records what you type on a
+                keyboard. While they can be used for things like authorized monitoring or usability testing, malicious
+                keyloggers can secretly capture everything you type — including passwords, messages, or financial
+                information — without you knowing.
+            </p>
 
-      <div class="notice">
-        <strong>Consent required:</strong>
-        This demo runs entirely in your browser and does not send or store data anywhere.
-        It only records what you type in the box after you press the Start Demo button.
-      </div>
+            <h3>How It Works</h3>
+            <p class="muted">
+                Keyloggers can exist as either hardware devices or software programs. Software keyloggers usually attach
+                themselves to keyboard input events, log each key press, and then store or transmit that data somewhere
+                else. This demo shows the concept in a safe way by recording keystrokes only inside the text box below,
+                and only after you choose to start the demo.
+            </p>
 
-      <h2>Simulated Environment</h2>
-      <p class="muted">Type in the box below once the demo is active to see how keystrokes are logged:</p>
+            <div class="notice">
+                <strong>Consent required:</strong> This demo runs entirely in your browser and does not send or store
+                data anywhere. It only records what you type in the box after you press the Start Demo button.
+            </div>
 
-      <textarea class="keylogger-input" id="demo-input" placeholder="Type here when the demo is active..."></textarea>
+            <h2>Simulated Environment</h2>
+            <p class="muted">Type in the box below once the demo is active to see how keystrokes are logged:</p>
 
-      <div class="controls">
-        <button id="start-btn">Start Demo (I consent)</button>
-        <button id="stop-btn" disabled>Stop Demo</button>
-      </div>
-    </section>
+            <textarea
+                class="keylogger-input"
+                id="demo-input"
+                placeholder="Type here when the demo is active..."
+            ></textarea>
 
-    <!-- RIGHT SIDE -->
-    <section class="panel right">
-      <h2>Captured Logs</h2>
+            <div class="controls">
+                <button id="start-btn">Start Demo (I consent)</button>
+                <button id="stop-btn" disabled>Stop Demo</button>
+            </div>
+        </section>
 
-      <div class="log" id="live-log" aria-live="polite"></div>
 
-      <div class="control-row">
-        <button id="clear-log">Clear Log</button>
-        <button id="download-sample">Download Sample</button>
-      </div>
+        <!-- ============================================================
+             4) RIGHT PANEL — Live log and protective guidance
+             ============================================================ -->
+        <section class="panel right">
+            <h2>Captured Logs</h2>
 
-      <div class="education">
-        <h3>Why Is This Dangerous?</h3>
-        <p>
-          Real keyloggers stay hidden, recording everything you type and often sending that information to attackers.
-          This can include usernames, passwords, emails, credit card numbers, and more.
-          Even apps or browser extensions that seem harmless can contain hidden logging features.
-        </p>
+            <div class="log" id="live-log" aria-live="polite"></div>
 
-        <h3>How to Protect Yourself</h3>
-        <ul>
-          <li>Keep your operating system, browser, and antivirus software updated.</li>
-          <li>Only install apps or extensions from trusted sources.</li>
-          <li>Use strong and unique passwords, and enable multi-factor authentication.</li>
-          <li>Check background tasks and network activity for anything unusual.</li>
-          <li>Learn how phishing and social engineering can lead to malware infections.</li>
-        </ul>
+            <div class="control-row">
+                <button id="clear-log">Clear Log</button>
+                <button id="download-sample">Download Sample</button>
+            </div>
 
-        <p class="muted extra-note">
-          Good awareness and digital hygiene are the strongest defense.
-          This demo shows a safe and local example, but real-world keyloggers can be completely invisible.
-        </p>
-      </div>
-    </section>
+            <div class="education">
+                <h3>Why Is This Dangerous?</h3>
+                <p>
+                    Real keyloggers stay hidden, recording everything you type and often sending that information to
+                    attackers. This can include usernames, passwords, emails, credit card numbers, and more. Even apps
+                    or browser extensions that seem harmless can contain hidden logging features.
+                </p>
 
-  </main>
+                <h3>How to Protect Yourself</h3>
+                <ul>
+                    <li>Keep your operating system, browser, and antivirus software updated.</li>
+                    <li>Only install apps or extensions from trusted sources.</li>
+                    <li>Use strong and unique passwords, and enable multi-factor authentication.</li>
+                    <li>Check background tasks and network activity for anything unusual.</li>
+                    <li>Learn how phishing and social engineering can lead to malware infections.</li>
+                </ul>
 
-  <script src="script.js"></script>
+                <p class="muted extra-note">
+                    Good awareness and digital hygiene are the strongest defense. This demo shows a safe and local
+                    example, but real-world keyloggers can be completely invisible.
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+
+    <!-- ============================================================
+         5) SCRIPT
+         ============================================================ -->
+    <script src="script.js"></script>
+
 </body>
 
 </html>

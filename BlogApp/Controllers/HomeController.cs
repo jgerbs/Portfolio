@@ -1,71 +1,88 @@
-// Jack Gerber - A01266976
-// Date: Nov 05, 2025
- 
-using Microsoft.AspNetCore.Mvc;
-using BlogApp.Models;
-using Microsoft.EntityFrameworkCore;
+/* ============================================================
+   File:    Controllers/HomeController.cs
+   Purpose: Serves the blog home page with date-filtered,
+            reverse-chronological article listings.
+
+   Responsibilities:
+   - Resolve the currently authenticated user (if any)
+   - Apply optional startDate / endDate query filters to articles
+   - Pass an IsAdmin flag to the view for conditional UI rendering
+   - Return a Tuple<ApplicationUser?, List<Article>> model to the view
+
+   Sections:
+   1) USING DIRECTIVES + NAMESPACE
+   2) CONSTRUCTOR + DEPENDENCY INJECTION
+   3) HOME INDEX (date-filtered article list)
+   4) PRIVATE HELPER
+============================================================ */
+
+/* ============================================================
+   1) USING DIRECTIVES + NAMESPACE
+   ============================================================ */
 using BlogApp.Data;
+using BlogApp.Models;
 using Microsoft.AspNetCore.Identity;
-using System.Threading.Tasks;
-using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlogApp.Controllers;
 
+/* ============================================================
+   2) CONSTRUCTOR + DEPENDENCY INJECTION
+   ============================================================ */
 public class HomeController : Controller
 {
-    private readonly ApplicationDbContext _context;
+    private readonly ApplicationDbContext         _context;
     private readonly UserManager<ApplicationUser> _userManager;
 
-    public HomeController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+    public HomeController(
+        ApplicationDbContext         context,
+        UserManager<ApplicationUser> userManager)
     {
-        _context = context;
+        _context     = context;
         _userManager = userManager;
     }
 
-    // GET action to display the index page with filtered articles based on date range
+    /* ============================================================
+       3) HOME INDEX (date-filtered article list)
+       Accepts optional startDate / endDate query parameters to
+       narrow the article set. Results are ordered newest-first.
+       ViewBag.IsAdmin drives admin-only UI elements in the view.
+       ============================================================ */
+
     public async Task<IActionResult> Index(DateTime? startDate, DateTime? endDate)
     {
         if (_userManager == null || _context == null)
             return ErrorView("Internal system error: dependencies not loaded properly.");
 
-        // Get the current logged-in user, if authenticated
+        // Resolve the current user (null when anonymous)
         ApplicationUser? user = null;
         if (User.Identity != null && User.Identity.IsAuthenticated)
-        {
             user = await _userManager.GetUserAsync(User);
-        }
-        
-        // Check if the user is an Admin
-        bool isAdmin = user != null && await _userManager.IsInRoleAsync(user, "Admin");
 
-        // Set the IsAdmin flag in the ViewBag
-        ViewBag.IsAdmin = isAdmin;
+        ViewBag.IsAdmin = user != null && await _userManager.IsInRoleAsync(user, "Admin");
 
-        // Start with a query to get all articles
+        // Build the article query with optional date filters
         var articlesQuery = _context.Articles.AsQueryable();
 
-        // Filter by date posted instead of event dates
         if (startDate.HasValue && endDate.HasValue)
-        {
             articlesQuery = articlesQuery.Where(a => a.DatePosted >= startDate && a.DatePosted <= endDate);
-        }
         else if (startDate.HasValue)
-        {
             articlesQuery = articlesQuery.Where(a => a.DatePosted >= startDate);
-        }
         else if (endDate.HasValue)
-        {
             articlesQuery = articlesQuery.Where(a => a.DatePosted <= endDate);
-        }
 
-        // Execute the query and get the filtered list of articles
-        var articles = await articlesQuery.OrderByDescending(a => a.DatePosted).ToListAsync();
+        var articles = await articlesQuery
+            .OrderByDescending(a => a.DatePosted)
+            .ToListAsync();
 
-        // Create a model with the user and the list of articles
         var model = new Tuple<ApplicationUser?, List<Article>>(user, articles);
-
-        return View(model); // Return the view with the model
+        return View(model);
     }
+
+    /* ============================================================
+       4) PRIVATE HELPER
+       ============================================================ */
 
     private IActionResult ErrorView(string message)
     {
@@ -73,4 +90,3 @@ public class HomeController : Controller
         return View("~/Views/Shared/Error.cshtml");
     }
 }
-

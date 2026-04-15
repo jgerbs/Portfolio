@@ -1,9 +1,30 @@
+@* ============================================================
+   File:    Views/Account/Register.cshtml
+   Purpose: New-account registration form with inline error handling
+            for validation failures, duplicate email detection, and
+            a success banner with a resend confirmation shortcut.
+
+   Sections:
+   1) PAGE SETUP
+   2) VALIDATION ERRORS + DUPLICATE EMAIL HANDLING
+   3) REGISTRATION ERROR / SUCCESS BANNERS
+   4) REGISTRATION FORM
+   ============================================================ *@
 @model BlogApp.ViewModels.RegisterViewModel
+
+@* ============================================================
+   1) PAGE SETUP
+   ============================================================ *@
 @{
     ViewData["Title"] = "Create Account";
 }
 
-@* Show validation errors *@
+@* ============================================================
+   2) VALIDATION ERRORS + DUPLICATE EMAIL HANDLING
+   Shows Identity validation errors. When a duplicate email is
+   detected, provides context-aware recovery options based on
+   whether the existing account is confirmed or not.
+   ============================================================ *@
 @if (!ViewData.ModelState.IsValid && ViewData.ModelState.Values.Any(v => v.Errors.Count > 0))
 {
     <div class="alert alert-danger mt-3">
@@ -12,7 +33,6 @@
             <div>@error.ErrorMessage</div>
         }
 
-        @* Duplicate email handling *@
         @if (ViewBag.DuplicateEmail == true)
         {
             <hr />
@@ -41,24 +61,22 @@
     </div>
 }
 
-@* DISPLAY ONLY REGISTRATION-SPECIFIC ERRORS *@
+@* ============================================================
+   3) REGISTRATION ERROR / SUCCESS BANNERS
+   ============================================================ *@
 @if (TempData["RegisterError"] != null)
 {
     <div class="alert alert-danger mt-3">@TempData["RegisterError"]</div>
 }
 
-@* SUCCESSFUL REGISTRATION MESSAGE *@
 @if (TempData["RegisterSuccess"] != null)
 {
     var email = TempData["RegisterSuccess"] as string;
 
     <div class="alert alert-success mt-3">
         <strong>Account Created!</strong><br />
-        A confirmation email has been sent to:
-        <strong>@email</strong><br /><br />
-
+        A confirmation email has been sent to: <strong>@email</strong><br /><br />
         Please confirm your account before signing in.<br /><br />
-
         <form asp-action="ResendConfirmationEmail" method="post" class="d-inline">
             <input type="hidden" name="email" value="@email" />
             <button class="btn btn-secondary btn-sm">Resend Confirmation Email</button>
@@ -66,6 +84,9 @@
     </div>
 }
 
+@* ============================================================
+   4) REGISTRATION FORM
+   ============================================================ *@
 <h2>Create Account</h2>
 <br />
 

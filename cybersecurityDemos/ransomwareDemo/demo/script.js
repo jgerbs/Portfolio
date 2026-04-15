@@ -1,13 +1,33 @@
-/******************************************************************
-   RANSOMWARE SIM DEMO + FULL SPLUNK-STYLE LOG VIEWER
-******************************************************************/
+/* ============================================================
+   ransomwareDemo/demo/script.js
+   Interactive ransomware attack simulation with Splunk-style log viewer.
 
-/* ==========================================================
-   GLOBALS
-========================================================== */
+   Responsibilities:
+   - Initializes a simulated file system with Documents, Pictures, and Downloads folders
+   - Renders a deceptive Foogle search page and fake software download site
+   - Handles malicious executable download, execution warning, and simulation trigger
+   - Runs the ransomware simulation: file enumeration, encryption, shadow copy deletion
+   - Powers a Splunk-style SOC log panel with search, severity tagging, and JSON expansion
+   - Provides simulated payment / decryption flow to restore files
+
+   Sections:
+   1) GLOBALS — shared state and simulated file system
+   2) PAGE INITIALIZATION
+   3) UTILITY + SYSMON-STYLE LOGGING
+   4) FOOGLE SEARCH + FAKE DOWNLOAD SITE
+   5) DOWNLOAD HANDLER + FILE SYSTEM RENDERING
+   6) FILE PREVIEW + ENCRYPTION MODALS
+   7) RANSOMWARE SIMULATION
+   8) DECRYPTION HANDLER
+   9) SPLUNK ENGINE — ADD, SEARCH, RENDER
+   10) STATUS LED
+   ============================================================ */
+
+/* ============================================================
+   1) GLOBALS — shared state and simulated file system
+   ============================================================ */
 let splunkEventsCache = [];
 
-/* Fake File System */
 let fileSystem = {
     Documents: {
         expanded: true,
@@ -59,10 +79,9 @@ let fileSystem = {
     }
 };
 
-
-/******************************************************************
-   PAGE INIT
-******************************************************************/
+/* ============================================================
+   2) PAGE INITIALIZATION
+   ============================================================ */
 window.onload = () => {
     document.getElementById("introModal").style.display = "flex";
     loadFoogleSearch();
@@ -72,20 +91,14 @@ document.getElementById("introProceed").onclick = () => {
     document.getElementById("introModal").style.display = "none";
 };
 
-
-/******************************************************************
-   UTILS
-******************************************************************/
+/* ============================================================
+   3) UTILITY + SYSMON-STYLE LOGGING
+   ============================================================ */
 function wait(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-
-/******************************************************************
-   REALISTIC SYSMon-STYLE LOGGING
-******************************************************************/
 function logSysmonLike(msg, fileTarget = null, severity = "info") {
-
     const event = {
         time: new Date().toISOString(),
         host: "EmployeeWorkstation-01",
@@ -93,9 +106,7 @@ function logSysmonLike(msg, fileTarget = null, severity = "info") {
         event_id: determineEventId(msg),
         severity: severity,
         raw: msg,
-
         user: "WORKSTATION\\Jack",
-
         process: {
             image: "C:\\Users\\Jack\\Downloads\\UnapprovedApp.exe",
             commandLine: "\"C:\\Users\\Jack\\Downloads\\UnapprovedApp.exe\"",
@@ -108,14 +119,12 @@ function logSysmonLike(msg, fileTarget = null, severity = "info") {
                 SHA256: "921eab0c980d4cd3c72cbc88a901f45d0dd..."
             }
         },
-
         file: fileTarget
             ? {
                 targetFilename: fileTarget,
                 action: msg.includes("Encrypting") ? "FileEncrypted" : "FileAccessed"
             }
             : null,
-
         message: msg
     };
 
@@ -123,16 +132,15 @@ function logSysmonLike(msg, fileTarget = null, severity = "info") {
 }
 
 function determineEventId(msg) {
-    if (msg.includes("executed")) return 1;          // Process Create
-    if (msg.includes("Encrypting")) return 11;       // File Write/Create
-    if (msg.includes("shadow copy")) return 1;       // vssadmin.exe
-    return 3;                                       // Generic activity
+    if (msg.includes("executed"))    return 1;   // Process Create
+    if (msg.includes("Encrypting")) return 11;   // File Write/Create
+    if (msg.includes("shadow copy")) return 1;   // vssadmin.exe
+    return 3;                                    // Generic activity
 }
 
-
-/******************************************************************
-   FOOGLE SEARCH PAGE
-******************************************************************/
+/* ============================================================
+   4) FOOGLE SEARCH + FAKE DOWNLOAD SITE
+   ============================================================ */
 function loadFoogleSearch() {
     const left = document.getElementById("leftContent");
 
@@ -148,7 +156,6 @@ function loadFoogleSearch() {
             <div class="foogle-link">PhotoStudioPro: Free Photo Editor for Windows</div>
             <div class="foogle-url">https://www.photo-editor-foogle-downloads.com</div>
             <div class="foogle-desc">Fast, powerful, and free editor. RAW support, filters, and more.</div>
-
             <button id="visitSiteBtn" class="visitBtn">Visit Site</button>
         </div>
     `;
@@ -156,10 +163,6 @@ function loadFoogleSearch() {
     document.getElementById("visitSiteBtn").onclick = loadFakeSite;
 }
 
-
-/******************************************************************
-   FAKE SOFTWARE DOWNLOAD PAGE
-******************************************************************/
 function loadFakeSite() {
     const left = document.getElementById("leftContent");
 
@@ -168,22 +171,21 @@ function loadFakeSite() {
 
             <div class="simple-banner">
                 <h2>PhotoStudioPro: Free Photo Editing Suite</h2>
-                <p>Fast, powerful, and easy-to-use tools for photographers and creators. Completely free to use!!! (this is a simulated unapproved app, download and execute the .exe below to learn more)</p>
+                <p>Fast, powerful, and easy-to-use tools for photographers and creators.
+                   Completely free to use!!! (this is a simulated unapproved app, download
+                   and execute the .exe below to learn more)</p>
             </div>
 
             <div class="simple-flex">
 
-                <!-- LEFT SIDE (FEATURES + DOWNLOAD BUTTON) -->
                 <div class="simple-left">
-
                     <h3 class="simple-section-title">Key Features</h3>
-
                     <ul class="simple-features">
                         <li><strong>AI Auto-Enhance</strong>: Instantly fixes exposure, color, and sharpness.</li>
                         <li><strong>Retouch Tools</strong>: Remove blemishes, smooth skin, clean backgrounds.</li>
                         <li><strong>120+ Filters</strong>: Cinematic, HDR, retro film, portrait presets.</li>
                         <li><strong>Layer Editing</strong>: Add text, overlays, and creative effects.</li>
-                        <li><strong>RAW Support</strong>: Compatible with DSLR & mirrorless cameras.</li>
+                        <li><strong>RAW Support</strong>: Compatible with DSLR &amp; mirrorless cameras.</li>
                         <li><strong>One-Click Export</strong>: Save for web, print, or social instantly.</li>
                     </ul>
 
@@ -194,26 +196,20 @@ function loadFakeSite() {
                         <p><strong>OS:</strong> Windows 10/11 (64-bit)</p>
                     </div>
 
-                    <button id="downloadBtn" class="simple-download-btn">
-                        Download for Windows
-                    </button>
+                    <button id="downloadBtn" class="simple-download-btn">Download for Windows</button>
 
                     <div class="simple-safe-note">
                         <span>Secure digital signature verified</span>
                     </div>
 
-                    <button id="backToSearch" class="simple-back-btn">
-                        Back to Foogle
-                    </button>
-
+                    <button id="backToSearch" class="simple-back-btn">Back to Foogle</button>
                 </div>
 
-                <!-- RIGHT SIDE (YOUR ORIGINAL IMAGE) -->
                 <div class="simple-right">
                     <img src="../../../images/photoeditor.jpg" class="simple-screenshot">
                 </div>
-            </div>
 
+            </div>
         </div>
     `;
 
@@ -221,11 +217,10 @@ function loadFakeSite() {
     document.getElementById("backToSearch").onclick = loadFoogleSearch;
 }
 
-/******************************************************************
-   HANDLE DOWNLOAD (Adds UnapprovedApp.exe)
-******************************************************************/
+/* ============================================================
+   5) DOWNLOAD HANDLER + FILE SYSTEM RENDERING
+   ============================================================ */
 function handleDownload() {
-
     fileSystem.Downloads.files.push({
         name: "UnapprovedApp.exe",
         type: "Application",
@@ -236,16 +231,13 @@ function handleDownload() {
     });
 
     renderFileSystem();
-    logSysmonLike("Downloaded UnapprovedApp.exe into Downloads folder.", 
+    logSysmonLike(
+        "Downloaded UnapprovedApp.exe into Downloads folder.",
         "C:\\Users\\Jack\\Downloads\\UnapprovedApp.exe",
         "info"
     );
 }
 
-
-/******************************************************************
-   FILE SYSTEM RENDERING
-******************************************************************/
 function renderFileSystem() {
     const fx = document.getElementById("fileExplorer");
     fx.innerHTML = "";
@@ -253,28 +245,22 @@ function renderFileSystem() {
     for (const folderName in fileSystem) {
         const folder = fileSystem[folderName];
 
-        /* Folder header */
         const row = document.createElement("div");
         row.className = "folder-row";
         row.innerHTML = `
             <span class="caret">${folder.expanded ? "▼" : "▶"}</span>
             <span class="folder-name">${folderName}</span>
         `;
-
         row.onclick = () => {
             folder.expanded = !folder.expanded;
             renderFileSystem();
         };
-
         fx.appendChild(row);
 
-        /* Folder contents */
         if (folder.expanded) {
-            folder.files.forEach((file, index) => {
-
+            folder.files.forEach(file => {
                 const fileRow = document.createElement("div");
                 fileRow.className = "file-row";
-
                 if (file.encrypted) fileRow.classList.add("encrypted");
 
                 fileRow.innerHTML = `
@@ -285,19 +271,17 @@ function renderFileSystem() {
                     <span>${file.modified}</span>
                 `;
 
-                fileRow.onclick = (event) => {
+                fileRow.onclick = event => {
                     event.stopPropagation();
 
                     if (file.name === "UnapprovedApp.exe" && !file.encrypted) {
                         document.getElementById("executeModal").style.display = "flex";
                         return;
                     }
-
                     if (file.encrypted) {
                         openEncryptedWarning(file);
                         return;
                     }
-
                     openFilePreview(file);
                 };
 
@@ -309,16 +293,14 @@ function renderFileSystem() {
 
 renderFileSystem();
 
-
-/******************************************************************
-   FILE PREVIEW MODAL
-******************************************************************/
+/* ============================================================
+   6) FILE PREVIEW + ENCRYPTION MODALS
+   ============================================================ */
 function openFilePreview(file) {
     document.getElementById("fileModal").style.display = "flex";
     document.getElementById("fileModalTitle").textContent = `${file.name} (Preview)`;
 
     const box = document.getElementById("fileModalContent");
-
     if (file.type.includes("Image")) {
         box.innerHTML = `<img src="${file.content}" class="preview-image">`;
     } else {
@@ -334,21 +316,11 @@ document.getElementById("ransomClose").onclick = () => {
     document.getElementById("ransomModal").style.display = "none";
 };
 
-
-/******************************************************************
-   ENCRYPTED FILE OPEN → RANSOM MODAL
-******************************************************************/
 function openEncryptedWarning(file) {
     document.getElementById("ransomModal").style.display = "flex";
-
-    const preview = document.getElementById("ransomEncryptedContent");
-    preview.textContent = fakeEncrypt(file.content);
+    document.getElementById("ransomEncryptedContent").textContent = fakeEncrypt(file.content);
 }
 
-
-/******************************************************************
-   SAFE ENCRYPT / DECRYPT
-******************************************************************/
 function fakeEncrypt(txt) {
     return btoa(txt).split("").reverse().join("");
 }
@@ -357,10 +329,9 @@ function fakeDecrypt(txt) {
     return atob(txt.split("").reverse().join(""));
 }
 
-
-/******************************************************************
-   EXECUTE .EXE → WARNING
-******************************************************************/
+/* ============================================================
+   7) RANSOMWARE SIMULATION
+   ============================================================ */
 document.getElementById("execCancel").onclick = () => {
     document.getElementById("executeModal").style.display = "none";
 };
@@ -370,14 +341,8 @@ document.getElementById("execConfirm").onclick = () => {
     runSimulation();
 };
 
-
-/******************************************************************
-   RUN RANSOMWARE (Silent Encrypt)
-******************************************************************/
 async function runSimulation() {
-
     setStatus("Ransomware Running", true);
-
     logSysmonLike("User executed UnapprovedApp.exe", null, "info");
     await wait(700);
 
@@ -389,22 +354,17 @@ async function runSimulation() {
     logSysmonLike("Scanning files silently...", null, "info");
     await wait(800);
 
-    /* Encrypt each file */
+    /* Encrypt each file in the simulated file system */
     for (const folderName in fileSystem) {
-        const folder = fileSystem[folderName];
-
-        for (let file of folder.files) {
-
+        for (let file of fileSystem[folderName].files) {
             setStatus(`Encrypting ${file.name}...`, true);
 
-            const targetFile =
-                `C:\\Users\\Jack\\${folderName}\\${file.name}`;
-
+            const targetFile = `C:\\Users\\Jack\\${folderName}\\${file.name}`;
             logSysmonLike("Encrypting " + file.name, targetFile, "critical");
 
             file.encrypted = true;
-            file.content = fakeEncrypt(file.content);
-            file.name = file.name + ".jackcrypt";
+            file.content   = fakeEncrypt(file.content);
+            file.name      = file.name + ".jackcrypt";
 
             renderFileSystem();
             await wait(600);
@@ -412,7 +372,8 @@ async function runSimulation() {
     }
 
     setStatus("Deleting Shadow Copies...", true);
-    logSysmonLike("Attempting shadow copy deletion (simulated).",
+    logSysmonLike(
+        "Attempting shadow copy deletion (simulated).",
         "C:\\Windows\\System32\\vssadmin.exe",
         "critical"
     );
@@ -422,56 +383,49 @@ async function runSimulation() {
     logSysmonLike("Ransomware finished encrypting files.", null, "critical");
 }
 
-
-/******************************************************************
-   DECRYPT (Simulated Payment)
-******************************************************************/
+/* ============================================================
+   8) DECRYPTION HANDLER (simulated ransom payment)
+   ============================================================ */
 document.getElementById("decryptBtn").onclick = () => {
-
     for (const folderName in fileSystem) {
-        const folder = fileSystem[folderName];
-
-        folder.files.forEach(file => {
+        fileSystem[folderName].files.forEach(file => {
             file.encrypted = false;
-            file.content = fakeDecrypt(file.content);
-            file.name = file.name.replace(".jackcrypt", "");
+            file.content   = fakeDecrypt(file.content);
+            file.name      = file.name.replace(".jackcrypt", "");
         });
     }
 
     renderFileSystem();
-
     logSysmonLike("Files restored after simulated ransom payment.", null, "info");
     document.getElementById("ransomModal").style.display = "none";
-
     setStatus("Files Restored", false);
 };
 
-
-/******************************************************************
-   SPLUNK ENGINE — REAL SEARCH & HIGHLIGHT
-******************************************************************/
+/* ============================================================
+   9) SPLUNK ENGINE — ADD, SEARCH, RENDER
+   ============================================================ */
 function splunkAddEvent(event) {
     splunkEventsCache.push(event);
     renderSplunkEvents(splunkEventsCache);
 }
 
-/* Highlight search matches */
+/* Wrap search-term matches in a highlight span */
 function highlight(text, query) {
     if (!query) return text;
     const safe = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     return text.replace(new RegExp(safe, "gi"), m => `<mark class="splunk-highlight">${m}</mark>`);
 }
 
-/* Syntax-highlight JSON */
+/* Apply VS Code-style JSON syntax coloring */
 function syntaxHighlightJSON(obj) {
     return JSON.stringify(obj, null, 2)
-        .replace(/\"([^"]+)\"(?=\:)/g, '<span class="json-key">"$1"</span>')
-        .replace(/\"([^"]+)\"/g, '<span class="json-string">"$1"</span>')
-        .replace(/\b(true|false)\b/g, '<span class="json-boolean">$1</span>')
-        .replace(/\b([0-9]+)\b/g, '<span class="json-number">$1</span>');
+        .replace(/\"([^"]+)\"(?=\:)/g,  '<span class="json-key">"$1"</span>')
+        .replace(/\"([^"]+)\"/g,         '<span class="json-string">"$1"</span>')
+        .replace(/\b(true|false)\b/g,    '<span class="json-boolean">$1</span>')
+        .replace(/\b([0-9]+)\b/g,        '<span class="json-number">$1</span>');
 }
 
-/* Parse Splunk-style queries */
+/* Parse Splunk-style query strings into field filters and raw keyword filters */
 function parseQuery(q) {
     const parts = q.match(/(?:[^\s"]+|"[^"]*")+/g) || [];
     const filters = { raw: [], fields: {} };
@@ -488,29 +442,22 @@ function parseQuery(q) {
     return filters;
 }
 
-/* Query matching engine */
+/* Return true if the event matches all field and raw keyword filters */
 function splunkMatchEvent(ev, filters) {
-
-    // field=value filters
     for (const field in filters.fields) {
         const val = filters.fields[field];
-        const src = (ev[field] || ev.json[field] || "").toString().toLowerCase();
+        const src = (ev[field] || ev.json?.[field] || "").toString().toLowerCase();
         if (!src.includes(val)) return false;
     }
 
-    // raw search
     for (const kw of filters.raw) {
-        const raw = (ev.raw + " " + JSON.stringify(ev.json)).toLowerCase();
+        const raw = (ev.raw + " " + JSON.stringify(ev)).toLowerCase();
         if (!raw.includes(kw)) return false;
     }
 
     return true;
 }
 
-
-/******************************************************************
-   RENDER SPLUNK EVENTS
-******************************************************************/
 function renderSplunkEvents(events, query = "") {
     const container = document.getElementById("splunkEvents");
     container.innerHTML = "";
@@ -520,12 +467,9 @@ function renderSplunkEvents(events, query = "") {
     events
         .filter(ev => splunkMatchEvent(ev, filters))
         .forEach(ev => {
-
             const severity = ev.severity?.toLowerCase() || "info";
-            const sevClass = "sev-" + severity;
-
             const row = document.createElement("div");
-            row.className = "splunk-event " + sevClass;
+            row.className = "splunk-event sev-" + severity;
 
             const sevTag = `<span class="splunk-severity-tag">${severity.toUpperCase()}</span>`;
 
@@ -557,33 +501,21 @@ function renderSplunkEvents(events, query = "") {
         });
 }
 
-
-/******************************************************************
-   SEARCH BUTTON + ENTER
-******************************************************************/
 document.getElementById("splunkSearchBtn").onclick = () => {
     renderSplunkEvents(splunkEventsCache, document.getElementById("splunkSearchInput").value);
 };
 
 document.getElementById("splunkSearchInput").onkeydown = e => {
-    if (e.key === "Enter") {
-        renderSplunkEvents(splunkEventsCache, e.target.value);
-    }
+    if (e.key === "Enter") renderSplunkEvents(splunkEventsCache, e.target.value);
 };
 
-
-/******************************************************************
-   STATUS LED SYSTEM
-******************************************************************/
+/* ============================================================
+   10) STATUS LED
+   ============================================================ */
 function setStatus(text, active = false) {
-    const led = document.getElementById("statusLed");
+    const led   = document.getElementById("statusLed");
     const label = document.getElementById("statusLabel");
 
     label.textContent = text;
-
-    if (active) {
-        led.classList.add("active");
-    } else {
-        led.classList.remove("active");
-    }
+    led.classList.toggle("active", active);
 }

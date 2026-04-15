@@ -1,24 +1,52 @@
 <!DOCTYPE html>
+<!-- ============================================================
+     File:    wwwroot/email/confirm.html
+     Purpose: Transactional HTML email sent to new users asking
+              them to confirm their account before signing in.
+
+     Responsibilities:
+       - Renders a branded, inline-styled email safe for all
+         major email clients
+       - Provides a prominent CTA button linking to {{confirm_link}}
+       - Includes a plain-text fallback URL for clients that
+         block HTML buttons
+       - Displays a safe-to-ignore notice for unintended recipients
+
+     Sections:
+     1) EMAIL WRAPPER + BRANDING HEADER
+     2) BODY COPY
+     3) CONFIRM EMAIL BUTTON + FALLBACK LINK
+     4) FOOTER DISCLAIMER
+     ============================================================ -->
 <html>
 <body style="font-family: Arial, sans-serif; background:#f7f7f7; padding:20px;">
 
     <div style="max-width:600px; margin:auto; background:white; padding:25px; border-radius:8px;">
-        
+
+        <!-- ============================================================
+             1) EMAIL WRAPPER + BRANDING HEADER
+             ============================================================ -->
         <h2 style="color:#1EB6D9; text-align:center; margin-top:0;">
-            Welcome to Jack's Blog!
+            Welcome to Jack’s Blog!
         </h2>
 
+        <!-- ============================================================
+             2) BODY COPY
+             ============================================================ -->
         <p style="font-size:16px; color:#444;">
-            Thanks for signing up! We're excited to have you join.
+            Thanks for signing up! We’re excited to have you join.
         </p>
 
         <p style="font-size:16px; color:#444;">
             Please confirm your account by clicking the button below. After confirming your email, you can log in.
         </p>
 
+        <!-- ============================================================
+             3) CONFIRM EMAIL BUTTON + FALLBACK LINK
+             ============================================================ -->
         <div style="text-align:center; margin:30px 0;">
             <a href="{{confirm_link}}"
-               style="background:#1EB6D9; color:white; padding:14px 24px; 
+               style="background:#1EB6D9; color:white; padding:14px 24px;
                       font-size:16px; text-decoration:none; border-radius:6px; display:inline-block;">
                 Confirm Email
             </a>
@@ -32,6 +60,9 @@
             {{confirm_link}}
         </p>
 
+        <!-- ============================================================
+             4) FOOTER DISCLAIMER
+             ============================================================ -->
         <hr style="margin-top:30px; border:none; border-top:1px solid #ddd;">
 
         <p style="font-size:13px; color:#888; text-align:center;">

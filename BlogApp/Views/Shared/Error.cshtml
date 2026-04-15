@@ -1,4 +1,9 @@
-﻿@{
+@* ============================================================
+   File:    Views/Shared/Error.cshtml
+   Purpose: Generic error page — displays a custom message
+            passed via ViewBag.ErrorMessage, or a default fallback.
+   ============================================================ *@
+@{
     ViewData["Title"] = "Error";
     var message = ViewBag.ErrorMessage ?? "An unexpected error occurred.";
 }

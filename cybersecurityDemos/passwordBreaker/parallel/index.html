@@ -1,3 +1,13 @@
+<!-- ============================================================
+     parallel/index.html
+     Parallel heuristic PIN attack — splits the search across 4 Web Workers.
+
+     Responsibilities:
+     - Renders the header, status LED, thread count, and navigation home link
+     - Provides PIN input controls, random generator, and start/stop buttons
+     - Displays live per-thread log, total attempt count, and elapsed time
+     - Explains how the heuristic list is divided and searched in parallel
+     ============================================================ -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,7 +20,9 @@
 
 <body>
 
-    <!-- HEADER -->
+    <!-- ============================================================
+         1) HEADER + STATUS LED
+         ============================================================ -->
     <header class="cs-nav">
         <div class="cs-left">
             <a href="../../index.html" class="cs-home-btn">
@@ -30,25 +42,27 @@
 
     <main class="split">
 
-        <!-- LEFT PANEL -->
+        <!-- ============================================================
+             2) LEFT PANEL — PIN INPUT + CONTROLS + STATISTICS
+             ============================================================ -->
         <section class="panel left">
             <h2>Heuristic Parallel Attack</h2>
             <p class="muted">
-                This demonstration shows how modern PIN cracking works. 
-                Instead of checking all values in order, the attack begins with a heuristic list of highly likely PINs. 
-                These include common choices, patterns, sequences, keypad shapes, and birth years. 
+                This demonstration shows how modern PIN cracking works.
+                Instead of checking all values in order, the attack begins with a heuristic list of highly likely PINs.
+                These include common choices, patterns, sequences, keypad shapes, and birth years.
                 The list also contains the full range from 0000 to 9999 at the end so the system always finds the correct value.
             </p>
 
             <p class="muted">
-                The list is divided between several worker threads. 
-                Each thread searches its part of the list at the same time. 
+                The list is divided between several worker threads.
+                Each thread searches its part of the list at the same time.
                 When any thread finds the match, all threads stop instantly.
             </p>
 
             <h3>Choose a PIN</h3>
             <p class="muted">
-                All processing happens on your device only. 
+                All processing happens on your device only.
                 No information is sent or stored anywhere.
             </p>
 
@@ -73,7 +87,9 @@
             </div>
         </section>
 
-        <!-- RIGHT PANEL -->
+        <!-- ============================================================
+             3) RIGHT PANEL — THREAD LOG + EDUCATIONAL COPY
+             ============================================================ -->
         <section class="panel right">
             <h2>Thread Log</h2>
             <div class="log" id="log-box"></div>
@@ -82,8 +98,8 @@
                 <h3>How the Heuristic Search Works</h3>
 
                 <p class="muted">
-                    Most people do not choose PINs at random. 
-                    Attackers take advantage of this and check the most likely values first. 
+                    Most people do not choose PINs at random.
+                    Attackers take advantage of this and check the most likely values first.
                     The list used in this demo includes:
                 </p>
 
@@ -97,8 +113,8 @@
                 </ul>
 
                 <p class="muted">
-                    The list is split evenly between multiple threads. 
-                    Each thread works in parallel which greatly reduces the time needed to find a match. 
+                    The list is split evenly between multiple threads.
+                    Each thread works in parallel which greatly reduces the time needed to find a match.
                     This is why four threads can complete the entire search much faster than a single thread.
                 </p>
 

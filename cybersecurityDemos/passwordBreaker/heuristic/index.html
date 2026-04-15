@@ -1,3 +1,13 @@
+<!-- ============================================================
+     heuristic/index.html
+     Heuristic PIN attack demo — smart-guess queue before brute force fallback.
+
+     Responsibilities:
+     - Renders the header, status LED, and navigation home link
+     - Provides PIN input controls, random generator, and start/stop buttons
+     - Displays live heuristic log and statistics (count, elapsed time, current attempt)
+     - Explains the heuristic phases: common PINs, patterns, birth years, sequences
+     ============================================================ -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,7 +20,9 @@
 
 <body>
 
-    <!-- HEADER -->
+    <!-- ============================================================
+         1) HEADER + STATUS LED
+         ============================================================ -->
     <header class="cs-nav">
         <div class="cs-left">
             <a href="../../index.html" class="cs-home-btn">
@@ -30,7 +42,9 @@
 
     <main class="split">
 
-        <!-- LEFT PANEL -->
+        <!-- ============================================================
+             2) LEFT PANEL — PIN INPUT + CONTROLS + STATISTICS
+             ============================================================ -->
         <section class="panel left">
             <h2>Heuristic Attack Using Smart Guessing</h2>
             <p class="muted">
@@ -64,7 +78,9 @@
             </div>
         </section>
 
-        <!-- RIGHT PANEL -->
+        <!-- ============================================================
+             3) RIGHT PANEL — HEURISTIC LOG + EDUCATIONAL COPY
+             ============================================================ -->
         <section class="panel right">
             <h2>Heuristic Log</h2>
             <div class="log" id="log-box"></div>

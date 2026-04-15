@@ -1,3 +1,18 @@
+<!--
+  File:    BlogApp.csproj
+  Purpose: MSBuild project file for the BlogApp ASP.NET Core 9 web application.
+
+  Configuration:
+  - Target: .NET 9.0
+  - Nullable reference types enabled (enforced as errors via .editorconfig)
+  - Implicit global usings enabled
+
+  NuGet dependencies:
+  - Identity + EF Core (ASP.NET Identity, Entity Framework Core, PostgreSQL provider)
+  - EF Core tooling (Design + Tools — dev-time only via PrivateAssets)
+  - Resend  — transactional email delivery
+  - SendGrid — included as an additional email provider (not currently wired up)
+-->
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
@@ -7,9 +22,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- ASP.NET Core Identity + EF Core integration -->
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI"                  Version="9.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Core"                Version="9.0.10" />
+
+    <!-- Entity Framework Core -->
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.2" />
+
+    <!-- EF Core dev-time tooling (migrations, scaffolding) -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.2">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -18,9 +39,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="9.0.10" />
+
+    <!-- PostgreSQL EF Core provider -->
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
-    <PackageReference Include="Resend" Version="0.2.1" />
+
+    <!-- Email delivery -->
+    <PackageReference Include="Resend"   Version="0.2.1" />
     <PackageReference Include="SendGrid" Version="9.29.3" />
   </ItemGroup>
 

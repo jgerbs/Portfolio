@@ -1,33 +1,57 @@
+/* ============================================================
+   parallel/script.js
+   Parallel heuristic PIN attack — splits the search across 4 Web Workers.
+
+   Responsibilities:
+   - Builds a unified heuristic list (common PINs, patterns, sequences, birth years,
+     full brute force fallback) and deduplicates it
+   - Divides the list into equal chunks and spawns one Worker per chunk
+   - Aggregates attempt counts, live log entries, and timer via rAF
+   - Terminates all workers immediately when any one finds the correct PIN
+   - Handles start/stop button state and random PIN generation
+
+   Sections:
+   1) STATE + DOM REFERENCES
+   2) HEURISTIC LIST BUILDER
+   3) LOG HELPER + RANDOM PIN
+   4) WORKER MANAGEMENT — START + STOP
+   5) HEURISTIC PHASE ORCHESTRATION
+   6) TIMER + STATUS LED
+   ============================================================ */
+
+/* ============================================================
+   1) STATE + DOM REFERENCES
+   ============================================================ */
 let running = false;
 let correctPIN = "0000";
 let attempts = 0;
 let startTime = 0;
 let workers = [];
-let workerCount = 4;
+const workerCount = 4;
 
-const startBtn = document.getElementById("start-btn");
-const stopBtn = document.getElementById("stop-btn");
-const pinInput = document.getElementById("pin-input");
-const randomBtn = document.getElementById("random-pin");
+const startBtn          = document.getElementById("start-btn");
+const stopBtn           = document.getElementById("stop-btn");
+const pinInput          = document.getElementById("pin-input");
+const randomBtn         = document.getElementById("random-pin");
 
-const attemptsLabel = document.getElementById("attempts");
-const timeLabel = document.getElementById("time");
-const statusLabel = document.getElementById("status-label");
+const attemptsLabel     = document.getElementById("attempts");
+const timeLabel         = document.getElementById("time");
+const statusLabel       = document.getElementById("status-label");
 const currentAttemptLbl = document.getElementById("current-attempt");
-const threadCountLbl = document.getElementById("thread-count");
-const logBox = document.getElementById("log-box");
+const threadCountLbl    = document.getElementById("thread-count");
+const logBox            = document.getElementById("log-box");
+const indicator         = document.getElementById("indicator");
+const indicatorLabel    = document.getElementById("indicator-label");
 
-const indicator = document.getElementById("indicator");
-const indicatorLabel = document.getElementById("indicator-label");
-
-
-// -------------------------------------------------------------
-// BUILD HEURISTIC LIST
-// -------------------------------------------------------------
+/* ============================================================
+   2) HEURISTIC LIST BUILDER
+   Priority: COMMON → AAAA → PATTERNS → SEQUENCE → KEYPAD → BIRTH-YEAR → BRUTEFORCE
+   Deduplicates so each PIN is only searched once across all threads.
+   ============================================================ */
 function buildHeuristicList() {
     const q = [];
 
-    // COMMON PINS
+    /* Phase 1 — Top 50 most common PINs */
     const common = [
         "1234", "1111", "0000", "1342", "1212", "2222", "4444", "1122", "1986", "2020",
         "7777", "5555", "1989", "9999", "6969", "2004", "1010", "4321", "6666", "1984",
@@ -37,21 +61,19 @@ function buildHeuristicList() {
     ];
     common.forEach(pin => q.push({ type: "COMMON", pin }));
 
-    // AAAA
+    /* Phase 2 — AAAA (all same digit) */
     for (let d = 0; d <= 9; d++) {
         q.push({ type: "AAAA", pin: `${d}${d}${d}${d}` });
     }
 
-    // ABAB / AABB / ABBA patterns
+    /* Phase 3 — ABAB / AABB / ABBA repetition patterns */
     for (let a = 0; a <= 9; a++) {
         for (let b = 0; b <= 9; b++) {
             if (a === b) continue;
-
             q.push({ type: "PATTERNS", pin: `${a}${a}${a}${b}` });
             q.push({ type: "PATTERNS", pin: `${a}${a}${b}${a}` });
             q.push({ type: "PATTERNS", pin: `${a}${b}${a}${a}` });
             q.push({ type: "PATTERNS", pin: `${b}${a}${a}${a}` });
-
             q.push({ type: "PATTERNS", pin: `${a}${a}${b}${b}` });
             q.push({ type: "PATTERNS", pin: `${b}${b}${a}${a}` });
             q.push({ type: "PATTERNS", pin: `${a}${b}${b}${a}` });
@@ -61,29 +83,29 @@ function buildHeuristicList() {
         }
     }
 
-    // SEQUENCE UP/DOWN
+    /* Phase 4 — Sequential up/down */
     for (let i = 0; i < 7; i++) {
-        q.push({ type: "SEQUENCE-UP", pin: `${i}${i + 1}${i + 2}${i + 3}` });
+        q.push({ type: "SEQUENCE-UP",   pin: `${i}${i+1}${i+2}${i+3}` });
     }
     for (let i = 9; i > 2; i--) {
-        q.push({ type: "SEQUENCE-DOWN", pin: `${i}${i - 1}${i - 2}${i - 3}` });
+        q.push({ type: "SEQUENCE-DOWN", pin: `${i}${i-1}${i-2}${i-3}` });
     }
 
-    // KEYPAD PATTERNS
-    const keypad = ["8520", "0258", "7530", "0357", "1590", "9510", "2580", "0852"];
-    keypad.forEach(p => q.push({ type: "KEYPAD", pin: p }));
+    /* Phase 5 — Keypad patterns */
+    ["8520", "0258", "7530", "0357", "1590", "9510", "2580", "0852"]
+        .forEach(p => q.push({ type: "KEYPAD", pin: p }));
 
-    // YEARS
+    /* Phase 6 — Birth years 1950–2025 */
     for (let y = 1950; y <= 2025; y++) {
         q.push({ type: "BIRTH-YEAR", pin: y.toString() });
     }
 
-    // FALLBACK BRUTE FORCE
+    /* Phase 7 — Full brute force fallback */
     for (let i = 0; i <= 9999; i++) {
         q.push({ type: "BRUTEFORCE", pin: i.toString().padStart(4, "0") });
     }
 
-    // Deduplicate
+    /* Deduplicate */
     const seen = new Set();
     return q.filter(item => {
         if (seen.has(item.pin)) return false;
@@ -92,10 +114,9 @@ function buildHeuristicList() {
     });
 }
 
-
-// -------------------------------------------------------------
-// LOGGING
-// -------------------------------------------------------------
+/* ============================================================
+   3) LOG HELPER + RANDOM PIN
+   ============================================================ */
 function log(text) {
     const el = document.createElement("div");
     el.className = "log-line";
@@ -107,52 +128,33 @@ function log(text) {
 function randomPIN() {
     pinInput.value = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
 }
+
 randomBtn.addEventListener("click", randomPIN);
 
+/* ============================================================
+   4) WORKER MANAGEMENT — START + STOP
+   ============================================================ */
+function stopAllWorkers() {
+    running = false;
+    workers.forEach(w => w.terminate());
+    workers = [];
+    threadCountLbl.textContent = "0";
+}
 
-// -------------------------------------------------------------
-// START ATTACK
-// -------------------------------------------------------------
-startBtn.addEventListener("click", () => {
-    correctPIN = pinInput.value.trim();
-
-    if (!/^\d{4}$/.test(correctPIN)) {
-        alert("Enter a valid 4-digit PIN.");
-        return;
-    }
-
-    running = true;
-    attempts = 0;
-    logBox.innerHTML = "";
-    attemptsLabel.textContent = "0";
-    timeLabel.textContent = "0.000s";
-    currentAttemptLbl.textContent = "None";
-
-    statusLabel.textContent = "Heuristic phase...";
-    indicator.classList.add("active");
-    indicatorLabel.textContent = "Running";
-
-    startBtn.disabled = true;
-    stopBtn.disabled = false;
-
-    startTime = performance.now();
-
-    const heuristics = buildHeuristicList();
-
-    const chunkSize = Math.ceil(heuristics.length / workerCount);
-    const heuristicChunks = [];
-    for (let i = 0; i < workerCount; i++) {
-        heuristicChunks.push(heuristics.slice(i * chunkSize, (i + 1) * chunkSize));
-    }
-
-    startHeuristicPhase(heuristicChunks);
-    requestAnimationFrame(updateTime);
+stopBtn.addEventListener("click", () => {
+    stopAllWorkers();
+    indicator.classList.remove("active");
+    indicatorLabel.textContent = "Stopped";
+    statusLabel.textContent = "Stopped";
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
 });
 
-
-// -------------------------------------------------------------
-// HEURISTIC PHASE
-// -------------------------------------------------------------
+/* ============================================================
+   5) HEURISTIC PHASE ORCHESTRATION
+   Splits the list into equal chunks, spawns one Worker per chunk.
+   Workers report "attempt" (periodic), "found", or "done" messages.
+   ============================================================ */
 function startHeuristicPhase(chunks) {
     workers = [];
     threadCountLbl.textContent = chunks.length;
@@ -167,7 +169,7 @@ function startHeuristicPhase(chunks) {
             id: i + 1,
             correctPIN,
             list: chunks[i],
-            reportEvery: 30,
+            reportEvery: 30
         });
 
         worker.onmessage = (msg) => {
@@ -176,7 +178,6 @@ function startHeuristicPhase(chunks) {
             if (d.type === "attempt") {
                 attempts++;
                 attemptsLabel.textContent = attempts;
-
                 currentAttemptLbl.textContent = `${d.pin} (${d.category})`;
 
                 const el = document.createElement("div");
@@ -188,13 +189,9 @@ function startHeuristicPhase(chunks) {
 
             if (d.type === "found") {
                 running = false;
-
-                // Display the EXACT matching PIN
                 currentAttemptLbl.textContent = `${d.pin} (${d.category})`;
-
                 statusLabel.textContent = `PIN Found by Thread ${d.id}!`;
 
-                // Add the final MATCH log entry
                 const el = document.createElement("div");
                 el.className = "log-line thread-" + d.id;
                 el.textContent = `[Thread ${d.id}] MATCH FOUND: ${d.pin}`;
@@ -203,19 +200,20 @@ function startHeuristicPhase(chunks) {
 
                 indicator.classList.remove("active");
                 indicatorLabel.textContent = "Done";
-
                 stopAllWorkers();
                 startBtn.disabled = false;
                 stopBtn.disabled = true;
             }
 
-
             if (d.type === "done") {
                 finished++;
-
-                // All heuristic threads exhausted → go brute force
+                /* All heuristic threads exhausted — this shouldn't happen since the
+                   list includes a full brute force fallback, but handle gracefully */
                 if (finished === chunks.length && running) {
-                    startBruteForcePhase();
+                    statusLabel.textContent = "Exhausted all threads";
+                    stopAllWorkers();
+                    startBtn.disabled = false;
+                    stopBtn.disabled = true;
                 }
             }
         };
@@ -224,41 +222,43 @@ function startHeuristicPhase(chunks) {
     }
 }
 
+startBtn.addEventListener("click", () => {
+    correctPIN = pinInput.value.trim();
 
-// -------------------------------------------------------------
-// TIMER
-// -------------------------------------------------------------
+    if (!/^\d{4}$/.test(correctPIN)) {
+        alert("Enter a valid 4-digit PIN.");
+        return;
+    }
+
+    running = true;
+    attempts = 0;
+    logBox.innerHTML = "";
+    attemptsLabel.textContent = "0";
+    timeLabel.textContent = "0.000s";
+    currentAttemptLbl.textContent = "None";
+    statusLabel.textContent = "Heuristic phase...";
+    indicator.classList.add("active");
+    indicatorLabel.textContent = "Running";
+    startBtn.disabled = true;
+    stopBtn.disabled = false;
+    startTime = performance.now();
+
+    const heuristics = buildHeuristicList();
+    const chunkSize = Math.ceil(heuristics.length / workerCount);
+    const chunks = [];
+    for (let i = 0; i < workerCount; i++) {
+        chunks.push(heuristics.slice(i * chunkSize, (i + 1) * chunkSize));
+    }
+
+    startHeuristicPhase(chunks);
+    requestAnimationFrame(updateTime);
+});
+
+/* ============================================================
+   6) TIMER + STATUS LED
+   ============================================================ */
 function updateTime() {
     if (!running) return;
-    const elapsed = (performance.now() - startTime) / 1000;
-    timeLabel.textContent = elapsed.toFixed(3) + "s";
+    timeLabel.textContent = ((performance.now() - startTime) / 1000).toFixed(3) + "s";
     requestAnimationFrame(updateTime);
 }
-
-
-// -------------------------------------------------------------
-// STOP ALL WORKERS
-// -------------------------------------------------------------
-function stopAllWorkers() {
-    running = false;
-
-    for (const w of workers) w.terminate();
-    workers = [];
-
-    threadCountLbl.textContent = "0";
-}
-
-
-// -------------------------------------------------------------
-// STOP MANUAL BUTTON
-// -------------------------------------------------------------
-stopBtn.addEventListener("click", () => {
-    stopAllWorkers();
-
-    indicator.classList.remove("active");
-    indicatorLabel.textContent = "Stopped";
-    statusLabel.textContent = "Stopped";
-
-    startBtn.disabled = false;
-    stopBtn.disabled = true;
-});

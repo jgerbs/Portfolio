@@ -1,9 +1,34 @@
+/* ============================================================
+   script.js
+   Main animation and interaction controller for the portfolio.
+
+   Responsibilities:
+   - Drives the scroll-locked hero laptop opening sequence
+     (lid open, screen power-on, zoom, background shift, welcome fade)
+   - Manages the draggable / wheel-scrollable project rail
+   - Provides smart anchor scrolling aware of the shell scroll context
+   - Tracks the active section dot indicator on scroll
+   - Animates the education timeline path based on scroll progress
+   - Triggers one-shot reveal animations via IntersectionObserver
+
+   Section index:
+   1. Utility helpers & math
+   2. Global DOM state & resize bus
+   3. Hero laptop journey
+   4. Smart anchor scrolling
+   5. Work rail (draggable card carousel)
+   6. Section dots active state
+   7. Education path
+   8. Scroll reveal
+   9. Init
+   ============================================================ */
+
 (() => {
     "use strict";
 
-    /* =========================================================
-       HELPERS
-       ========================================================= */
+    /* ============================================================
+       1. UTILITY HELPERS & MATH
+       ============================================================ */
     const utils = {
         clamp(value, min, max) {
             return Math.min(Math.max(value, min), max);
@@ -30,6 +55,9 @@
         }
     };
 
+    /* ============================================================
+       2. GLOBAL DOM STATE & RESIZE BUS
+       ============================================================ */
     const dom = {
         winW: window.innerWidth,
         winH: window.innerHeight,
@@ -62,12 +90,9 @@
         });
     });
 
-    /* =========================================================
-       HERO LAPTOP JOURNEY
-       - Background color from version 1 (darker, cooler)
-       - Mobile hero improvements from version 2
-       - Work section reveal from version 1 (blur + transform)
-       ========================================================= */
+    /* ============================================================
+       3. HERO LAPTOP JOURNEY
+       ============================================================ */
     function initHeroSection() {
         const hero = document.querySelector(".hero-laptop");
         const scene = document.getElementById("heroLaptopScene");
@@ -92,10 +117,9 @@
         ) return;
 
         const root = document.documentElement;
-        const body = document.body;
 
         /* ---------------------------------------------------------
-           BACKGROUND SYSTEM — colors from version 1
+           Background gradient definitions
         --------------------------------------------------------- */
         const CLOSED_BG = `
             radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.10), transparent 22%),
@@ -115,18 +139,16 @@
 
         root.style.setProperty("--page-bg", CLOSED_BG);
 
-        /* Target the fixed bg div, not body — avoids overflow/isolation clipping seams */
         const pageBgFixed = document.getElementById("pageBgFixed");
         if (pageBgFixed) {
             pageBgFixed.style.background = CLOSED_BG;
         }
 
-        /* pageShell is empty right now, so this is not actually affecting your sections */
         pageShell.style.background = "transparent";
-
         heroBg.style.background = "none";
         heroBg.style.overflow = "hidden";
 
+        /* Two absolutely-positioned layers cross-fade as the lid opens */
         const closedLayer = document.createElement("div");
         Object.assign(closedLayer.style, {
             position: "absolute",
@@ -210,9 +232,10 @@
             }
         }
 
-        /* ----------------------------------------------------------
-           MOBILE TOUCH INTERCEPT — from version 2
-        ---------------------------------------------------------- */
+        /* ---------------------------------------------------------
+           Mobile touch intercept — prevents overscrolling past the
+           unlock threshold on coarse-pointer devices
+        --------------------------------------------------------- */
         function initMobileTouchIntercept() {
             if (!isMobileLike()) return;
             if (window.matchMedia("(pointer: fine)").matches) return;
@@ -244,15 +267,14 @@
                 }
             }, { passive: false });
 
-            sticky.addEventListener("touchend", () => {
-                intercepting = false;
-            }, { passive: true });
-
-            sticky.addEventListener("touchcancel", () => {
-                intercepting = false;
-            }, { passive: true });
+            sticky.addEventListener("touchend", () => { intercepting = false; }, { passive: true });
+            sticky.addEventListener("touchcancel", () => { intercepting = false; }, { passive: true });
         }
 
+        /* ---------------------------------------------------------
+           Shell handoff — scales/positions the page shell so it
+           appears to grow out of the laptop screen during zoom
+        --------------------------------------------------------- */
         function syncShellToScreen(zoomP) {
             if (zoomP <= 0.01) {
                 root.style.setProperty("--shell-opacity", "0");
@@ -286,15 +308,18 @@
             root.style.setProperty("--shell-opacity", String(opacity));
         }
 
+        /* ---------------------------------------------------------
+           Main render — called every RAF tick; derives all visual
+           states from a single scroll progress value [0, 1].
+           Mouse parallax keeps its own lerp since it's cursor-driven.
+           Scroll progress is applied directly (no lerp) to prevent
+           a "stuck frame" where the loop exits mid-transition.
+        --------------------------------------------------------- */
         function render() {
             state.ticking = false;
 
             const mobileLike = isMobileLike();
 
-            // FIXED: Use targetProgress directly for scroll-driven animation.
-            // Lerp on scroll progress was the root cause of the "stuck frame" bug —
-            // the loop would stop (threshold not met) while p was still mid-transition.
-            // Mouse parallax keeps its own lerp since it's cursor-driven, not scroll-driven.
             state.progress = state.targetProgress;
 
             state.mouseX = (dom.reducedMotion || mobileLike)
@@ -319,15 +344,13 @@
                 utils.clamp(utils.mapRange(p, mobileLike ? 0.18 : 0.28, mobileLike ? 0.60 : 0.70, 0, 1), 0, 1)
             );
 
-            // FIXED: Widen the fadeP band so the laptop fade-out completes well before
-            // finalWelcome starts. Previously both overlapped in a narrow ~0.10 window
-            // which created a visible "nothing visible" frame when lerp stalled there.
+            /* fadeP band is wide enough that laptop fade-out completes
+               well before finalWelcome starts — prevents a blank-frame gap */
             const fadeP = utils.easeInOut3(
                 utils.clamp(utils.mapRange(p, mobileLike ? 0.54 : 0.64, mobileLike ? 0.68 : 0.76, 0, 1), 0, 1)
             );
 
-            // FIXED: finalWelcome now starts earlier (0.72 desktop, 0.60 mobile) so there's
-            // meaningful overlap — the welcome fades in as the laptop fades out, never a gap.
+            /* finalWelcome starts early enough to overlap the laptop fade */
             const finalWelcomeP = utils.easeInOut3(
                 utils.clamp(utils.mapRange(p, mobileLike ? 0.58 : 0.72, mobileLike ? 0.76 : 0.88, 0, 1), 0, 1)
             );
@@ -339,10 +362,10 @@
             const bgShiftP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.10, 0.30, 0, 1), 0, 1));
             const heroFadeOutP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.84, 0.98, 0, 1), 0, 1));
 
+            /* Background cross-fade */
             closedLayer.style.opacity = String(1 - bgShiftP);
             insideLayer.style.opacity = String(bgShiftP);
 
-            /* Swap the fixed page bg once the colour shift completes — no seam between any sections */
             if (pageBgFixed) {
                 pageBgFixed.style.background = bgShiftP >= 1 ? INSIDE_BG : CLOSED_BG;
             }
@@ -361,12 +384,9 @@
                 glow2.style.transform = `scale(${utils.lerp(1, 0.88, bgShiftP)})`;
             }
 
-            /* Keep the base hero background solid so the handoff into Work stays seamless */
             heroBg.style.opacity = "1";
 
-            /* ---------------------------------------------------------
-               DEVICE / MOTION — mobile branch from version 2
-            --------------------------------------------------------- */
+            /* Device motion */
             const tiltInfluence = (dom.reducedMotion || mobileLike) ? 0 : 1 - zoomP;
             const tiltX = state.mouseY * -2.2 * tiltInfluence;
             const tiltY = state.mouseX * 3.2 * tiltInfluence;
@@ -384,7 +404,6 @@
                 : 0;
 
             if (mobileLike) {
-                // During zoom, shift the device upward so the screen fills the viewport
                 const zoomOffsetY = utils.lerp(0, -dom.winH * 0.08, zoomP);
                 deviceWrap.style.transform = `
                     translate3d(0, ${mobileBaseOffsetY + liftY + zoomOffsetY}px, 0)
@@ -406,6 +425,7 @@
             const fadeStrength = mobileLike ? 2.2 : 1.4;
             deviceWrap.style.opacity = String(utils.clamp(1 - fadeP * fadeStrength, 0, 1));
 
+            /* Screen power-on */
             const brightness = 0.18 + powerP * 0.82;
             const saturation = 0.15 + powerP * 1.1;
             const grayscale = 1 - powerP;
@@ -419,17 +439,10 @@
 
             const deviceOpacity = utils.clamp(1 - fadeP * fadeStrength, 0, 1);
 
-            if (base) {
-                base.style.opacity = String(deviceOpacity);
-            }
+            if (base) base.style.opacity = String(deviceOpacity);
+            if (shadow) shadow.style.opacity = String(deviceOpacity * 0.82);
 
-            if (shadow) {
-                shadow.style.opacity = String(deviceOpacity * 0.82);
-            }
-
-            /* ---------------------------------------------------------
-               HELLO TEXT
-            --------------------------------------------------------- */
+            /* Hello text */
             if (welcome) {
                 const wFade = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.06, 0.20, 0, 1), 0, 1));
                 welcome.style.opacity = String(1 - wFade);
@@ -437,19 +450,11 @@
                 welcome.style.filter = `blur(${wFade * 6}px)`;
             }
 
-            /* ---------------------------------------------------------
-               LOADER IN SCREEN
-            --------------------------------------------------------- */
+            /* Loader inside screen */
             const loaderP = utils.easeInOut3(utils.clamp(utils.mapRange(p, 0.16, 0.34, 0, 1), 0, 1));
             const loaderOutP = utils.easeInOut3(
                 utils.clamp(
-                    utils.mapRange(
-                        p,
-                        mobileLike ? 0.60 : 0.82,
-                        mobileLike ? 0.76 : 0.94,
-                        0,
-                        1
-                    ),
+                    utils.mapRange(p, mobileLike ? 0.60 : 0.82, mobileLike ? 0.76 : 0.94, 0, 1),
                     0,
                     1
                 )
@@ -466,9 +471,7 @@
                 indicator.style.transform = `translateX(-50%) translateY(${hide * 10}px)`;
             }
 
-            /* ---------------------------------------------------------
-               FINAL WELCOME
-            --------------------------------------------------------- */
+            /* Final welcome overlay */
             finalWelcome.style.opacity = String(finalWelcomeP);
             finalWelcome.style.transform = `
                 translate(-50%, calc(-50% + ${utils.lerp(28, 0, finalWelcomeP)}px))
@@ -480,17 +483,13 @@
                 state.heroUnlocked = true;
             }
 
-            /* ---------------------------------------------------------
-               WORK SECTION REVEAL — version 1 (blur + transform)
-            --------------------------------------------------------- */
+            /* Work section reveal */
             workSection.style.opacity = String(workRevealP);
             workSection.style.transform = `translate3d(0, ${utils.lerp(34, 0, workRevealP)}px, 0) scale(${utils.lerp(0.985, 1, workRevealP)})`;
             workSection.style.filter = `blur(${utils.lerp(18, 0, workRevealP)}px)`;
             workSection.classList.toggle("is-visible", workRevealP > 0.02);
 
-            /* ---------------------------------------------------------
-               SHELL HANDOFF
-            --------------------------------------------------------- */
+            /* Shell embed / full state classes */
             const isEmbedded = zoomP > 0.02 && p < 0.90;
             const isFull = p >= 0.90;
 
@@ -502,6 +501,7 @@
             syncShellToScreen(zoomP);
             hero.classList.toggle("hero-laptop--done", fadeP > 0.9);
 
+            /* Keep the mouse parallax loop alive while the cursor is still moving */
             if (
                 Math.abs(state.mouseX - state.targetMouseX) > 0.0005 ||
                 Math.abs(state.mouseY - state.targetMouseY) > 0.0005
@@ -554,13 +554,15 @@
         requestTick();
     }
 
-    /* =========================================================
-       SMART ANCHOR SCROLLING
-       ========================================================= */
+    /* ============================================================
+       4. SMART ANCHOR SCROLLING
+       ============================================================ */
     function initAnchorScrolling() {
         const pageShell = document.getElementById("laptopPageShell");
         if (!pageShell) return;
 
+        /* Scroll to a section ID, respecting whether the shell is
+           embedded inside the laptop screen or full-page */
         function scrollToSection(id) {
             const target = document.getElementById(id);
             if (!target) return;
@@ -597,12 +599,9 @@
         });
     }
 
-    /* =========================================================
-       WORK RAIL
-       - Metrics caching from version 2
-       - tick() from specified version: always-running RAF loop
-         with isInView early-return guard for proper responsiveness
-       ========================================================= */
+    /* ============================================================
+       5. WORK RAIL (DRAGGABLE CARD CAROUSEL)
+       ============================================================ */
     function initWorkRail() {
         const stage = document.getElementById("workRailStage");
         const cards = [...document.querySelectorAll(".rail-card")];
@@ -718,6 +717,7 @@
             return utils.clamp(value, state.minOffset, state.maxOffset);
         }
 
+        /* Ripple a vertical impulse to neighbouring cards on drag/wheel */
         function applyNeighborImpulse(centerIndex, strength) {
             cardStates.forEach((cardState) => {
                 const distance = Math.abs(cardState.index - centerIndex);
@@ -784,10 +784,7 @@
             }
         }
 
-        /* ---------------------------------------------------------
-           TICK — specified version: always-running RAF with
-           isInView early-return guard for card responsiveness
-        --------------------------------------------------------- */
+        /* Always-running RAF loop; skips physics when out of view and idle */
         function tick() {
             if (!state.isInView && !state.isDragging && Math.abs(state.railVelocity) < 0.002) {
                 requestAnimationFrame(tick);
@@ -923,9 +920,9 @@
         });
     }
 
-    /* =========================================================
-       SECTION DOTS ACTIVE STATE
-       ========================================================= */
+    /* ============================================================
+       6. SECTION DOTS ACTIVE STATE
+       ============================================================ */
     function initSectionDots() {
         const pageShell = document.getElementById("laptopPageShell");
         const sections = [...document.querySelectorAll("main section[id]")];
@@ -967,9 +964,9 @@
         updateActiveDot();
     }
 
-    /* =========================================================
-       EDUCATION PATH
-       ========================================================= */
+    /* ============================================================
+       7. EDUCATION PATH
+       ============================================================ */
     function initEducationPath() {
         const section = document.getElementById("education");
         const track = document.getElementById("eduPathTrack");
@@ -1011,6 +1008,8 @@
             return utils.clamp(-sectionTopInViewport / metrics.sectionScrollable, 0, 1);
         }
 
+        /* Translates the node track, fades the intro hero, and applies
+           focus / blur / rotate to each node based on viewport proximity */
         function updateScene(progress) {
             const viewportH = dom.winH;
             const viewportMidTarget = viewportH * 0.52;
@@ -1116,9 +1115,9 @@
         requestTick();
     }
 
-    /* =========================================================
-       SCROLL REVEAL
-       ========================================================= */
+    /* ============================================================
+       8. SCROLL REVEAL
+       ============================================================ */
     function initScrollReveal() {
         const items = [...document.querySelectorAll(".reveal-on-scroll")];
         if (!items.length) return;
@@ -1140,9 +1139,9 @@
         items.forEach((item) => observer.observe(item));
     }
 
-    /* =========================================================
-       INIT
-       ========================================================= */
+    /* ============================================================
+       9. INIT
+       ============================================================ */
     function init() {
         initHeroSection();
         initWorkRail();

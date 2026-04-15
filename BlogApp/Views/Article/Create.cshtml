@@ -1,15 +1,30 @@
-@* Jack Gerber - A01266976
-   Date: Nov 05, 2025 *@
- 
+@* ============================================================
+   File:    Views/Article/Create.cshtml
+   Purpose: Article creation form with a rich-text editor (TinyMCE),
+            cover image URL field, and optional file upload.
+
+   Sections:
+   1) PAGE SETUP
+   2) ARTICLE CREATION FORM (title, description, image, content)
+   3) TINYMCE RICH-TEXT EDITOR INIT
+   ============================================================ *@
 @model BlogApp.Models.Article
 
+@* ============================================================
+   1) PAGE SETUP
+   ============================================================ *@
 @{
     ViewData["Title"] = "Create Article";
 }
 
 <h2>@ViewData["Title"]</h2>
 
+@* ============================================================
+   2) ARTICLE CREATION FORM (title, description, image, content)
+   enctype="multipart/form-data" is required for the file upload.
+   ============================================================ *@
 <form asp-action="Create" method="post" enctype="multipart/form-data">
+
     <div class="form-group mb-3">
         <label asp-for="Title" class="form-label"></label>
         <input asp-for="Title" class="form-control" />
@@ -44,16 +59,22 @@
     <a href="@Url.Action("Index", "Home")" class="btn btn-secondary">Cancel</a>
 </form>
 
+@* ============================================================
+   3) TINYMCE RICH-TEXT EDITOR INIT
+   Targets the #ContentHtml textarea. Content style matches the
+   dark theme of the application.
+   ============================================================ *@
 @section Scripts {
-    <script src="https://cdn.tiny.cloud/1/anh78ka4etlahevadg7u1z8nkt57jamv4okn497vxtjmfk07/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://cdn.tiny.cloud/1/anh78ka4etlahevadg7u1z8nkt57jamv4okn497vxtjmfk07/tinymce/6/tinymce.min.js"
+            referrerpolicy="origin"></script>
     <script>
         tinymce.init({
-            selector: '#ContentHtml',
-            plugins: 'image link media code lists',
-            toolbar: 'undo redo | styles | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image media | code',
-            height: 500,
-            menubar: false,
-            branding: false,
+            selector:      '#ContentHtml',
+            plugins:       'image link media code lists',
+            toolbar:       'undo redo | styles | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image media | code',
+            height:        500,
+            menubar:       false,
+            branding:      false,
             content_style: "body { background-color: #0A1E24; color: #E6F4F8; font-family: 'Inter', sans-serif; }"
         });
     </script>

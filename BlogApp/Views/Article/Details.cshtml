@@ -1,25 +1,48 @@
-@* Jack Gerber - A01266976
-   Date: Nov 05, 2025 *@
+@* ============================================================
+   File:    Views/Article/Details.cshtml
+   Purpose: Full article detail view — displays title, resolved
+            author name, post date, and raw HTML content body.
 
+   Sections:
+   1) PAGE SETUP + AUTHOR RESOLUTION
+   2) ARTICLE HEADER (title, author, date)
+   3) ARTICLE CONTENT BODY
+   4) BACK NAVIGATION
+   ============================================================ *@
 @model BlogApp.Models.Article
 @using Microsoft.AspNetCore.Identity
 @inject UserManager<ApplicationUser> UserManager
 
+@* ============================================================
+   1) PAGE SETUP + AUTHOR RESOLUTION
+   Resolves ContributorUsername to a display name at render time.
+   ============================================================ *@
 @{
-    var author = await UserManager.FindByNameAsync(Model.ContributorUsername);
+    var author     = await UserManager.FindByNameAsync(Model.ContributorUsername);
     var authorName = author != null ? $"{author.FirstName} {author.LastName}" : "Unknown Author";
     ViewData["Title"] = Model.Title;
 }
 
+@* ============================================================
+   2) ARTICLE HEADER (title, author, date)
+   ============================================================ *@
 <div class="article-details container py-4">
     <h1 class="text-accent mb-2">@Model.Title</h1>
-    <p class="text-muted mb-4"><strong>@authorName
-    </strong> - @Model.DatePosted.ToLocalTime().ToString("MMMM dd, yyyy")</p>
+    <p class="text-muted mb-4">
+        <strong>@authorName</strong> — @Model.DatePosted.ToLocalTime().ToString("MMMM dd, yyyy")
+    </p>
 
+    @* ============================================================
+       3) ARTICLE CONTENT BODY
+       Rendered as raw HTML to preserve TinyMCE-authored markup.
+       ============================================================ *@
     <div class="content-body">
         @Html.Raw(Model.ContentHtml)
     </div>
 
+    @* ============================================================
+       4) BACK NAVIGATION
+       ============================================================ *@
     <div class="mt-4">
         <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Back to Home</a>
     </div>

@@ -1,33 +1,56 @@
-﻿@* Jack Gerber - A01266976
-   Date: Nov 05, 2025 *@
- 
-@model Tuple<BlogApp.Models.ApplicationUser?, List<BlogApp.Models.Article>?>
+@* ============================================================
+   File:    Views/Home/Index.cshtml
+   Purpose: Main blog landing page — shows a personalized welcome,
+            a date-filter modal, and a two-tier article layout:
+            the newest 3 as featured cards, the rest as a compact list.
+            Per-article delete confirmation modals are rendered
+            for owners and admins.
 
+   Sections:
+   1) MODEL + DIRECTIVES + PAGE DATA SETUP
+   2) PAGE HEADER + FILTER BUTTON
+   3) DATE FILTER MODAL
+   4) FEATURED ARTICLES (top 3, newest-first)
+   5) OLDER ARTICLES (remaining, compact row layout)
+   6) DELETE CONFIRMATION MODALS (per article, owners + admins only)
+   7) EMPTY STATE
+   ============================================================ *@
+@model Tuple<BlogApp.Models.ApplicationUser?, List<BlogApp.Models.Article>?>
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<ApplicationUser> SignInManager
-@inject UserManager<ApplicationUser> UserManager
+@inject UserManager<ApplicationUser>   UserManager
 
+@* ============================================================
+   1) MODEL + DIRECTIVES + PAGE DATA SETUP
+   Capitalizes the first name defensively for the welcome message.
+   ============================================================ *@
 @{
-    var user = Model?.Item1;
+    var user     = Model?.Item1;
     var articles = Model?.Item2 ?? new List<Article>();
-    var safeFirst = user?.FirstName ?? "User";
-    var capitalizedName = char.ToUpper(safeFirst[0]) + (safeFirst.Length > 1 ? safeFirst.Substring(1).ToLower() : "");
 
-    ViewData["Title"] = user != null
-        ? $"Welcome, {capitalizedName}!"
-        : "Home Page";
+    var safeFirst       = user?.FirstName ?? "User";
+    var capitalizedName = char.ToUpper(safeFirst[0]) + (safeFirst.Length > 1 ? safeFirst[1..].ToLower() : "");
+
+    ViewData["Title"] = user != null ? $"Welcome, {capitalizedName}!" : "Home Page";
 }
 
+@* ============================================================
+   2) PAGE HEADER + FILTER BUTTON
+   ============================================================ *@
 <div class="d-flex justify-content-between align-items-center">
     <h2>@ViewData["Title"]</h2>
 
     <div class="d-flex justify-content-end align-items-center">
-        <!-- Filter Button -->
-        <button class="btn btn-secondary me-3" data-bs-toggle="modal" data-bs-target="#filterModal">Filter</button>
+        <button class="btn btn-secondary me-3"
+                data-bs-toggle="modal"
+                data-bs-target="#filterModal">Filter</button>
     </div>
 </div>
 
-<!-- Filter Modal -->
+@* ============================================================
+   3) DATE FILTER MODAL
+   Submits startDate / endDate as GET parameters to HomeController.Index.
+   ============================================================ *@
 <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -55,41 +78,44 @@
     </div>
 </div>
 
+@* ============================================================
+   ARTICLE LISTINGS
+   ============================================================ *@
 <div class="articles-section">
     <h2 class="section-title">Latest Articles</h2>
 
     @if (articles.Any())
     {
-        <!-- Featured Top 3 -->
+        @* ============================================================
+           4) FEATURED ARTICLES (top 3, newest-first)
+           Each card shows a linked cover image, post meta, title,
+           description, and owner/admin edit controls.
+           ============================================================ *@
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
             @foreach (var article in articles.OrderByDescending(a => a?.DatePosted).Take(3))
             {
-                if (article == null)
-                {
-                    continue;
-                }
+                if (article == null) { continue; }
 
                 var contributor = await UserManager.FindByNameAsync(article.ContributorUsername ?? string.Empty);
-                bool isOwner = User?.Identity?.IsAuthenticated == true &&
-                               article.ContributorUsername == User?.Identity?.Name;
-                bool isAdmin = User?.IsInRole("Admin") == true;
+                bool isOwner    = User?.Identity?.IsAuthenticated == true &&
+                                  article.ContributorUsername == User?.Identity?.Name;
+                bool isAdmin    = User?.IsInRole("Admin") == true;
 
                 <div class="col">
                     <div class="featured-article-card">
-                        <!-- IMAGE -->
+
                         <a asp-controller="Article"
                            asp-action="Details"
-                           asp-route-id="@(article?.ArticleId ?? 0)"
+                           asp-route-id="@article.ArticleId"
                            class="featured-img-link">
-                            <img src="@(string.IsNullOrEmpty(article?.CoverImageUrl) ? "/images/placeholder.jpg" : article!.CoverImageUrl)"
-                                 alt="@(article?.Title ?? "Article Image")"
+                            <img src="@(string.IsNullOrEmpty(article.CoverImageUrl) ? "/images/placeholder.jpg" : article.CoverImageUrl)"
+                                 alt="@(article.Title ?? "Article Image")"
                                  class="featured-img" />
                         </a>
 
-                        <!-- CONTENT -->
                         <div class="featured-content">
                             <p class="featured-meta">
-                                @(article?.DatePosted.ToLocalTime().ToString("MMMM dd, yyyy") ?? "Unknown Date")
+                                @article.DatePosted.ToLocalTime().ToString("MMMM dd, yyyy")
                                 <span class="separator">·</span>
                                 <span>@(contributor?.FirstName ?? "Unknown") @(contributor?.LastName ?? "Author")</span>
                             </p>
@@ -97,12 +123,12 @@
                             <h3 class="featured-title">
                                 <a asp-controller="Article"
                                    asp-action="Details"
-                                   asp-route-id="@(article?.ArticleId ?? 0)">
-                                    @(article?.Title ?? "Untitled Article")
+                                   asp-route-id="@article.ArticleId">
+                                    @(article.Title ?? "Untitled Article")
                                 </a>
                             </h3>
 
-                            @if (!string.IsNullOrEmpty(article?.ShortDescription))
+                            @if (!string.IsNullOrEmpty(article.ShortDescription))
                             {
                                 <p class="featured-desc">@article.ShortDescription</p>
                             }
@@ -112,13 +138,13 @@
                                 <div class="admin-btns">
                                     <a asp-controller="Article"
                                        asp-action="Edit"
-                                       asp-route-id="@(article?.ArticleId ?? 0)"
+                                       asp-route-id="@article.ArticleId"
                                        class="edit-btn"
                                        title="Edit">✎</a>
                                     <button type="button"
                                             class="delete-btn"
                                             data-bs-toggle="modal"
-                                            data-bs-target="#deleteModal-@(article?.ArticleId ?? 0)"
+                                            data-bs-target="#deleteModal-@article.ArticleId"
                                             title="Delete">🗑</button>
                                 </div>
                             }
@@ -128,24 +154,25 @@
             }
         </div>
 
-        <!-- Older Articles -->
+        @* ============================================================
+           5) OLDER ARTICLES (remaining, compact row layout)
+           Three-column flex row: meta + title on the left, description
+           in the centre, thumbnail on the right.
+           ============================================================ *@
         <div class="older-articles">
             @foreach (var article in articles.OrderByDescending(a => a?.DatePosted).Skip(3))
             {
-                if (article == null)
-                {
-                    continue;
-                }
+                if (article == null) { continue; }
 
                 var contributor = await UserManager.FindByNameAsync(article.ContributorUsername ?? string.Empty);
-                bool isOwner = User?.Identity?.IsAuthenticated == true &&
-                               article.ContributorUsername == User?.Identity?.Name;
-                bool isAdmin = User?.IsInRole("Admin") == true;
+                bool isOwner    = User?.Identity?.IsAuthenticated == true &&
+                                  article.ContributorUsername == User?.Identity?.Name;
+                bool isAdmin    = User?.IsInRole("Admin") == true;
 
                 <div class="older-article-flex">
                     <div class="older-left">
                         <p class="article-meta">
-                            @(article?.DatePosted.ToLocalTime().ToString("MMMM dd, yyyy") ?? "Unknown Date")
+                            @article.DatePosted.ToLocalTime().ToString("MMMM dd, yyyy")
                             <span class="separator">·</span>
                             <span>@(contributor?.FirstName ?? "Unknown") @(contributor?.LastName ?? "Author")</span>
                         </p>
@@ -154,8 +181,8 @@
                             <h4 class="older-title">
                                 <a asp-controller="Article"
                                    asp-action="Details"
-                                   asp-route-id="@(article?.ArticleId ?? 0)">
-                                    @(article?.Title ?? "Untitled Article")
+                                   asp-route-id="@article.ArticleId">
+                                    @(article.Title ?? "Untitled Article")
                                 </a>
                             </h4>
 
@@ -164,13 +191,13 @@
                                 <div class="admin-btns">
                                     <a asp-controller="Article"
                                        asp-action="Edit"
-                                       asp-route-id="@(article?.ArticleId ?? 0)"
+                                       asp-route-id="@article.ArticleId"
                                        class="edit-btn"
                                        title="Edit">✎</a>
                                     <button type="button"
                                             class="delete-btn"
                                             data-bs-toggle="modal"
-                                            data-bs-target="#deleteModal-@(article?.ArticleId ?? 0)"
+                                            data-bs-target="#deleteModal-@article.ArticleId"
                                             title="Delete">🗑</button>
                                 </div>
                             }
@@ -178,7 +205,7 @@
                     </div>
 
                     <div class="older-middle">
-                        @if (!string.IsNullOrEmpty(article?.ShortDescription))
+                        @if (!string.IsNullOrEmpty(article.ShortDescription))
                         {
                             <p class="article-desc">@article.ShortDescription</p>
                         }
@@ -187,9 +214,9 @@
                     <div class="older-right">
                         <a asp-controller="Article"
                            asp-action="Details"
-                           asp-route-id="@(article?.ArticleId ?? 0)">
-                            <img src="@(string.IsNullOrEmpty(article?.CoverImageUrl) ? "/images/placeholder-thumb.jpg" : article!.CoverImageUrl)"
-                                 alt="@(article?.Title ?? "Article Image")"
+                           asp-route-id="@article.ArticleId">
+                            <img src="@(string.IsNullOrEmpty(article.CoverImageUrl) ? "/images/placeholder-thumb.jpg" : article.CoverImageUrl)"
+                                 alt="@(article.Title ?? "Article Image")"
                                  class="older-thumb" />
                         </a>
                     </div>
@@ -197,20 +224,20 @@
             }
         </div>
 
-        @* Delete Modals for all articles *@
+        @* ============================================================
+           6) DELETE CONFIRMATION MODALS (per article, owners + admins only)
+           One modal per article; triggered by the delete buttons above.
+           ============================================================ *@
         @foreach (var a in articles.OrderByDescending(x => x?.DatePosted))
         {
-            if (a == null)
-            {
-                continue;
-            }
+            if (a == null) { continue; }
 
             var isOwner = User?.Identity?.IsAuthenticated == true && a.ContributorUsername == User?.Identity?.Name;
             var isAdmin = User?.IsInRole("Admin") == true;
 
             if (User?.Identity?.IsAuthenticated == true && (isAdmin || isOwner))
             {
-                <div class="modal fade" id="deleteModal-@(a?.ArticleId ?? 0)" tabindex="-1" aria-hidden="true">
+                <div class="modal fade" id="deleteModal-@a.ArticleId" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -218,14 +245,14 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
                             <div class="modal-body">
-                                <p>Are you sure you want to delete <strong>@(a?.Title ?? "this article")</strong>?</p>
+                                <p>Are you sure you want to delete <strong>@(a.Title ?? "this article")</strong>?</p>
                                 <p class="text-muted mb-0">This action cannot be undone.</p>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                 <form asp-controller="Article"
                                       asp-action="DeleteConfirmed"
-                                      asp-route-id="@(a?.ArticleId ?? 0)"
+                                      asp-route-id="@a.ArticleId"
                                       method="post">
                                     <button type="submit" class="btn btn-danger">Delete</button>
                                 </form>
@@ -238,6 +265,9 @@
     }
     else
     {
+        @* ============================================================
+           7) EMPTY STATE
+           ============================================================ *@
         <p>No articles available.</p>
     }
 </div>

@@ -232,6 +232,21 @@
             }
         }
 
+        function unlockHeroForNavigation() {
+            state.heroUnlocked = true;
+            state.isScrollLocking = false;
+            state.targetProgress = 1;
+            state.progress = 1;
+
+            requestAnimationFrame(() => {
+                requestTick();
+            });
+        }
+
+        window.heroLaptopController = {
+            unlockForNavigation: unlockHeroForNavigation
+        };
+
         /* ---------------------------------------------------------
            Mobile touch intercept — prevents overscrolling past the
            unlock threshold on coarse-pointer devices
@@ -567,15 +582,24 @@
             const target = document.getElementById(id);
             if (!target) return;
 
-            if (pageShell.classList.contains("is-laptop-embedded")) {
-                const sr = pageShell.getBoundingClientRect();
-                const tr = target.getBoundingClientRect();
-                const top = tr.top - sr.top + pageShell.scrollTop - 80;
-                pageShell.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
-            } else {
-                const y = target.getBoundingClientRect().top + window.scrollY - 80;
-                window.scrollTo({ top: y, behavior: "smooth" });
+            const heroController = window.heroLaptopController;
+            const isPastHero = id !== "hero" && id !== "top";
+
+            if (isPastHero && heroController?.unlockForNavigation) {
+                heroController.unlockForNavigation();
             }
+
+            requestAnimationFrame(() => {
+                if (pageShell.classList.contains("is-laptop-embedded")) {
+                    const sr = pageShell.getBoundingClientRect();
+                    const tr = target.getBoundingClientRect();
+                    const top = tr.top - sr.top + pageShell.scrollTop - 80;
+                    pageShell.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+                } else {
+                    const y = target.getBoundingClientRect().top + window.scrollY - 80;
+                    window.scrollTo({ top: y, behavior: "smooth" });
+                }
+            });
         }
 
         document.querySelectorAll(".nav-link, .section-dots .dot, .brand").forEach((link) => {

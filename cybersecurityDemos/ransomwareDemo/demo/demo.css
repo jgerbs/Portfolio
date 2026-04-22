@@ -22,11 +22,6 @@
    9) FILE PREVIEW MODAL
    10) SPLUNK PANEL + SEARCH BAR
    11) SPLUNK EVENT ROWS + SEVERITY SYSTEM
-
-   Cleanup notes:
-   - Removed the first duplicate #fileModal .file-modal-box definition (lines 436–445);
-     kept the more complete second definition which overrides it with correct sizing,
-     color, animation, and close button styles
    ============================================================ */
 
 /* ============================================================
@@ -49,15 +44,16 @@
 
 .modal-box {
     background: #0d1117;
-    border: 2px solid #1eb6d9;
-    border-radius: 12px;
+    border: 2px solid #F97316;
+    border-radius: 4px;
     padding: 22px;
     width: 540px;
     max-width: 95%;
-    box-shadow: 0 0 25px rgba(0, 255, 255, 0.25);
+    box-shadow: 0 0 30px rgba(249, 115, 22, 0.2);
     color: white;
     position: relative;
     animation: modalPop 0.25s ease-out;
+    font-family: 'Share Tech Mono', monospace;
 }
 
 @keyframes modalPop {
@@ -129,7 +125,7 @@
 .encrypted-sub {
     text-align: center;
     margin-top: 18px;
-    color: #00c7ff;
+    color: #FB923C;
 }
 
 #encryptedPreview {
@@ -139,26 +135,29 @@
     overflow-x: hidden;
     white-space: pre-wrap;
     word-break: break-all;
-    background: #111;
-    color: #00eaff;
+    background: #0A0B0D;
+    color: #FB923C;
     padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #1eb6d9;
+    border-radius: 4px;
+    border: 1px solid rgba(249, 115, 22, 0.4);
+    font-family: 'Share Tech Mono', monospace;
 }
 
 .decrypt-btn {
     margin-top: 20px;
     width: 100%;
-    background: #00bcd4;
-    color: #000;
+    background: #F97316;
+    color: #06070A;
     padding: 10px;
-    border-radius: 8px;
+    border-radius: 4px;
     font-weight: bold;
     cursor: pointer;
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 0.1em;
 }
 
 .decrypt-btn:hover {
-    background: #14d7f0;
+    background: #FB923C;
 }
 
 /* ============================================================
@@ -168,13 +167,14 @@
     position: relative;
     background: #1c0000;
     padding: 2rem;
-    border-radius: 12px;
+    border-radius: 4px;
     border: 2px solid red;
     width: 90%;
     max-width: 520px;
     text-align: center;
     animation: pulseBorder 1.3s infinite;
     color: red;
+    font-family: 'Share Tech Mono', monospace;
 }
 
 .warning-icon {
@@ -194,6 +194,7 @@
     color: #ff8a8a;
     max-height: 200px;
     overflow-y: auto;
+    font-family: 'Share Tech Mono', monospace;
 }
 
 @keyframes pulseBorder {
@@ -221,33 +222,35 @@
 
 .panel {
     padding: 20px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.03);
+    border-radius: 4px;
+    background: #0B0D10;
+    border: 1px solid rgba(255,255,255,0.055);
     overflow: hidden;
     display: flex;
     flex-direction: column;
 }
 
 .pane-title {
+    font-family: 'Bebas Neue', sans-serif;
     font-size: 1.35rem;
-    font-weight: 600;
+    letter-spacing: 0.06em;
     color: var(--accent);
     margin-bottom: 12px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(249, 115, 22, 0.15);
 }
 
 /* Left pane renders a white browser-like surface */
 .pane-left {
     background: #ffffff !important;
     color: #222 !important;
-    border-radius: 14px;
+    border-radius: 4px;
 }
 
 .pane-left #leftContent {
     background: #ffffff;
     padding: 10px;
-    border-radius: 8px;
+    border-radius: 4px;
 }
 
 /* All panes scroll independently */
@@ -375,8 +378,8 @@
     overflow-y: auto;
     height: calc(100% - 40px);
     padding-right: 6px;
-    font-family: "JetBrains Mono", monospace;
-    font-size: 0.92rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.88rem;
 }
 
 .folder-row {
@@ -419,16 +422,17 @@
    9) FILE PREVIEW MODAL
    ============================================================ */
 #fileModal .file-modal-box {
-    background: #0f1621;
-    border: 2px solid #1eb6d9;
-    border-radius: 14px;
+    background: #0B0D10;
+    border: 2px solid #F97316;
+    border-radius: 4px;
     padding: 26px;
     width: 620px;
     max-width: 95%;
-    box-shadow: 0 0 25px rgba(0, 200, 255, 0.25);
+    box-shadow: 0 0 30px rgba(249, 115, 22, 0.2);
     color: white;
     position: relative;
     animation: modalPop 0.25s ease-out;
+    font-family: 'Share Tech Mono', monospace;
 }
 
 #fileModalClose {
@@ -437,8 +441,8 @@
     top: 12px;
     font-size: 32px;
     cursor: pointer;
-    color: #c8eaff;
-    opacity: 0.8;
+    color: #E2E8F0;
+    opacity: 0.7;
     font-weight: 300;
 }
 
@@ -448,20 +452,22 @@
 }
 
 #fileModalTitle {
-    font-size: 1.9rem;
-    font-weight: 700;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 0.05em;
+    font-weight: 400;
     margin-bottom: 20px;
-    color: #58d0ff;
+    color: #FB923C;
 }
 
 #fileModalContent {
     padding: 18px;
-    background: #141c27;
-    border: 1px solid #243241;
-    border-radius: 10px;
-    font-family: "Inter", sans-serif;
-    font-size: 1.05rem;
-    line-height: 1.55;
+    background: #040506;
+    border: 1px solid rgba(249, 115, 22, 0.12);
+    border-radius: 4px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.9rem;
+    line-height: 1.6;
     color: #e9f5ff;
     white-space: pre-wrap;
     word-break: break-word;
@@ -470,12 +476,12 @@
 }
 
 #fileModalContent::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
 }
 
 #fileModalContent::-webkit-scrollbar-thumb {
-    background: #1eb6d9;
-    border-radius: 4px;
+    background: rgba(249, 115, 22, 0.35);
+    border-radius: 3px;
 }
 
 /* ============================================================
@@ -489,46 +495,51 @@
 
 #splunkSearchInput {
     flex: 1;
-    padding: 12px 16px;
-    border-radius: 6px;
-    background: #0d1117;
-    border: 1px solid #2b3642;
-    color: #d7e9ff;
-    font-family: "Inter", sans-serif;
-    font-size: 0.95rem;
+    padding: 10px 14px;
+    border-radius: 4px;
+    background: #040506;
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #E2E8F0;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.88rem;
     outline: none;
     transition: border 0.2s, box-shadow 0.2s;
 }
 
 #splunkSearchInput:focus {
-    border: 1px solid #1eb6d9;
-    box-shadow: 0 0 6px #1eb6d980;
+    border: 1px solid #F97316;
+    box-shadow: 0 0 8px rgba(249, 115, 22, 0.3);
 }
 
 #splunkSearchBtn {
-    background: #1eb6d9;
-    border-radius: 6px;
-    padding: 12px 18px;
+    background: #F97316;
+    border-radius: 4px;
+    padding: 10px 16px;
     cursor: pointer;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
     font-weight: bold;
     border: none;
-    color: #000;
+    color: #06070A;
     transition: background 0.15s;
 }
 
 #splunkSearchBtn:hover {
-    background: #29d3ff;
+    background: #FB923C;
 }
 
 #splunkHeaderRow {
     display: grid;
     grid-template-columns: 1.2fr 1fr 1fr 3fr;
     padding: 10px 14px;
-    background: #0e1a24;
-    border-bottom: 2px solid #1eb6d9;
-    font-size: 0.9rem;
+    background: rgba(249, 115, 22, 0.05);
+    border-bottom: 2px solid rgba(249, 115, 22, 0.35);
+    font-size: 0.78rem;
     font-weight: bold;
-    color: #8fceff;
+    letter-spacing: 0.1em;
+    color: #FB923C;
+    font-family: 'Share Tech Mono', monospace;
 }
 
 #splunkEvents {
@@ -536,6 +547,9 @@
     height: calc(100% - 135px);
     padding-right: 6px;
 }
+
+#splunkEvents::-webkit-scrollbar { width: 5px; }
+#splunkEvents::-webkit-scrollbar-thumb { background: rgba(249,115,22,0.2); border-radius: 3px; }
 
 /* ============================================================
    11) SPLUNK EVENT ROWS + SEVERITY SYSTEM
@@ -545,14 +559,14 @@
     grid-template-columns: 1.2fr 1fr 1fr 3fr;
     align-items: center;
     padding: 10px 14px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     cursor: pointer;
     transition: background 0.12s;
     position: relative;
 }
 
 .splunk-event:hover {
-    background: rgba(30, 182, 217, 0.12);
+    background: rgba(249, 115, 22, 0.07);
 }
 
 /* Left-edge severity indicator bar */
@@ -567,34 +581,36 @@
 }
 
 .splunk-event.sev-critical::before { background: #ff3b3b; }
-.splunk-event.sev-high::before     { background: #ff8c42; }
+.splunk-event.sev-high::before     { background: #F97316; }
 .splunk-event.sev-medium::before   { background: #ffd452; }
-.splunk-event.sev-info::before     { background: #1eb6d9; }
+.splunk-event.sev-info::before     { background: #475569; }
 
 /* Severity badge */
 .splunk-severity-tag {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 600;
     padding: 2px 6px;
-    border-radius: 4px;
+    border-radius: 3px;
     margin-left: 6px;
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 0.08em;
 }
 
-.sev-critical .splunk-severity-tag { background: #ff3b3b30; color: #ff6a6a; }
-.sev-high     .splunk-severity-tag { background: #ff8c4230; color: #ff8c42; }
-.sev-medium   .splunk-severity-tag { background: #ffd45230; color: #ffd452; }
-.sev-info     .splunk-severity-tag { background: #1eb6d930; color: #1eb6d9; }
+.sev-critical .splunk-severity-tag { background: rgba(255,59,59,0.18);   color: #ff6a6a; }
+.sev-high     .splunk-severity-tag { background: rgba(249,115,22,0.15);  color: #FB923C; }
+.sev-medium   .splunk-severity-tag { background: rgba(255,212,82,0.15);  color: #ffd452; }
+.sev-info     .splunk-severity-tag { background: rgba(71,85,105,0.25);   color: #94A3B8; }
 
 /* Event cell typography */
-.splunk-time   { color: #f7ca88; font-weight: 600; font-family: "JetBrains Mono", monospace; }
+.splunk-time   { color: #f7ca88; font-weight: 600; font-family: 'Share Tech Mono', monospace; }
 .splunk-host   { color: #9cdcfe; }
-.splunk-source { color: #34cfff; }
+.splunk-source { color: #FB923C; }
 
 .splunk-raw {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: #d7e9ff;
+    color: #94A3B8;
     display: flex;
     align-items: center;
     gap: 6px;
@@ -603,17 +619,17 @@
 /* Expanded JSON panel (toggled on row click) */
 .splunk-expanded {
     grid-column: 1 / span 4;
-    background: #0d141c;
-    border-left: 4px solid #1eb6d9;
+    background: #040506;
+    border-left: 4px solid #F97316;
     margin-top: 6px;
     margin-bottom: 12px;
     padding: 16px 18px;
-    border-radius: 6px;
-    font-family: "JetBrains Mono", monospace;
+    border-radius: 0 4px 4px 0;
+    font-family: 'Share Tech Mono', monospace;
     white-space: pre-wrap;
     word-break: break-word;
-    font-size: 0.88rem;
-    line-height: 1.4;
+    font-size: 0.85rem;
+    line-height: 1.5;
 }
 
 /* JSON syntax colors */
@@ -624,7 +640,7 @@
 
 /* Search term highlight */
 .splunk-highlight {
-    background: #1eb6d955;
+    background: rgba(249, 115, 22, 0.3);
     padding: 0 2px;
     border-radius: 2px;
 }

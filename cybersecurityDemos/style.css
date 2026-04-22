@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&display=swap');
+
 /* ============================================================
    File:    style.css
    Purpose: Global shared stylesheet for the Cybersecurity
@@ -42,13 +44,14 @@
    ============================================================ */
 
 :root {
-    --bg-top:    #07151B;
-    --bg-mid:    #0A1E24;
-    --text:      #E6F4F8;
-    --muted:     #98A0AB;
-    --accent:    #1EB6D9;
-    --border:    rgba(255, 255, 255, 0.06);
-    --panel-bg:  rgba(255, 255, 255, 0.02);
+    --bg-top:       #06070A;
+    --bg-mid:       #0D0F11;
+    --text:         #E6F4F8;
+    --muted:        #64748B;
+    --accent:       #F97316;
+    --accent-dark:  rgba(249, 115, 22, 0.35);
+    --border:       rgba(255, 255, 255, 0.06);
+    --panel-bg:     rgba(255, 255, 255, 0.02);
 
     --led-off:   #7a7f85;
     --led-on1:   #2ea85f;
@@ -435,4 +438,523 @@ button:disabled { background: rgba(255, 255, 255, 0.15); cursor: not-allowed; }
         padding: 2.2rem 1.4rem;
         margin: 1.5rem auto;
     }
+}
+
+
+/* ============================================================
+   15) LANDING PAGE — BODY OVERRIDE
+   ============================================================ */
+
+.lp-body {
+    background:
+        radial-gradient(ellipse 70% 50% at 15% -5%, rgba(249,115,22,0.07) 0%, transparent 55%),
+        radial-gradient(ellipse 60% 45% at 85% 105%, rgba(251,191,36,0.04) 0%, transparent 55%),
+        #06070A;
+    background-attachment: fixed;
+}
+
+.lp-body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(249,115,22,0.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(249,115,22,0.022) 1px, transparent 1px);
+    background-size: 52px 52px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.lp-body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent 0px,
+        transparent 3px,
+        rgba(0, 0, 0, 0.03) 3px,
+        rgba(0, 0, 0, 0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+}
+
+
+/* ============================================================
+   16) LANDING PAGE — HERO
+   ============================================================ */
+
+.lp-hero {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: clamp(56px, 9vw, 96px) clamp(24px, 5vw, 80px) clamp(48px, 7vw, 80px);
+    border-bottom: 1px solid rgba(249,115,22,0.1);
+    overflow: hidden;
+}
+
+.lp-hero-corner {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    opacity: 0.45;
+}
+
+.lp-hero-corner--tl { top: 20px; left: 24px; border-top: 2px solid #F97316; border-left: 2px solid #F97316; }
+.lp-hero-corner--tr { top: 20px; right: 24px; border-top: 2px solid #F97316; border-right: 2px solid #F97316; }
+.lp-hero-corner--bl { bottom: 20px; left: 24px; border-bottom: 2px solid #F97316; border-left: 2px solid #F97316; }
+.lp-hero-corner--br { bottom: 20px; right: 24px; border-bottom: 2px solid #F97316; border-right: 2px solid #F97316; }
+
+.lp-hero-inner {
+    position: relative;
+    z-index: 2;
+    max-width: 920px;
+    margin: 0 auto;
+    animation: lp-fadeUp 0.75s ease both;
+}
+
+.lp-classified-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(0.6rem, 1.1vw, 0.75rem);
+    color: #F97316;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 22px;
+    opacity: 0.75;
+}
+
+.lp-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(80px, 17vw, 154px);
+    line-height: 0.88;
+    margin: 0 0 22px;
+    letter-spacing: 0.03em;
+    color: #EEF2F7;
+    animation: lp-titleGlitch 9s ease infinite;
+}
+
+@keyframes lp-titleGlitch {
+    0%, 88%, 100% {
+        text-shadow:
+            0 0 50px rgba(249,115,22,0.14),
+            0 0 100px rgba(249,115,22,0.07);
+    }
+    89% {
+        text-shadow:
+            4px 0 0 rgba(239,68,68,0.75),
+            -4px 0 0 rgba(59,130,246,0.75),
+            0 0 50px rgba(249,115,22,0.3);
+    }
+    90% {
+        text-shadow:
+            -3px 0 0 rgba(239,68,68,0.6),
+            3px 0 0 rgba(59,130,246,0.6);
+    }
+    91% {
+        text-shadow:
+            2px 0 0 rgba(239,68,68,0.8),
+            -2px 0 0 rgba(59,130,246,0.8),
+            0 0 50px rgba(249,115,22,0.2);
+    }
+    92% {
+        text-shadow:
+            0 0 50px rgba(249,115,22,0.14),
+            0 0 100px rgba(249,115,22,0.07);
+    }
+}
+
+.lp-subtitle {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(0.78rem, 1.7vw, 0.98rem);
+    color: #94A3B8;
+    letter-spacing: 0.1em;
+    margin: 0 0 34px;
+}
+
+.lp-cursor {
+    display: inline-block;
+    color: #F97316;
+    animation: lp-blink 1.1s step-end infinite;
+    font-weight: bold;
+    margin-left: 2px;
+}
+
+@keyframes lp-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.lp-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin-bottom: 32px;
+}
+
+.lp-divider-line {
+    flex: 1;
+    max-width: 220px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(249,115,22,0.35), transparent);
+    display: block;
+}
+
+.lp-divider-icon {
+    color: #F97316;
+    font-size: 1rem;
+    opacity: 0.65;
+}
+
+.lp-stats {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 28px;
+    flex-wrap: wrap;
+}
+
+.lp-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.lp-stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.2rem;
+    color: #F97316;
+    letter-spacing: 0.05em;
+    line-height: 1;
+}
+
+.lp-stat-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.62rem;
+    color: #475569;
+    letter-spacing: 0.18em;
+}
+
+.lp-stat-sep {
+    color: rgba(249,115,22,0.2);
+    font-size: 1.6rem;
+    line-height: 1;
+}
+
+
+/* ============================================================
+   17) LANDING PAGE — MAIN + GRID
+   ============================================================ */
+
+.lp-main {
+    position: relative;
+    z-index: 2;
+    padding: clamp(36px, 5vw, 64px) clamp(20px, 5vw, 80px) clamp(56px, 8vw, 96px);
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.lp-section-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 36px;
+}
+
+.lp-section-line {
+    flex: 1;
+    height: 1px;
+    background: rgba(249,115,22,0.12);
+    display: block;
+}
+
+.lp-section-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.28em;
+    color: #475569;
+}
+
+.lp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 18px;
+}
+
+
+/* ============================================================
+   18) LANDING PAGE — CARDS
+   ============================================================ */
+
+.lp-card {
+    display: flex;
+    flex-direction: column;
+    background: #0B0D10;
+    border: 1px solid rgba(255,255,255,0.055);
+    border-radius: 3px;
+    text-decoration: none;
+    color: #E2E8F0;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    animation: lp-fadeUp 0.5s ease both;
+}
+
+.lp-card:nth-child(1) { animation-delay: 0.05s; }
+.lp-card:nth-child(2) { animation-delay: 0.10s; }
+.lp-card:nth-child(3) { animation-delay: 0.15s; }
+.lp-card:nth-child(4) { animation-delay: 0.20s; }
+.lp-card:nth-child(5) { animation-delay: 0.25s; }
+.lp-card:nth-child(6) { animation-delay: 0.30s; }
+.lp-card:nth-child(7) { animation-delay: 0.35s; }
+
+/* Left accent stripe */
+.lp-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg, #F97316, rgba(249,115,22,0.15));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+}
+
+.lp-card:hover {
+    border-color: rgba(249,115,22,0.3);
+    transform: translateY(-5px);
+    box-shadow:
+        0 16px 48px rgba(249,115,22,0.11),
+        0 0 0 1px rgba(249,115,22,0.07);
+}
+
+.lp-card:hover::before {
+    opacity: 1;
+}
+
+/* Critical variant */
+.lp-card--critical::before {
+    background: linear-gradient(180deg, #EF4444, rgba(239,68,68,0.15));
+}
+
+.lp-card--critical:hover {
+    border-color: rgba(239,68,68,0.35);
+    box-shadow:
+        0 16px 48px rgba(239,68,68,0.13),
+        0 0 0 1px rgba(239,68,68,0.08);
+}
+
+/* Card top bar */
+.lp-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 11px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    background: rgba(0,0,0,0.25);
+}
+
+.lp-module {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    color: #374151;
+}
+
+/* Threat badges */
+.lp-threat {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    padding: 3px 8px;
+    border-radius: 2px;
+    font-weight: bold;
+}
+
+.lp-threat--critical {
+    background: rgba(239,68,68,0.13);
+    color: #F87171;
+    border: 1px solid rgba(239,68,68,0.22);
+}
+
+.lp-threat--high {
+    background: rgba(249,115,22,0.11);
+    color: #FB923C;
+    border: 1px solid rgba(249,115,22,0.18);
+}
+
+.lp-threat--medium {
+    background: rgba(251,191,36,0.09);
+    color: #FCD34D;
+    border: 1px solid rgba(251,191,36,0.18);
+}
+
+/* Image area */
+.lp-img-wrap {
+    position: relative;
+    overflow: hidden;
+    height: 148px;
+}
+
+.lp-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.45s ease, filter 0.3s ease;
+    filter: brightness(0.7) saturate(0.75);
+}
+
+.lp-card:hover .lp-img {
+    transform: scale(1.07);
+    filter: brightness(0.82) saturate(1.05);
+}
+
+.lp-img-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        transparent 35%,
+        rgba(11,13,16,0.92) 100%
+    );
+}
+
+/* Card body */
+.lp-card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.45rem;
+    letter-spacing: 0.04em;
+    color: #E2E8F0;
+    margin: 16px 18px 8px;
+    line-height: 1.1;
+    transition: color 0.3s ease;
+}
+
+.lp-card:hover .lp-card-title {
+    color: #FB923C;
+}
+
+.lp-card--critical:hover .lp-card-title {
+    color: #F87171;
+}
+
+.lp-card-desc {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.76rem;
+    line-height: 1.65;
+    color: #4B5563;
+    margin: 0 18px 20px;
+    flex: 1;
+    transition: color 0.3s ease;
+}
+
+.lp-card:hover .lp-card-desc {
+    color: #6B7280;
+}
+
+/* Card footer */
+.lp-card-enter {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: #374151;
+    padding: 12px 18px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+    background: rgba(0,0,0,0.18);
+}
+
+.lp-card:hover .lp-card-enter {
+    color: #FB923C;
+    border-top-color: rgba(249,115,22,0.13);
+    background: rgba(249,115,22,0.04);
+}
+
+.lp-card--critical:hover .lp-card-enter {
+    color: #F87171;
+    border-top-color: rgba(239,68,68,0.13);
+    background: rgba(239,68,68,0.04);
+}
+
+.lp-arrow {
+    display: inline-block;
+    transition: transform 0.25s ease;
+}
+
+.lp-card:hover .lp-arrow {
+    transform: translateX(5px);
+}
+
+
+/* ============================================================
+   19) LANDING PAGE — FOOTER
+   ============================================================ */
+
+.lp-footer {
+    position: relative;
+    z-index: 2;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    padding: 22px clamp(20px, 5vw, 80px);
+    background: rgba(0,0,0,0.3);
+}
+
+.lp-footer-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.lp-footer-icon {
+    color: #F97316;
+    opacity: 0.55;
+    flex-shrink: 0;
+    font-size: 0.95rem;
+}
+
+.lp-footer-text {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.68rem;
+    color: #374151;
+    letter-spacing: 0.05em;
+}
+
+
+/* ============================================================
+   20) LANDING PAGE — SHARED KEYFRAMES
+   ============================================================ */
+
+@keyframes lp-fadeUp {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+
+/* ============================================================
+   21) LANDING PAGE — RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 768px) {
+    .lp-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .lp-stat-sep { display: none; }
+    .lp-stats { gap: 20px; }
+}
+
+@media (max-width: 480px) {
+    .lp-hero { padding: 50px 18px 38px; }
+    .lp-hero-corner { display: none; }
+    .lp-main { padding: 28px 16px 56px; }
 }

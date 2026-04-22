@@ -1,124 +1,193 @@
 <!DOCTYPE html>
-<!--
-  ============================================================
-  File:    index.html
-  Purpose: Root landing page for the Cybersecurity Algorithm
-           Demonstrations suite.
-
-  Responsibilities:
-  - Renders the top navigation bar with the site title
-  - Displays a card grid linking to each cybersecurity demo
-  - Provides brief descriptions of each demo for orientation
-  - Includes a footer with an educational disclaimer
-
-  Sections:
-  1) HEAD — metadata, viewport, stylesheet link
-  2) NAVIGATION BAR — site header with centered title
-  3) DEMO CARD GRID — links to all seven demo modules
-  4) FOOTER — educational disclaimer
-  ============================================================
--->
 <html lang="en">
 
 <head>
-    <!-- ============================================================
-         1) HEAD
-         ============================================================ -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Key Cybersecurity Concepts</title>
+    <title>Threat Matrix — Cybersecurity Demos</title>
     <link rel="stylesheet" href="style.css" />
 </head>
 
-<body>
+<body class="lp-body">
 
-    <!-- ============================================================
-         2) NAVIGATION BAR
-         ============================================================ -->
+    <!-- NAV -->
     <header class="cs-nav">
         <div class="cs-left">
             <a href="../index.html" class="cs-home-btn">
                 <img src="../images/home.svg" alt="Home" class="cs-home-icon">
             </a>
         </div>
-
         <div class="cs-center">
             <h1>Cybersecurity Algorithm Demonstrations</h1>
         </div>
-
-        <!-- Intentionally empty: balances flex layout used on demo pages -->
         <div class="cs-right"></div>
     </header>
 
+    <!-- HERO -->
+    <section class="lp-hero">
+        <div class="lp-hero-corner lp-hero-corner--tl"></div>
+        <div class="lp-hero-corner lp-hero-corner--tr"></div>
+        <div class="lp-hero-corner lp-hero-corner--bl"></div>
+        <div class="lp-hero-corner lp-hero-corner--br"></div>
 
-    <!-- ============================================================
-         3) DEMO CARD GRID
-         ============================================================ -->
-    <div class="section">
-        <h2>Cybersecurity Demos</h2>
+        <div class="lp-hero-inner">
+            <div class="lp-classified-label">// CLASSIFIED — EDUCATIONAL USE ONLY //</div>
 
-        <div class="card-grid">
+            <h1 class="lp-title">THREAT<br>MATRIX</h1>
 
-            <!-- Key Logger -->
-            <a href="keyLogger/index.html" class="card">
-                <img src="../images/logger.webp" class="project-thumb" alt="Keylogger Preview">
-                <h3>Key Logger Demo</h3>
-                <p>Simulates a key logger capturing keystrokes in real-time. Demonstrates how attackers intercept user input.</p>
+            <p class="lp-subtitle">Cybersecurity Algorithm Demonstrations<span class="lp-cursor">_</span></p>
+
+            <div class="lp-divider">
+                <span class="lp-divider-line"></span>
+                <span class="lp-divider-icon">◈</span>
+                <span class="lp-divider-line"></span>
+            </div>
+
+            <div class="lp-stats">
+                <div class="lp-stat">
+                    <span class="lp-stat-num">07</span>
+                    <span class="lp-stat-label">MODULES</span>
+                </div>
+                <span class="lp-stat-sep">|</span>
+                <div class="lp-stat">
+                    <span class="lp-stat-num">100%</span>
+                    <span class="lp-stat-label">CLIENT-SIDE</span>
+                </div>
+                <span class="lp-stat-sep">|</span>
+                <div class="lp-stat">
+                    <span class="lp-stat-num">0</span>
+                    <span class="lp-stat-label">DATA COLLECTED</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MODULE GRID -->
+    <main class="lp-main">
+
+        <div class="lp-section-header">
+            <span class="lp-section-line"></span>
+            <span class="lp-section-label">ACTIVE MODULES</span>
+            <span class="lp-section-line"></span>
+        </div>
+
+        <div class="lp-grid">
+
+            <!-- MOD-01: Key Logger -->
+            <a href="keyLogger/index.html" class="lp-card">
+                <div class="lp-card-top">
+                    <span class="lp-module">MOD-01</span>
+                    <span class="lp-threat lp-threat--high">▲ HIGH</span>
+                </div>
+                <div class="lp-img-wrap">
+                    <img src="../images/logger.webp" alt="Keylogger Preview" class="lp-img">
+                    <div class="lp-img-overlay"></div>
+                </div>
+                <h3 class="lp-card-title">Key Logger Demo</h3>
+                <p class="lp-card-desc">Simulates a key logger capturing keystrokes in real-time. Demonstrates how attackers intercept user input.</p>
+                <div class="lp-card-enter">ENTER MODULE <span class="lp-arrow">→</span></div>
             </a>
 
-            <!-- Brute Force Attack -->
-            <a href="passwordBreaker/bruteForce/index.html" class="card">
-                <img src="../images/brute-force.webp" class="project-thumb" alt="Brute Force Preview">
-                <h3>Brute Force Attack</h3>
-                <p>Tests every PIN from 0000 to 9999 sequentially. Establishes a baseline for comparing smarter attack methods.</p>
+            <!-- MOD-02: Brute Force -->
+            <a href="passwordBreaker/bruteForce/index.html" class="lp-card">
+                <div class="lp-card-top">
+                    <span class="lp-module">MOD-02</span>
+                    <span class="lp-threat lp-threat--medium">▲ MEDIUM</span>
+                </div>
+                <div class="lp-img-wrap">
+                    <img src="../images/brute-force.webp" alt="Brute Force Preview" class="lp-img">
+                    <div class="lp-img-overlay"></div>
+                </div>
+                <h3 class="lp-card-title">Brute Force Attack</h3>
+                <p class="lp-card-desc">Tests every PIN from 0000 to 9999 sequentially. Establishes a baseline for comparing smarter attack methods.</p>
+                <div class="lp-card-enter">ENTER MODULE <span class="lp-arrow">→</span></div>
             </a>
 
-            <!-- Dictionary Attack -->
-            <a href="passwordBreaker/dictionary/index.html" class="card">
-                <img src="../images/dictionary.webp" class="project-thumb" alt="Dictionary Preview">
-                <h3>Dictionary Attack</h3>
-                <p>Uses real-world breach statistics to test the most commonly used PINs first.</p>
+            <!-- MOD-03: Dictionary -->
+            <a href="passwordBreaker/dictionary/index.html" class="lp-card">
+                <div class="lp-card-top">
+                    <span class="lp-module">MOD-03</span>
+                    <span class="lp-threat lp-threat--medium">▲ MEDIUM</span>
+                </div>
+                <div class="lp-img-wrap">
+                    <img src="../images/dictionary.webp" alt="Dictionary Preview" class="lp-img">
+                    <div class="lp-img-overlay"></div>
+                </div>
+                <h3 class="lp-card-title">Dictionary Attack</h3>
+                <p class="lp-card-desc">Uses real-world breach statistics to test the most commonly used PINs first.</p>
+                <div class="lp-card-enter">ENTER MODULE <span class="lp-arrow">→</span></div>
             </a>
 
-            <!-- Heuristic Attack -->
-            <a href="passwordBreaker/heuristic/index.html" class="card">
-                <img src="../images/heuristic.webp" class="project-thumb" alt="Heuristic Preview">
-                <h3>Heuristic Attack</h3>
-                <p>Uses human behavior patterns like repetition, sequences, keypad paths, and birth-year tendencies.</p>
+            <!-- MOD-04: Heuristic -->
+            <a href="passwordBreaker/heuristic/index.html" class="lp-card">
+                <div class="lp-card-top">
+                    <span class="lp-module">MOD-04</span>
+                    <span class="lp-threat lp-threat--high">▲ HIGH</span>
+                </div>
+                <div class="lp-img-wrap">
+                    <img src="../images/heuristic.webp" alt="Heuristic Preview" class="lp-img">
+                    <div class="lp-img-overlay"></div>
+                </div>
+                <h3 class="lp-card-title">Heuristic Attack</h3>
+                <p class="lp-card-desc">Uses human behavior patterns like repetition, sequences, keypad paths, and birth-year tendencies.</p>
+                <div class="lp-card-enter">ENTER MODULE <span class="lp-arrow">→</span></div>
             </a>
 
-            <!-- Parallel Heuristic Attack -->
-            <a href="passwordBreaker/parallel/index.html" class="card">
-                <img src="../images/multithreading.webp" class="project-thumb" alt="Parallel Preview">
-                <h3>Parallel Heuristic Attack</h3>
-                <p>Splits the search across multiple threads using Web Workers for significant performance gains.</p>
+            <!-- MOD-05: Parallel -->
+            <a href="passwordBreaker/parallel/index.html" class="lp-card">
+                <div class="lp-card-top">
+                    <span class="lp-module">MOD-05</span>
+                    <span class="lp-threat lp-threat--high">▲ HIGH</span>
+                </div>
+                <div class="lp-img-wrap">
+                    <img src="../images/multithreading.webp" alt="Parallel Preview" class="lp-img">
+                    <div class="lp-img-overlay"></div>
+                </div>
+                <h3 class="lp-card-title">Parallel Heuristic Attack</h3>
+                <p class="lp-card-desc">Splits the search across multiple threads using Web Workers for significant performance gains.</p>
+                <div class="lp-card-enter">ENTER MODULE <span class="lp-arrow">→</span></div>
             </a>
 
-            <!-- Ransomware Demo -->
-            <a href="ransomwareDemo/demo/index.html" class="card">
-                <img src="../images/ransomware.webp" class="project-thumb" alt="Ransomware Simulation">
-                <h3>Ransomware Attack Demo</h3>
-                <p>Simulates an employee launching UnapprovedApp_Setup.exe on EmployeeWorkstation-01.</p>
+            <!-- MOD-06: Ransomware Demo -->
+            <a href="ransomwareDemo/demo/index.html" class="lp-card lp-card--critical">
+                <div class="lp-card-top">
+                    <span class="lp-module">MOD-06</span>
+                    <span class="lp-threat lp-threat--critical">⚠ CRITICAL</span>
+                </div>
+                <div class="lp-img-wrap">
+                    <img src="../images/ransomware.webp" alt="Ransomware Simulation" class="lp-img">
+                    <div class="lp-img-overlay"></div>
+                </div>
+                <h3 class="lp-card-title">Ransomware Attack Demo</h3>
+                <p class="lp-card-desc">Simulates an employee launching UnapprovedApp_Setup.exe on EmployeeWorkstation-01.</p>
+                <div class="lp-card-enter">ENTER MODULE <span class="lp-arrow">→</span></div>
             </a>
 
-            <!-- Ransomware Incident Breakdown -->
-            <a href="ransomwareDemo/breakdown/index.html" class="card">
-                <img src="../images/incident.webp" class="project-thumb" alt="Ransomware Breakdown">
-                <h3>Ransomware Incident Breakdown</h3>
-                <p>Includes SIEM logs, Sysmon activity, Suricata alerts, and a professional IR report.</p>
+            <!-- MOD-07: Ransomware Breakdown -->
+            <a href="ransomwareDemo/breakdown/index.html" class="lp-card">
+                <div class="lp-card-top">
+                    <span class="lp-module">MOD-07</span>
+                    <span class="lp-threat lp-threat--high">▲ HIGH</span>
+                </div>
+                <div class="lp-img-wrap">
+                    <img src="../images/incident.webp" alt="Ransomware Breakdown" class="lp-img">
+                    <div class="lp-img-overlay"></div>
+                </div>
+                <h3 class="lp-card-title">Ransomware Incident Breakdown</h3>
+                <p class="lp-card-desc">Includes SIEM logs, Sysmon activity, Suricata alerts, and a professional IR report.</p>
+                <div class="lp-card-enter">ENTER MODULE <span class="lp-arrow">→</span></div>
             </a>
 
         </div>
-    </div>
+    </main>
 
-
-    <!-- ============================================================
-         4) FOOTER
-         ============================================================ -->
-    <footer>
-        Educational cybersecurity demos. All processing is 100% in your browser.
+    <!-- FOOTER -->
+    <footer class="lp-footer">
+        <div class="lp-footer-inner">
+            <span class="lp-footer-icon">⊘</span>
+            <span class="lp-footer-text">Educational cybersecurity demonstrations. All processing is 100% client-side. No data leaves your device.</span>
+        </div>
     </footer>
 
 </body>
-
 </html>
